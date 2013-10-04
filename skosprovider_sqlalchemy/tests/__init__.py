@@ -13,6 +13,13 @@ def _initTestingDB(engine):
         bind=engine
     )
     DBSession = Session()
+
+    from skosprovider_sqlalchemy.models import (
+        Initialiser
+    )
+
+    init = Initialiser(DBSession)
+    init.init_all()
     return DBSession
 
 engine = create_engine('sqlite:///:memory:', echo=True)

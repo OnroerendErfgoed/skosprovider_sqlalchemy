@@ -47,7 +47,14 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.trans.rollback()
 
     def _create_test_data(self):
-        from ..models import Concept, ConceptScheme, Collection
+        from ..models import (
+            Concept, 
+            ConceptScheme, 
+            Collection,
+            Label,
+            Note,
+            Language
+        )
         cs = ConceptScheme(
             id = 1
         )
@@ -57,10 +64,16 @@ class SQLAlchemyProviderTests(unittest.TestCase):
             conceptscheme=cs
         )
         self.session.add(con)
+        l = Label('prefLabel','en','Churches')
+        con.labels.append(l)
+        l = Label('prefLabel','nl','kerken')
+        con.labels.append(l)
         col = Collection(
             id = 2,
             conceptscheme=cs
         )
+        l = Label('prefLabel','en','Churches by function')
+        col.labels.append(l)
         self.session.add(col)
         self.session.flush()
 
@@ -80,5 +93,41 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_get_all(self):
         all = self.provider.get_all()
         self.assertEquals(2, len(all))
-        self.assertIn({'id': 1, 'label': None}, all)
-        self.assertIn({'id': 2, 'label': None}, all)
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+
+    def test_find_all(self):
+        all = self.provider.find({})
+        self.assertEquals(2, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+
+    def test_find_type_all(self):
+        all = self.provider.find({'type': 'all'})
+        self.assertEquals(2, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+
+    def test_find_type_concept(self):
+        all = self.provider.find({'type': 'concept'})
+        self.assertEquals(1, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+
+    def test_find_type_collection(self):
+        all = self.provider.find({'type': 'collection'})
+        self.assertEquals(1, len(all))
+        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+
+    def test_find_label_kerken(self):
+        all = self.provider.find({'label': 'kerken'})
+        self.assertEquals(1, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+
+    def test_find_label_churches_type_concept(self):
+        all = self.provider.find({'label': 'churches', 'type': 'concept'})
+        self.assertEquals(1, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+
+    def test_expand_concept(self):
+        ids = self.provider.expand_concept(1)
+        self.assertEquals([1], ids)

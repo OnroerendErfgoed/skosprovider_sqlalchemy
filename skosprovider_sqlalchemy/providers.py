@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 
+import logging
+log = logging.getLogger(__name__)
+
 from skosprovider.providers import VocabularyProvider
 
 from skosprovider.skos import (
     Concept,
-    Collection
+    Collection,
+    Label
 )
 
 from skosprovider_sqlalchemy.models import (
     Thing,
-    Concept as ConceptModel
+    Concept as ConceptModel,
+    Label as LabelModel
 )
 
 
 class SQLAlchemyProvider(VocabularyProvider):
 
     def __init__(self, metadata, session):
-        if not 'default_language' in metadata:
-            metadata['default_language'] = 'nl'
         super(SQLAlchemyProvider, self).__init__(metadata)
         self.conceptscheme_id = metadata.get('conceptscheme_id', metadata.get('id'))
         self.session = session
@@ -26,13 +29,13 @@ class SQLAlchemyProvider(VocabularyProvider):
         if thing.type and thing.type == 'collection':
             return Collection(
                 thing.id,
-                thing.labels if hasattr(thing, 'labels') else [],
+                [Label(l.label, l.labeltype_id, l.language_id) for l in thing.labels],
                 thing.members if hasattr(thing, 'members') else []
             )
         else:
             return Concept(
                 thing.id,
-                thing.labels if hasattr(thing, 'labels') else [],
+                [Label(l.label, l.labeltype_id, l.language_id) for l in thing.labels],
                 thing.notes if hasattr(thing, 'notes') else [],
                 thing.broader if hasattr(thing, 'broader') else [],
                 thing.narrower if hasattr(thing, 'narrower') else [],
@@ -42,19 +45,31 @@ class SQLAlchemyProvider(VocabularyProvider):
     def get_by_id(self, id):
         thing = self.session\
                     .query(Thing)\
-                    .filter(ConceptModel.id == id, 
-                            ConceptModel.conceptscheme_id == self.conceptscheme_id
+                    .filter(Thing.id == id, 
+                            Thing.conceptscheme_id == self.conceptscheme_id
                     ).one()
         return self._from_thing(thing)
 
-    def find(self, query):
-        pass
+    def find(self, query, **kwargs):
+        log.debug(query)
+        lan = self._get_language(**kwargs)
+        q = self.session\
+                .query(Thing)\
+                .filter(Thing.conceptscheme_id == self.conceptscheme_id)
+        if 'type' in query and query['type'] in ['concept', 'collection']:
+            q = q.filter(Thing.type == query['type'])
+        if 'label' in query:
+            q = q.filter(Thing.labels.any(LabelModel.label.ilike('%' + query['label'].lower() + '%')))
+        all = q.all()
+        return [{'id': c.id, 'label': str(c.label(lan)) if c.label(lan) is not None else None} for c in all]
 
-    def get_all(self):
+    def get_all(self, **kwargs):
         all = self.session\
                   .query(Thing)\
+                  .filter(Thing.conceptscheme_id == self.conceptscheme_id)\
                   .all()
-        return [{'id': c.id, 'label': c.label()} for c in all]
+        lan = self._get_language(**kwargs)
+        return [{'id': c.id, 'label': str(c.label(lan)) if c.label(lan) is not None else None} for c in all]
 
     def expand_concept(self, id):
         return self.expand(id)

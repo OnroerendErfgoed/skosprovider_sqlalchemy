@@ -14,7 +14,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     relationship,
-    backref
+    backref,
+    object_session
     )
 
 Base = declarative_base()
@@ -107,17 +108,14 @@ class Language(Base):
     def __str__(self):
         return self.name
 
-    def label(language='any'):
-        return label(self.labels, language)
 
 class LabelType(Base):
     __tablename__ = 'labeltype'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
+    
+    name = Column(String(20), primary_key=True)
     description = Column(Text)
 
-    def __init__(self, id, name, description):
-        self.id = id
+    def __init__(self, name, description):
         self.name = name
         self.description = description
 
@@ -127,17 +125,17 @@ class LabelType(Base):
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
-    label= Column(Text)
+    label= Column(String(512))
 
     labeltype = relationship('LabelType', uselist = False)
     language = relationship('Language', uselist = False)
 
-    labeltype_id = Column(Integer, ForeignKey('labeltype.id')) 
+    labeltype_id = Column(String(20), ForeignKey('labeltype.name')) 
     language_id = Column(String(10), ForeignKey('language.id'))
 
-    def __init__(self, labeltype, language, label):
-        self.labeltype = labeltype
-        self.language = language
+    def __init__(self, labeltype_id, language_id, label):
+        self.labeltype_id = labeltype_id
+        self.language_id = language_id
         self.label = label
 
     def __str__(self):
@@ -145,12 +143,12 @@ class Label(Base):
 
 class NoteType(Base):
     __tablename__ = 'notetype'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
+    
+    name = Column(String(20), primary_key=True)
     description = Column(Text)
 
-    def __init__(self, id, name, description):
-        self.id = id
+    def __init__(self, name, description):
+        
         self.name = name
         self.description = description
 
@@ -163,7 +161,7 @@ class Note(Base):
     note = Column(Text)
 
     notetype = relationship('NoteType', uselist = False)
-    notetype_id = Column(Integer, ForeignKey('notetype.id'))
+    notetype_id = Column(String(20), ForeignKey('notetype.name'))
 
     language = relationship('Language', uselist = False)
     language_id = Column(String(10), ForeignKey('language.id'))
@@ -207,3 +205,50 @@ def label(labels=[], language='any'):
         return label(labels, 'any')
     else:
         return None
+
+class Initialiser(object):
+
+    def __init__(self, session):
+        self.session = session
+
+    def init_all(self):
+        self.init_labeltype()
+        self.init_notetype()
+        self.init_languages()
+
+    def init_notetype(self):
+        notetypes = [
+            ('changeNote', 'A change note.'),
+            ('definition', 'A definition.'),
+            ('editorialNote', 'An editorial note.'),
+            ('example', 'An example.'),
+            ('historyNote', 'A historynote.'),
+            ('scopeNote', 'A scopenote.'),
+            ('note', 'A note.')
+        ]
+        for n in notetypes:
+            nt = NoteType(n[0], n[1])
+            self.session.add(nt)
+
+    def init_labeltype(self):
+        labeltypes = [
+            ('hiddenLabel', 'A hidden label.'),
+            ('altLabel', 'An alternative label.'),
+            ('prefLabel', 'A preferred label.')
+        ]
+        for l in labeltypes:
+            lt = LabelType(l[0], l[1])
+            self.session.add(lt)
+
+    def init_languages(self):
+        languages = [
+            ('la', 'Latin'),
+            ('nl', 'Dutch'),
+            ('vls', 'Flemish'),
+            ('en', 'English'),
+            ('fr', 'French'),
+            ('de', 'German')
+        ]
+        for l in languages:
+            lan = Language(l[0], l[1])
+            self.session.add(lan)
