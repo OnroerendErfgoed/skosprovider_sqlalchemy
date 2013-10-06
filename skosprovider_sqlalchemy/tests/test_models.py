@@ -88,7 +88,7 @@ class CollectionTests(ModelTestCase):
             id=1
         )
         c = self._get_concept()
-        col.concepts.append(c)
+        col.members.append(c)
         self.session.flush()
         self.assertEqual(1, len(c.collections))
         self.assertEqual(col, c.collections[0])
