@@ -89,8 +89,8 @@ class Collection(Thing):
         'polymorphic_identity': 'collection'
     }
 
-    concepts = relationship(
-        'Concept', 
+    members = relationship(
+        'Thing', 
         secondary=collection_concept, 
         backref=backref('collections'),
         primaryjoin='Thing.id==collection_concept.c.collection_id',
