@@ -40,6 +40,11 @@ conceptscheme_note = Table('conceptscheme_note', Base.metadata,
     Column('note_id', Integer, ForeignKey('note.id'))
 )
 
+collection_concept = Table('collection_concept', Base.metadata,
+    Column('collection_id', Integer, ForeignKey('concept.id'), primary_key = True),
+    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key = True)
+)
+
 class Thing(Base):
     __tablename__ = 'concept'
     id = Column(Integer, primary_key=True)
@@ -83,6 +88,14 @@ class Collection(Thing):
     __mapper_args__ = {
         'polymorphic_identity': 'collection'
     }
+
+    concepts = relationship(
+        'Concept', 
+        secondary=collection_concept, 
+        backref=backref('collections'),
+        primaryjoin='Thing.id==collection_concept.c.collection_id',
+        secondaryjoin='Thing.id==collection_concept.c.concept_id'
+    )
 
 class ConceptScheme(Base):
     __tablename__ = 'conceptscheme'
@@ -195,9 +208,10 @@ def label(labels=[], language='any'):
     alt = None
     for l in labels:
         if language == 'any' or l.language.id == language:
-            if l.labeltype.name == 'prefLabel':
+            labeltype = l.labeltype_id or l.labeltype.name
+            if labeltype == 'prefLabel':
                 return l
-            if alt is None and l.labeltype.name == 'altLabel':
+            if alt is None and labeltype == 'altLabel':
                 alt = l
     if alt is not None:
         return alt
