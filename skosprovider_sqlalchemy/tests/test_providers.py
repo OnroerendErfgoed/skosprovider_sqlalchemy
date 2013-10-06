@@ -74,6 +74,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         )
         l = Label('prefLabel','en','Churches by function')
         col.labels.append(l)
+        col.members.append(con)
         self.session.add(col)
         self.session.flush()
 
@@ -125,6 +126,14 @@ class SQLAlchemyProviderTests(unittest.TestCase):
 
     def test_find_label_churches_type_concept(self):
         all = self.provider.find({'label': 'churches', 'type': 'concept'})
+        self.assertEquals(1, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+
+    def test_find_collection_unexisting(self):
+        self.assertRaises(ValueError, self.provider.find, {'collection': {'id': 404}})
+
+    def test_find_collection_2_no_depth(self):
+        all = self.provider.find({'collection': {'id':2}})
         self.assertEquals(1, len(all))
         self.assertIn({'id': 1, 'label': 'Churches'}, all)
 

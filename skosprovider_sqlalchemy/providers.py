@@ -17,6 +17,14 @@ from skosprovider_sqlalchemy.models import (
     Label as LabelModel
 )
 
+from sqlalchemy.orm import (
+    joinedload,
+)
+
+from sqlalchemy.orm.exc import (
+    NoResultFound
+)
+
 
 class SQLAlchemyProvider(VocabularyProvider):
 
@@ -43,11 +51,14 @@ class SQLAlchemyProvider(VocabularyProvider):
             )
 
     def get_by_id(self, id):
-        thing = self.session\
-                    .query(Thing)\
-                    .filter(Thing.id == id, 
-                            Thing.conceptscheme_id == self.conceptscheme_id
-                    ).one()
+        try:
+            thing = self.session\
+                        .query(Thing)\
+                        .filter(Thing.id == id, 
+                                Thing.conceptscheme_id == self.conceptscheme_id
+                        ).one()
+        except NoResultFound:
+            return False
         return self._from_thing(thing)
 
     def find(self, query, **kwargs):
@@ -55,17 +66,26 @@ class SQLAlchemyProvider(VocabularyProvider):
         lan = self._get_language(**kwargs)
         q = self.session\
                 .query(Thing)\
+                .options(joinedload('labels'))\
                 .filter(Thing.conceptscheme_id == self.conceptscheme_id)
         if 'type' in query and query['type'] in ['concept', 'collection']:
             q = q.filter(Thing.type == query['type'])
         if 'label' in query:
             q = q.filter(Thing.labels.any(LabelModel.label.ilike('%' + query['label'].lower() + '%')))
+        if 'collection' in query:
+            coll = self.get_by_id(query['collection']['id'])
+            if not coll or not isinstance(coll, Collection):
+                raise ValueError(
+                    'You are searching for items in an unexisting collection.'
+                )
+            q = q.filter(Thing.collections.any(Thing.id==query['collection']['id']))
         all = q.all()
         return [{'id': c.id, 'label': str(c.label(lan)) if c.label(lan) is not None else None} for c in all]
 
     def get_all(self, **kwargs):
         all = self.session\
                   .query(Thing)\
+                  .options(joinedload('labels'))\
                   .filter(Thing.conceptscheme_id == self.conceptscheme_id)\
                   .all()
         lan = self._get_language(**kwargs)
