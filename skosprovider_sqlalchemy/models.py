@@ -22,23 +22,23 @@ from sqlalchemy.orm import (
 Base = declarative_base()
 
 concept_label = Table('concept_label', Base.metadata,
-    Column('concept_id', Integer, ForeignKey('concept.id')),
-    Column('label_id', Integer, ForeignKey('label.id'))
+    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True),
+    Column('label_id', Integer, ForeignKey('label.id'), primary_key=True)
 )
 
 conceptscheme_label = Table('conceptscheme_label', Base.metadata,
-    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id')),
-    Column('label_id', Integer, ForeignKey('label.id'))
+    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id'), primary_key=True),
+    Column('label_id', Integer, ForeignKey('label.id'), primary_key=True)
 )
 
 concept_note = Table('concept_note', Base.metadata,
-    Column('concept_id', Integer, ForeignKey('concept.id')),
-    Column('note_id', Integer, ForeignKey('note.id'))
+    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True),
+    Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
 conceptscheme_note = Table('conceptscheme_note', Base.metadata,
-    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id')),
-    Column('note_id', Integer, ForeignKey('note.id'))
+    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id'), primary_key=True),
+    Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
 collection_concept = Table('collection_concept', Base.metadata,
