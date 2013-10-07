@@ -226,7 +226,7 @@ class Note(Base):
     notetype_id = Column(String(20), ForeignKey('notetype.name'))
 
     language = relationship('Language', uselist = False)
-    language_id = Column(String(10), ForeignKey('language.id'))
+    language_id = Column(String(10), ForeignKey('language.id'), nullable=True)
 
     def __init__(self, notetype_id, language_id, note):
         self.notetype_id = notetype_id

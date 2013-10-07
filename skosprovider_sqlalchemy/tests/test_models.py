@@ -124,6 +124,65 @@ class CollectionTests(ModelTestCase):
         self.assertEqual(col, c.collections[0])
 
 
+class LabelTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import Label
+        return Label
+
+    def test_simple(self):
+        l = self._get_target_class()('Kerken', 'prefLabel', 'nl')
+        self.assertEqual('nl', l.language_id)
+        self.assertEqual('prefLabel', l.labeltype_id)
+        self.assertEqual('Kerken', l.__str__())
+
+    def test_load_objects(self):
+        l = self._get_target_class()('Kerken', 'prefLabel', 'nl')
+        self.session.add(l)
+        self.session.flush()
+        self.assertEqual('Dutch', l.language.name)
+        self.assertEqual('prefLabel', l.labeltype.name)
+
+    def test_no_language(self):
+        l = self._get_target_class()('Kerken', 'prefLabel')
+        self.assertEqual(None, l.language_id)
+        self.assertEqual('prefLabel', l.labeltype_id)
+        self.assertEqual('Kerken', l.__str__())
+        self.session.add(l)
+        self.session.flush()
+        self.assertEqual(None, l.language_id)
+        self.assertEqual('prefLabel', l.labeltype.name)
+
+
+class NoteTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import Note
+        return Note
+
+    def test_simple(self):
+        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', 'nl')
+        self.assertEqual('nl', n.language_id)
+        self.assertEqual('definition', n.notetype_id)
+        self.assertEqual('Een kerk is een religieus gebouw.', n.__str__())
+
+    def test_load_objects(self):
+        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', 'nl')
+        self.session.add(n)
+        self.session.flush()
+        self.assertEqual('Dutch', l.language.name)
+        self.assertEqual('defintion', l.labeltype.name)
+
+    def test_no_language(self):
+        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', None)
+        self.assertEqual(None, n.language_id)
+        self.assertEqual('definition', n.notetype_id)
+        self.assertEqual('Een kerk is een religieus gebouw.', n.__str__())
+        self.session.add(n)
+        self.session.flush()
+        self.assertEqual(None, l.language)
+        self.assertEqual('defintion', l.labeltype.name)
+
 class LanguageTests(ModelTestCase):
 
     def _get_target_class(self):
