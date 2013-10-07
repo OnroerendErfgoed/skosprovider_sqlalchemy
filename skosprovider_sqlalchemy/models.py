@@ -7,7 +7,8 @@ from sqlalchemy import (
     Text,
     String,
     ForeignKey,
-    Table
+    Table,
+    event
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -45,6 +46,16 @@ collection_concept = Table('collection_concept', Base.metadata,
     Column('concept_id', Integer, ForeignKey('concept.id'), primary_key = True)
 )
 
+concept_related_concept = Table('concept_related_concept', Base.metadata,
+    Column('concept_id_from', Integer, ForeignKey('concept.id'), primary_key=True),
+    Column('concept_id_to', Integer, ForeignKey('concept.id'), primary_key=True)
+)
+
+hierarchy  = Table('concept_hierarchy_concept', Base.metadata,
+    Column('concept_id_broader', Integer, ForeignKey('concept.id'), primary_key=True),
+    Column('concept_id_narrower', Integer, ForeignKey('concept.id'), primary_key=True)
+)
+
 class Thing(Base):
     __tablename__ = 'concept'
     id = Column(Integer, primary_key=True)
@@ -79,9 +90,39 @@ class Thing(Base):
 
 class Concept(Thing):
 
+    related_concepts = relationship(
+        'Concept', 
+        secondary=concept_related_concept, 
+        primaryjoin='Concept.id==concept_related_concept.c.concept_id_to',
+        secondaryjoin='Concept.id==concept_related_concept.c.concept_id_from',
+    )
+
     __mapper_args__ = {
         'polymorphic_identity': 'concept'
     }
+
+def related_concepts_append_listener(target, value, initiator):
+
+    if not hasattr(target, '__related_to_'):
+        target.__related_to__ = set()
+
+    target.__related_to__.add(value)
+
+    if (target) not in getattr(value, '__related_to__', set()):
+        value.related_concepts.append(target)
+
+event.listen(Concept.related_concepts, 'append', related_concepts_append_listener)
+
+
+def related_concepts_remove_listener(target, value, initiator):
+
+    if (value) in getattr(target, '__related_to__', set()):
+        target.__related_to__.remove(value)
+
+    if target in value.related_concepts:
+        value.related_concepts.remove(target)
+
+event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listener)
 
 class Collection(Thing):
 
@@ -144,9 +185,9 @@ class Label(Base):
     language = relationship('Language', uselist = False)
 
     labeltype_id = Column(String(20), ForeignKey('labeltype.name')) 
-    language_id = Column(String(10), ForeignKey('language.id'))
+    language_id = Column(String(10), ForeignKey('language.id'), nullable=True)
 
-    def __init__(self, labeltype_id, language_id, label):
+    def __init__(self, label, labeltype_id = 'prefLabel', language_id = None):
         self.labeltype_id = labeltype_id
         self.language_id = language_id
         self.label = label
@@ -207,7 +248,7 @@ def label(labels=[], language='any'):
     '''
     alt = None
     for l in labels:
-        if language == 'any' or l.language.id == language:
+        if language == 'any' or l.language_id == language:
             labeltype = l.labeltype_id or l.labeltype.name
             if labeltype == 'prefLabel':
                 return l

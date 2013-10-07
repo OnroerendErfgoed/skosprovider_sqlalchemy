@@ -33,13 +33,28 @@ class ConceptTests(ModelTestCase):
 
     def test_simple(self):
         from ..models import Label
-        l = Label('prefLabel', 'en', 'Churches')
+        l = Label('Churches', 'prefLabel', 'en')
         c = self._get_target_class()(
             id=1,
             labels=[l]
         )
         self.assertEqual(1, c.id)
         self.assertEqual(l, c.label())
+
+    def test_related(self):
+        c1 = self._get_target_class()(
+            id=1
+        )
+        c2 = self._get_target_class()(
+            id=2
+        )
+        c1.related_concepts.append(c2)
+        self.session.flush()
+        self.assertEqual(1, len(c1.related_concepts))
+        self.assertEqual(1, len(c2.related_concepts))
+        c2.related_concepts.remove(c1)
+        self.assertEqual(0, len(c1.related_concepts))
+        self.assertEqual(0, len(c2.related_concepts))
 
 
 class ConceptSchemeTests(ModelTestCase):
@@ -50,7 +65,7 @@ class ConceptSchemeTests(ModelTestCase):
 
     def test_simple(self):
         from ..models import Label
-        l = Label('prefLabel', 'en', 'Heritage types')
+        l = Label('Heritage types', 'prefLabel', 'en')
         c = self._get_target_class()(
             id=1,
             labels=[l]
@@ -70,12 +85,12 @@ class CollectionTests(ModelTestCase):
         from ..models import Concept, Label
         return Concept(
             id=2,
-            labels=[Label('prefLabel', 'en', 'Cathedrals')]
+            labels=[Label('Cathedrals', 'prefLabel', 'en')]
         )
 
     def test_simple(self):
         from ..models import Label
-        l = Label('prefLabel', 'en', 'Churches by function')
+        l = Label('Churches by function', 'prefLabel', 'en')
         c = self._get_target_class()(
             id=1,
             labels=[l]
@@ -148,3 +163,4 @@ class NoteTests(ModelTestCase):
         self.assertEqual('definition', n.notetype_id)
         self.assertEqual('en', n.language_id)
         self.assertEqual('A church is a place of worship for certain religions.', n.note)
+

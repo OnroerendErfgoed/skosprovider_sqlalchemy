@@ -47,7 +47,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 thing.notes if hasattr(thing, 'notes') else [],
                 thing.broader if hasattr(thing, 'broader') else [],
                 thing.narrower if hasattr(thing, 'narrower') else [],
-                thing.related if hasattr(thing, 'related') else [],
+                [c.id for c in thing.related_concepts],
             )
 
     def get_by_id(self, id):
