@@ -45,8 +45,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                 thing.id,
                 [Label(l.label, l.labeltype_id, l.language_id) for l in thing.labels],
                 thing.notes if hasattr(thing, 'notes') else [],
-                thing.broader if hasattr(thing, 'broader') else [],
-                thing.narrower if hasattr(thing, 'narrower') else [],
+                [c.id for c in thing.broader_concepts],
+                [c.id for c in thing.narrower_concepts],
                 [c.id for c in thing.related_concepts],
             )
 

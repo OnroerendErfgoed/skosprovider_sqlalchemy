@@ -56,6 +56,21 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(0, len(c1.related_concepts))
         self.assertEqual(0, len(c2.related_concepts))
 
+    def test_broader_narrower(self):
+        c1 = self._get_target_class()(
+            id=1
+        )
+        c2 = self._get_target_class()(
+            id=2
+        )
+        c1.narrower_concepts.append(c2)
+        self.session.flush()
+        self.assertEqual(1, len(c1.narrower_concepts))
+        self.assertEqual(1, len(c2.broader_concepts))
+        c2.broader_concepts.remove(c1)
+        self.assertEqual(0, len(c1.narrower_concepts))
+        self.assertEqual(0, len(c2.broader_concepts))
+
 
 class ConceptSchemeTests(ModelTestCase):
 

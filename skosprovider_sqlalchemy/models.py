@@ -51,7 +51,7 @@ concept_related_concept = Table('concept_related_concept', Base.metadata,
     Column('concept_id_to', Integer, ForeignKey('concept.id'), primary_key=True)
 )
 
-hierarchy  = Table('concept_hierarchy_concept', Base.metadata,
+concept_hierarchy_concept  = Table('concept_hierarchy_concept', Base.metadata,
     Column('concept_id_broader', Integer, ForeignKey('concept.id'), primary_key=True),
     Column('concept_id_narrower', Integer, ForeignKey('concept.id'), primary_key=True)
 )
@@ -95,6 +95,14 @@ class Concept(Thing):
         secondary=concept_related_concept, 
         primaryjoin='Concept.id==concept_related_concept.c.concept_id_to',
         secondaryjoin='Concept.id==concept_related_concept.c.concept_id_from',
+    )
+
+    narrower_concepts = relationship(
+        'Concept', 
+        secondary=concept_hierarchy_concept,
+        backref=backref('broader_concepts'),
+        primaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_broader',
+        secondaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_narrower',
     )
 
     __mapper_args__ = {
