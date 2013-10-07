@@ -62,7 +62,6 @@ class SQLAlchemyProvider(VocabularyProvider):
         return self._from_thing(thing)
 
     def find(self, query, **kwargs):
-        log.debug(query)
         lan = self._get_language(**kwargs)
         q = self.session\
                 .query(Thing)\
