@@ -64,15 +64,15 @@ class SQLAlchemyProviderTests(unittest.TestCase):
             conceptscheme=cs
         )
         self.session.add(con)
-        l = Label('prefLabel','en','Churches')
+        l = Label('Churches', 'prefLabel', 'en')
         con.labels.append(l)
-        l = Label('prefLabel','nl','kerken')
+        l = Label('Kerken', 'prefLabel','nl')
         con.labels.append(l)
         col = Collection(
             id = 2,
             conceptscheme=cs
         )
-        l = Label('prefLabel','en','Churches by function')
+        l = Label('Churches by function', 'prefLabel','en')
         col.labels.append(l)
         col.members.append(con)
         self.session.add(col)
