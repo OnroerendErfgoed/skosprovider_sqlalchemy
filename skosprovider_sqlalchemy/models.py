@@ -17,8 +17,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     relationship,
-    backref,
-    object_session
+    backref
     )
 
 Base = declarative_base()
@@ -57,6 +56,7 @@ concept_hierarchy_concept  = Table('concept_hierarchy_concept', Base.metadata,
     Column('concept_id_broader', Integer, ForeignKey('concept.id'), primary_key=True),
     Column('concept_id_narrower', Integer, ForeignKey('concept.id'), primary_key=True)
 )
+
 
 class Thing(Base):
     __tablename__ = 'concept'
@@ -111,6 +111,7 @@ class Concept(Thing):
         'polymorphic_identity': 'concept'
     }
 
+
 def related_concepts_append_listener(target, value, initiator):
 
     if not hasattr(target, '__related_to_'):
@@ -134,6 +135,7 @@ def related_concepts_remove_listener(target, value, initiator):
 
 event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listener)
 
+
 class Collection(Thing):
 
     __mapper_args__ = {
@@ -147,6 +149,7 @@ class Collection(Thing):
         primaryjoin='Thing.id==collection_concept.c.collection_id',
         secondaryjoin='Thing.id==collection_concept.c.concept_id'
     )
+
 
 class ConceptScheme(Base):
     __tablename__ = 'conceptscheme'
@@ -186,6 +189,7 @@ class LabelType(Base):
     def __str__(self):
         return self.name
 
+
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
@@ -205,6 +209,7 @@ class Label(Base):
     def __str__(self):
         return self.label
 
+
 class NoteType(Base):
     __tablename__ = 'notetype'
     
@@ -218,6 +223,7 @@ class NoteType(Base):
 
     def __str__(self):
         return self.name
+
 
 class Note(Base):
     __tablename__ = 'note'
@@ -234,6 +240,7 @@ class Note(Base):
         self.notetype_id = notetype_id
         self.language_id = language_id
         self.note = note
+
 
 def label(labels=[], language='any'):
     '''
@@ -270,6 +277,7 @@ def label(labels=[], language='any'):
         return label(labels, 'any')
     else:
         return None
+
 
 class Initialiser(object):
 

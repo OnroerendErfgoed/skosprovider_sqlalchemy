@@ -9,13 +9,9 @@ from skosprovider_sqlalchemy.providers import (
     SQLAlchemyProvider
 )
 
-from skosprovider.skos import (
-    Concept,
-    Collection
-)
-
 from . import engine
 from sqlalchemy.orm import sessionmaker
+
 
 class SQLAlchemyProviderTests(unittest.TestCase):
 
@@ -31,7 +27,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         from skosprovider_sqlalchemy.models import Base
         Base.metadata.bind = engine
         sm = sessionmaker(bind=engine)
-        self.session= sm()
+        self.session = sm()
 
         # Set up testdata
         self._create_test_data()
@@ -48,36 +44,34 @@ class SQLAlchemyProviderTests(unittest.TestCase):
 
     def _create_test_data(self):
         from ..models import (
-            Concept, 
-            ConceptScheme, 
+            Concept,
+            ConceptScheme,
             Collection,
-            Label,
-            Note,
-            Language
+            Label
         )
         cs = ConceptScheme(
-            id = 1
+            id=1
         )
         self.session.add(cs)
         con = Concept(
-            id = 1,
+            id=1,
             conceptscheme=cs
         )
         self.session.add(con)
         l = Label('Churches', 'prefLabel', 'en')
         con.labels.append(l)
-        l = Label('Kerken', 'prefLabel','nl')
+        l = Label('Kerken', 'prefLabel', 'nl')
         con.labels.append(l)
         col = Collection(
-            id = 2,
+            id=2,
             conceptscheme=cs
         )
-        l = Label('Churches by function', 'prefLabel','en')
+        l = Label('Churches by function', 'prefLabel', 'en')
         col.labels.append(l)
         col.members.append(con)
         self.session.add(col)
         chap = Concept(
-            id = 3,
+            id=3,
             conceptscheme=cs
         )
         l = Label('Chapels', 'prefLabel', 'en')
@@ -85,7 +79,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(chap)
         chap.related_concepts.append(con)
         cath = Concept(
-            id = 4,
+            id=4,
             conceptscheme=cs
         )
         l = Label('Cathedrals', 'prefLabel', 'en')
@@ -98,6 +92,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEquals('SOORTEN', self.provider.get_vocabulary_id())
 
     def test_get_concept_by_id(self):
+        from skosprovider.skos import Concept
         con = self.provider.get_by_id(1)
         self.assertIsInstance(con, Concept)
         self.assertEqual(1, con.id)
@@ -105,6 +100,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEqual([4], con.narrower)
 
     def test_get_collection_by_id(self):
+        from skosprovider.skos import Collection
         col = self.provider.get_by_id(2)
         self.assertIsInstance(col, Collection)
         self.assertEquals(2, col.id)
@@ -156,10 +152,14 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertIn({'id': 1, 'label': 'Churches'}, all)
 
     def test_find_collection_unexisting(self):
-        self.assertRaises(ValueError, self.provider.find, {'collection': {'id': 404}})
+        self.assertRaises(
+            ValueError,
+            self.provider.find,
+            {'collection': {'id': 404}}
+        )
 
     def test_find_collection_2_no_depth(self):
-        all = self.provider.find({'collection': {'id':2}})
+        all = self.provider.find({'collection': {'id': 2}})
         self.assertEquals(1, len(all))
         self.assertIn({'id': 1, 'label': 'Churches'}, all)
 

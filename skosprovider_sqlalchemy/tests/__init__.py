@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+
 
 def _initTestingDB(engine):
     from skosprovider_sqlalchemy.models import (
@@ -26,9 +25,11 @@ def _initTestingDB(engine):
 
 engine = create_engine('sqlite:///:memory:', echo=True)
 
+
 def setUpPackage():
     session = _initTestingDB(engine)
     session.commit()
+
 
 def tearDownPackage():
     pass

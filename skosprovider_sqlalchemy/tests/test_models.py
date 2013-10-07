@@ -6,6 +6,7 @@ from . import engine
 
 from sqlalchemy.orm import sessionmaker
 
+
 class ModelTestCase(unittest.TestCase):
 
     @classmethod
@@ -20,7 +21,7 @@ class ModelTestCase(unittest.TestCase):
         from skosprovider_sqlalchemy.models import Base
         Base.metadata.bind = engine
         sm = sessionmaker(bind=engine)
-        self.session= sm()
+        self.session = sm()
 
     def tearDown(self):
         self.session.close()
@@ -163,27 +164,40 @@ class NoteTests(ModelTestCase):
         return Note
 
     def test_simple(self):
-        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', 'nl')
+        n = self._get_target_class()(
+            'Een kerk is een religieus gebouw.',
+            'definition',
+            'nl'
+        )
         self.assertEqual('nl', n.language_id)
         self.assertEqual('definition', n.notetype_id)
         self.assertEqual('Een kerk is een religieus gebouw.', n.__str__())
 
     def test_load_objects(self):
-        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', 'nl')
+        n = self._get_target_class()(
+            'Een kerk is een religieus gebouw.',
+            'definition',
+            'nl'
+        )
         self.session.add(n)
         self.session.flush()
-        self.assertEqual('Dutch', l.language.name)
-        self.assertEqual('defintion', l.labeltype.name)
+        self.assertEqual('Dutch', n.language.name)
+        self.assertEqual('defintion', n.labeltype.name)
 
     def test_no_language(self):
-        n = self._get_target_class()('Een kerk is een religieus gebouw.', 'definition', None)
+        n = self._get_target_class()(
+            'Een kerk is een religieus gebouw.',
+            'definition',
+            None
+        )
         self.assertEqual(None, n.language_id)
         self.assertEqual('definition', n.notetype_id)
         self.assertEqual('Een kerk is een religieus gebouw.', n.__str__())
         self.session.add(n)
         self.session.flush()
-        self.assertEqual(None, l.language)
-        self.assertEqual('defintion', l.labeltype.name)
+        self.assertEqual(None, n.language)
+        self.assertEqual('defintion', n.labeltype.name)
+
 
 class LanguageTests(ModelTestCase):
 
@@ -232,11 +246,13 @@ class NoteTests(ModelTestCase):
 
     def test_simple(self):
         n = self._get_target_class()(
-            'definition', 
-            'en', 
+            'definition',
+            'en',
             'A church is a place of worship for certain religions.'
         )
         self.assertEqual('definition', n.notetype_id)
         self.assertEqual('en', n.language_id)
-        self.assertEqual('A church is a place of worship for certain religions.', n.note)
-
+        self.assertEqual(
+            'A church is a place of worship for certain religions.',
+            n.note
+        )

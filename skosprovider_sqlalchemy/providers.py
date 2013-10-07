@@ -13,7 +13,6 @@ from skosprovider.skos import (
 
 from skosprovider_sqlalchemy.models import (
     Thing,
-    Concept as ConceptModel,
     Label as LabelModel
 )
 
