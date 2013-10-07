@@ -179,9 +179,9 @@ class Note(Base):
     language = relationship('Language', uselist = False)
     language_id = Column(String(10), ForeignKey('language.id'))
 
-    def __init__(self, notetype, language, note):
-        self.notetype = notetype
-        self.language = language
+    def __init__(self, notetype_id, language_id, note):
+        self.notetype_id = notetype_id
+        self.language_id = language_id
         self.note = note
 
 def label(labels=[], language='any'):

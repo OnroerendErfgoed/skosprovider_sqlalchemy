@@ -93,3 +93,58 @@ class CollectionTests(ModelTestCase):
         self.assertEqual(1, len(c.collections))
         self.assertEqual(col, c.collections[0])
 
+
+class LanguageTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import Language
+        return Language
+
+    def test_simple(self):
+        l = self._get_target_class()('nl', 'Dutch')
+        self.assertEqual('nl', l.id)
+        self.assertEqual('Dutch', l.name)
+        self.assertEqual('Dutch', l.__str__())
+
+
+class LabelTypeTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import LabelType
+        return LabelType
+
+    def test_simple(self):
+        l = self._get_target_class()('prefLabel', 'Preferred label')
+        self.assertEqual('prefLabel', l.name)
+        self.assertEqual('Preferred label', l.description)
+        self.assertEqual('prefLabel', l.__str__())
+
+
+class NoteTypeTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import NoteType
+        return NoteType
+
+    def test_simple(self):
+        n = self._get_target_class()('definition', 'A definition.')
+        self.assertEqual('definition', n.name)
+        self.assertEqual('A definition.', n.description)
+        self.assertEqual('definition', n.__str__())
+
+
+class NoteTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from ..models import Note
+        return Note
+
+    def test_simple(self):
+        n = self._get_target_class()(
+            'definition', 
+            'en', 
+            'A church is a place of worship for certain religions.'
+        )
+        self.assertEqual('definition', n.notetype_id)
+        self.assertEqual('en', n.language_id)
+        self.assertEqual('A church is a place of worship for certain religions.', n.note)
