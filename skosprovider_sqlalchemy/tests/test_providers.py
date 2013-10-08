@@ -169,11 +169,11 @@ class SQLAlchemyProviderTests(unittest.TestCase):
 
     def test_expand_concept(self):
         ids = self.provider.expand_concept(1)
-        self.assertEquals([1,4], ids)
+        self.assertEquals([1, 4], ids)
 
     def test_expand_collection(self):
         ids = self.provider.expand(2)
-        self.assertEquals([1,4], ids)
+        self.assertEquals([1, 4], ids)
 
     def test_expand_concept_without_narrower(self):
         ids = self.provider.expand(3)
