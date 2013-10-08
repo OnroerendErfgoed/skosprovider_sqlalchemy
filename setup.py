@@ -43,5 +43,9 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
     ],
-    test_suite='nose.collector'
+    test_suite='nose.collector',
+    entry_points="""\
+    [console_scripts]
+    init_skos_db = skosprovider_sqlalchemy.scripts.init_skos_db:main
+    """,
 )
