@@ -93,4 +93,20 @@ class SQLAlchemyProvider(VocabularyProvider):
         return self.expand(id)
 
     def expand(self, id):
-        return [id]
+        try:
+            thing = self.session\
+                        .query(Thing)\
+                        .filter(Thing.id == id, 
+                                Thing.conceptscheme_id == self.conceptscheme_id
+                        ).one()
+        except NoResultFound:
+            return False
+        ret = []
+        if thing.type == 'collection':
+            for m in thing.members:
+                ret = ret + self.expand(m.id)
+        else:
+            ret.append(thing.id)
+            for n in thing.narrower_concepts:
+                ret = ret + self.expand(n.id)
+        return list(set(ret))

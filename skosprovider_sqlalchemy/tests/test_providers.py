@@ -99,6 +99,10 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEqual([3], con.related)
         self.assertEqual([4], con.narrower)
 
+    def test_get_unexisting_by_id(self):
+        con = self.provider.get_by_id(404)
+        self.assertFalse(con)
+
     def test_get_collection_by_id(self):
         from skosprovider.skos import Collection
         col = self.provider.get_by_id(2)
@@ -165,4 +169,16 @@ class SQLAlchemyProviderTests(unittest.TestCase):
 
     def test_expand_concept(self):
         ids = self.provider.expand_concept(1)
-        self.assertEquals([1], ids)
+        self.assertEquals([1,4], ids)
+
+    def test_expand_collection(self):
+        ids = self.provider.expand(2)
+        self.assertEquals([1,4], ids)
+
+    def test_expand_concept_without_narrower(self):
+        ids = self.provider.expand(3)
+        self.assertEquals([3], ids)
+
+    def test_expand_unexisting(self):
+        ids = self.provider.expand(404)
+        self.assertFalse(ids)
