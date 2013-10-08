@@ -79,7 +79,12 @@ class Thing(Base):
     )
 
     conceptscheme = relationship('ConceptScheme', backref='concepts')
-    conceptscheme_id = Column(Integer, ForeignKey('conceptscheme.id'))
+    conceptscheme_id = Column(
+        Integer, 
+        ForeignKey('conceptscheme.id'),
+        nullable=False,
+        index=True
+    )
 
     def label(self, language='any'):
         return label(self.labels, language)
@@ -193,13 +198,26 @@ class LabelType(Base):
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
-    label= Column(String(512))
+    label= Column(
+        String(512),
+        nullable=False
+    )
 
     labeltype = relationship('LabelType', uselist = False)
     language = relationship('Language', uselist = False)
 
-    labeltype_id = Column(String(20), ForeignKey('labeltype.name')) 
-    language_id = Column(String(10), ForeignKey('language.id'), nullable=True)
+    labeltype_id = Column(
+        String(20), 
+        ForeignKey('labeltype.name'),
+        nullable=False,
+        index=True
+    ) 
+    language_id = Column(
+        String(10),
+        ForeignKey('language.id'),
+        nullable=True,
+        index=True
+    )
 
     def __init__(self, label, labeltype_id = 'prefLabel', language_id = None):
         self.labeltype_id = labeltype_id
@@ -228,13 +246,26 @@ class NoteType(Base):
 class Note(Base):
     __tablename__ = 'note'
     id = Column(Integer, primary_key=True)
-    note = Column(Text)
+    note = Column(
+        Text,
+        nullable=False
+    )
 
     notetype = relationship('NoteType', uselist = False)
-    notetype_id = Column(String(20), ForeignKey('notetype.name'))
+    notetype_id = Column(
+        String(20), 
+        ForeignKey('notetype.name'),
+        nullable=False,
+        index=True
+    )
 
     language = relationship('Language', uselist = False)
-    language_id = Column(String(10), ForeignKey('language.id'), nullable=True)
+    language_id = Column(
+        String(10),
+        ForeignKey('language.id'),
+        nullable=True,
+        index=True
+    )
 
     def __init__(self, notetype_id, language_id, note):
         self.notetype_id = notetype_id
