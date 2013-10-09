@@ -267,10 +267,13 @@ class Note(Base):
         index=True
     )
 
-    def __init__(self, notetype_id, language_id, note):
+    def __init__(self, note, notetype_id, language_id):
         self.notetype_id = notetype_id
         self.language_id = language_id
         self.note = note
+
+    def __str__(self):
+        return self.note
 
 
 def label(labels=[], language='any'):

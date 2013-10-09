@@ -182,7 +182,7 @@ class NoteTests(ModelTestCase):
         self.session.add(n)
         self.session.flush()
         self.assertEqual('Dutch', n.language.name)
-        self.assertEqual('defintion', n.labeltype.name)
+        self.assertEqual('definition', n.notetype.name)
 
     def test_no_language(self):
         n = self._get_target_class()(
@@ -196,7 +196,7 @@ class NoteTests(ModelTestCase):
         self.session.add(n)
         self.session.flush()
         self.assertEqual(None, n.language)
-        self.assertEqual('defintion', n.labeltype.name)
+        self.assertEqual('definition', n.notetype.name)
 
 
 class LanguageTests(ModelTestCase):
@@ -236,23 +236,3 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.name)
         self.assertEqual('A definition.', n.description)
         self.assertEqual('definition', n.__str__())
-
-
-class NoteTests(ModelTestCase):
-
-    def _get_target_class(self):
-        from ..models import Note
-        return Note
-
-    def test_simple(self):
-        n = self._get_target_class()(
-            'definition',
-            'en',
-            'A church is a place of worship for certain religions.'
-        )
-        self.assertEqual('definition', n.notetype_id)
-        self.assertEqual('en', n.language_id)
-        self.assertEqual(
-            'A church is a place of worship for certain religions.',
-            n.note
-        )
