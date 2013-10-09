@@ -236,3 +236,66 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.name)
         self.assertEqual('A definition.', n.description)
         self.assertEqual('definition', n.__str__())
+
+
+class LabelFunctionTest(ModelTestCase):
+
+    def _get_fut(self):
+        from ..models import label
+        return label
+
+    def _get_knokke_heist_nl(self):
+        from ..models import Label
+        return Label('Knokke-Heist', "prefLabel", 'nl')
+
+    def _get_cnocke_heyst_nl(self):
+        from ..models import Label
+        return Label('Cnock-Heyst', "altLabel", 'nl')
+
+    def _get_knokke_heist_en(self):
+        from ..models import Label
+        return Label('Knocke-Heyst', "prefLabel", 'en')
+
+    def test_label_empty(self):
+        label = self._get_fut()
+        self.assertEqual(None, label([]))
+        self.assertEqual(None, label([], 'nl'))
+        self.assertEqual(None, label([], None))
+
+    def test_label_pref(self):
+        label = self._get_fut()
+        kh = self._get_knokke_heist_nl()
+        labels = [kh]
+        self.assertEqual(kh, label(labels))
+        self.assertEqual(kh, label(labels, 'nl'))
+        self.assertEqual(kh, label(labels, 'en'))
+        self.assertEqual(kh, label(labels, None))
+
+    def test_label_pref_nl_and_en(self):
+        label = self._get_fut()
+        kh = self._get_knokke_heist_nl()
+        khen = self._get_knokke_heist_en()
+        labels = [kh, khen]
+        self.assertIn(label(labels), [kh, khen])
+        self.assertEqual(kh, label(labels, 'nl'))
+        self.assertEqual(khen, label(labels, 'en'))
+        self.assertIn(label(labels, None), [kh, khen])
+
+    def test_label_alt(self):
+        label = self._get_fut()
+        ch = self._get_cnocke_heyst_nl()
+        labels = [ch]
+        self.assertEqual(ch, label(labels))
+        self.assertEqual(ch, label(labels, 'nl'))
+        self.assertEqual(ch, label(labels, 'en'))
+        self.assertEqual(ch, label(labels, None))
+
+    def test_pref_precedes_alt(self):
+        label = self._get_fut()
+        kh = self._get_knokke_heist_nl()
+        ch = self._get_cnocke_heyst_nl()
+        labels = [kh, ch]
+        self.assertEqual(kh, label(labels))
+        self.assertEqual(kh, label(labels, 'nl'))
+        self.assertEqual(kh, label(labels, 'en'))
+        self.assertEqual(kh, label(labels, None))
