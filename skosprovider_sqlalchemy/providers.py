@@ -35,6 +35,11 @@ class SQLAlchemyProvider(VocabularyProvider):
         self.session = session
 
     def _from_thing(self, thing):
+        '''
+        Load one concept or collection from the database.
+
+        :param skosprovider_sqlalchemy.models.Thing thing: Thing to load.
+        '''
         if thing.type and thing.type == 'collection':
             return Collection(
                 thing.id,
@@ -70,6 +75,10 @@ class SQLAlchemyProvider(VocabularyProvider):
         return self._from_thing(thing)
 
     def _get_id_and_label(self, c, lan):
+        '''
+        :param skosprovider_sqlalchemy.models.Thing c: A concept or collection.
+        :param string lan: A language (eg. "en", "nl", "la", "fr")
+        '''
         l = c.label(lan)
         return {
             'id': c.id,

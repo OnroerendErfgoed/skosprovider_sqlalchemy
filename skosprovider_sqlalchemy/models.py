@@ -314,6 +314,14 @@ def label(labels=[], language='any'):
 
 
 class Initialiser(object):
+    '''
+    Initialises a database.
+
+    Adds necessary values for labelType, noteType and language to the database.
+
+    The list of languages added by default is very small and will probably need 
+    to be expanded for your local needs.
+    '''
 
     def __init__(self, session):
         self.session = session
