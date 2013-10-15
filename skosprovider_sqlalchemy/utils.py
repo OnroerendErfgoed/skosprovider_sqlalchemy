@@ -6,21 +6,21 @@ from skosprovider.skos import (
 )
 
 from skosprovider_sqlalchemy.models import (
+    Thing as ThingModel,
     Concept as ConceptModel,
-    Collection as ColletionModel,
+    Collection as CollectionModel,
     Label as LabelModel,
     Note as NoteModel
 )
 
 def import_provider(provider, conceptscheme, session):
 
+    #First pass: load all concepts and collections
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
-        #labels = [l.__dict__ for l in c.labels]
-            
         if isinstance(c, Concept):
             cm = ConceptModel(
-                id=c.id,
+                id=int(c.id),
                 conceptscheme=conceptscheme
             )
             for n in c.notes:
@@ -31,7 +31,7 @@ def import_provider(provider, conceptscheme, session):
                 ))
         elif isinstance(c, Collection):
             cm = CollectionModel(
-                id=c.id,
+                id=int(c.id),
                 conceptscheme=conceptscheme
             )
         for l in c.labels:
@@ -41,3 +41,17 @@ def import_provider(provider, conceptscheme, session):
                 language_id=l.language
             ))
         session.add(cm)
+
+    #Second pass: link
+    for stuff in provider.get_all():
+        c = provider.get_by_id(stuff['id'])
+        if isinstance(c, Concept) and len(c.narrower) > 0:
+            cm = session.query(ConceptModel).get(int(c.id))
+            for nc in c.narrower:
+                nc = session.query(ConceptModel).get(int(nc))
+                cm.narrower_concepts.append(nc)
+        elif isinstance(c, Collection) and len(c.members) > 0:
+            cm = session.query(CollectionModel).get(int(c.id))
+            for mc in c.members:
+                mc = session.query(ThingModel).get(int(mc))
+                cm.members.append(mc)
