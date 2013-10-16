@@ -77,7 +77,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         l = Label('Chapels', 'prefLabel', 'en')
         chap.labels.append(l)
         self.session.add(chap)
-        chap.related_concepts.append(con)
+        chap.related_concepts.add(con)
         cath = Concept(
             id=4,
             conceptscheme=cs

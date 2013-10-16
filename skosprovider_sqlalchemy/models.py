@@ -102,6 +102,7 @@ class Concept(Thing):
         secondary=concept_related_concept, 
         primaryjoin='Concept.id==concept_related_concept.c.concept_id_to',
         secondaryjoin='Concept.id==concept_related_concept.c.concept_id_from',
+        collection_class=set
     )
 
     narrower_concepts = relationship(
@@ -125,7 +126,7 @@ def related_concepts_append_listener(target, value, initiator):
     target.__related_to__.add(value)
 
     if (target) not in getattr(value, '__related_to__', set()):
-        value.related_concepts.append(target)
+        value.related_concepts.add(target)
 
 event.listen(Concept.related_concepts, 'append', related_concepts_append_listener)
 
@@ -135,7 +136,12 @@ def related_concepts_remove_listener(target, value, initiator):
     if (value) in getattr(target, '__related_to__', set()):
         target.__related_to__.remove(value)
 
-    if target in value.related_concepts:
+    if not hasattr(target, '__removed_from__'):
+        target.__removed_from__ = set()
+
+    target.__removed_from__.add(value)
+
+    if target in value.related_concepts and target not in getattr(value, '__removed_from__', set()):
         value.related_concepts.remove(target)
 
 event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listener)

@@ -55,7 +55,7 @@ def import_provider(provider, conceptscheme, session):
                 cm = session.query(ConceptModel).get(int(c.id))
                 for rc in c.related:
                     rc = session.query(ConceptModel).get(int(rc))
-                    cm.related_concepts.append(rc)
+                    cm.related_concepts.add(rc)
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.query(CollectionModel).get(int(c.id))
             for mc in c.members:
