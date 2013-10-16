@@ -68,7 +68,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         )
         l = Label('Churches by function', 'prefLabel', 'en')
         col.labels.append(l)
-        col.members.append(con)
+        col.members.add(con)
         self.session.add(col)
         chap = Concept(
             id=3,

@@ -60,4 +60,4 @@ def import_provider(provider, conceptscheme, session):
             cm = session.query(CollectionModel).get(int(c.id))
             for mc in c.members:
                 mc = session.query(ThingModel).get(int(mc))
-                cm.members.append(mc)
+                cm.members.add(mc)

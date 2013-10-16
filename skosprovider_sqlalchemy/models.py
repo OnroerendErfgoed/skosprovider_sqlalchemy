@@ -158,7 +158,8 @@ class Collection(Thing):
         secondary=collection_concept, 
         backref=backref('collections'),
         primaryjoin='Thing.id==collection_concept.c.collection_id',
-        secondaryjoin='Thing.id==collection_concept.c.concept_id'
+        secondaryjoin='Thing.id==collection_concept.c.concept_id',
+        collection_class=set
     )
 
 
