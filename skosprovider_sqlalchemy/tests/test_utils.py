@@ -191,5 +191,5 @@ class ImportProviderTests(UtilsTestCase):
         self.assertEqual(10, netherlands.id)
         self.assertEqual('concept', netherlands.type)
         self.assertEqual(1, len(netherlands.labels))
-        self.assertEqual(2, netherlands.broader_concepts[0].id)
+        self.assertEqual(2, netherlands.broader_concepts.pop().id)
         self.assertEqual(1, len(netherlands.related_concepts))

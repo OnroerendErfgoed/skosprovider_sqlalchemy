@@ -85,7 +85,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         l = Label('Cathedrals', 'prefLabel', 'en')
         cath.labels.append(l)
         self.session.add(cath)
-        cath.broader_concepts.append(con)
+        cath.broader_concepts.add(con)
         self.session.flush()
 
     def test_get_vocabulary_id(self):

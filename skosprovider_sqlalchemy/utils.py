@@ -50,7 +50,7 @@ def import_provider(provider, conceptscheme, session):
                 cm = session.query(ConceptModel).get(int(c.id))
                 for nc in c.narrower:
                     nc = session.query(ConceptModel).get(int(nc))
-                    cm.narrower_concepts.append(nc)
+                    cm.narrower_concepts.add(nc)
             if len(c.related) > 0:
                 cm = session.query(ConceptModel).get(int(c.id))
                 for rc in c.related:

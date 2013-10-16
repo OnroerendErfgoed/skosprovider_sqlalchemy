@@ -108,9 +108,10 @@ class Concept(Thing):
     narrower_concepts = relationship(
         'Concept', 
         secondary=concept_hierarchy_concept,
-        backref=backref('broader_concepts'),
+        backref=backref('broader_concepts', collection_class=set),
         primaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_broader',
         secondaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_narrower',
+        collection_class=set
     )
 
     __mapper_args__ = {
