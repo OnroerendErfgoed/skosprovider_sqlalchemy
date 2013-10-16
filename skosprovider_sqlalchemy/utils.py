@@ -45,11 +45,17 @@ def import_provider(provider, conceptscheme, session):
     #Second pass: link
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
-        if isinstance(c, Concept) and len(c.narrower) > 0:
-            cm = session.query(ConceptModel).get(int(c.id))
-            for nc in c.narrower:
-                nc = session.query(ConceptModel).get(int(nc))
-                cm.narrower_concepts.append(nc)
+        if isinstance(c, Concept): 
+            if len(c.narrower) > 0:
+                cm = session.query(ConceptModel).get(int(c.id))
+                for nc in c.narrower:
+                    nc = session.query(ConceptModel).get(int(nc))
+                    cm.narrower_concepts.append(nc)
+            if len(c.related) > 0:
+                cm = session.query(ConceptModel).get(int(c.id))
+                for rc in c.related:
+                    rc = session.query(ConceptModel).get(int(rc))
+                    cm.related_concepts.append(rc)
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.query(CollectionModel).get(int(c.id))
             for mc in c.members:

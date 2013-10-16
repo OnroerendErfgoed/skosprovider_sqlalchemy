@@ -95,7 +95,7 @@ class ImportProviderTests(UtilsTestCase):
                     'labels': [
                         {'type': 'prefLabel', 'language': 'en', 'label': 'Europe'}
                     ],
-                    'narrower': [4, 5], 'broader': [1]
+                    'narrower': [4, 5, 10], 'broader': [1]
                 }, {
                     'id': 3,
                     'labels': [
@@ -110,7 +110,7 @@ class ImportProviderTests(UtilsTestCase):
                     'labels': [
                         {'type': 'prefLabel', 'language': 'en', 'label': 'Belgium'}
                     ],
-                    'narrower': [7, 8, 9], 'broader': [2]
+                    'narrower': [7, 8, 9], 'broader': [2], 'related': [10]
                 }, {
                     'id': 5,
                     'labels': [
@@ -148,6 +148,12 @@ class ImportProviderTests(UtilsTestCase):
                     ],
                     'broader': [4]
                 }, {
+                    'id': 10,
+                    'labels': [
+                        {'type': 'prefLabel', 'language': 'nl', 'label': 'Nederland'}
+                    ],
+                    'related': [4]
+                }, {
                     'id': '333',
                     'type': 'collection',
                     'labels': [
@@ -156,7 +162,7 @@ class ImportProviderTests(UtilsTestCase):
                             'label': 'Places where dutch is spoken'
                         }
                     ],
-                    'members': ['4', '7', '8']
+                    'members': ['4', '7', 8,10]
                 }
             ]
         )
@@ -180,4 +186,10 @@ class ImportProviderTests(UtilsTestCase):
         self.assertEqual(333, dutch.id)
         self.assertEqual('collection', dutch.type)
         self.assertEqual(1, len(dutch.labels))
-        self.assertEqual(3, len(dutch.members))
+        self.assertEqual(4, len(dutch.members))
+        netherlands = self.session.query(ConceptModel).get(10)
+        self.assertEqual(10, netherlands.id)
+        self.assertEqual('concept', netherlands.type)
+        self.assertEqual(1, len(netherlands.labels))
+        self.assertEqual(2, netherlands.broader_concepts[0].id)
+        self.assertEqual(1, len(netherlands.related_concepts))
