@@ -321,6 +321,27 @@ def label(labels=[], language='any'):
         return None
 
 
+class Visitation(Base):
+    __tablename__ = 'visitation'
+    id = Column(Integer, primary_key=True)
+    lft = Column(Integer, index=True, nullable=False)
+    rght = Column(Integer, index=True, nullable=False)
+
+    conceptscheme = relationship('ConceptScheme')
+    conceptscheme_id = Column(
+        Integer, 
+        ForeignKey('conceptscheme.id'),
+        primary_key=True
+    )
+    concept = relationship('Concept')
+    concept_id = Column(
+        Integer,
+        ForeignKey('concept.id'),
+        nullable=False,
+        index=True
+    )
+
+
 class Initialiser(object):
     '''
     Initialises a database.
