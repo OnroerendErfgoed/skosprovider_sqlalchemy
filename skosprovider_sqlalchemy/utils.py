@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import logging
+log = logging.getLogger(__name__)
+
 from skosprovider.skos import (
     Concept,
     Collection
@@ -61,3 +64,35 @@ def import_provider(provider, conceptscheme, session):
             for mc in c.members:
                 mc = session.query(ThingModel).get(int(mc))
                 cm.members.add(mc)
+
+class VisitationCalculator(object):
+
+    def __init__(self, session):
+        self.session = session
+
+    def visit(self, conceptscheme):
+        self.count = 0
+        self.visitation = []
+        topc = self.session\
+                   .query(ConceptModel)\
+                   .filter(ConceptModel.conceptscheme == conceptscheme)\
+                   .filter(ConceptModel.broader_concepts == None)\
+                   .all()
+        for tc in topc:
+            self._visit_concept(tc)
+        self.visitation.sort(key=lambda v: v['lft'])
+        return self.visitation
+
+    def _visit_concept(self, concept):
+        log.debug('Visiting concept %s.' % concept.id)
+        self.count += 1
+        v = {
+            'id': concept.id,
+            'lft': self.count
+        }
+        if concept.type == 'concept':
+            for nc in concept.narrower_concepts:
+                self._visit_concept(nc)
+        self.count += 1
+        v['rght'] = self.count
+        self.visitation.append(v)
