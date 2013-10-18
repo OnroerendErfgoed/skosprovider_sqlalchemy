@@ -50,19 +50,25 @@ def import_provider(provider, conceptscheme, session):
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept): 
             if len(c.narrower) > 0:
-                cm = session.query(ConceptModel).get(int(c.id))
+                cm = session.query(ConceptModel)\
+                            .get((int(c.id), conceptscheme.id))
                 for nc in c.narrower:
-                    nc = session.query(ConceptModel).get(int(nc))
+                    nc = session.query(ConceptModel)\
+                                .get((int(nc), conceptscheme.id))
                     cm.narrower_concepts.add(nc)
             if len(c.related) > 0:
-                cm = session.query(ConceptModel).get(int(c.id))
+                cm = session.query(ConceptModel)\
+                            .get((int(c.id), conceptscheme.id))
                 for rc in c.related:
-                    rc = session.query(ConceptModel).get(int(rc))
+                    rc = session.query(ConceptModel)\
+                                .get((int(rc), conceptscheme.id))
                     cm.related_concepts.add(rc)
         elif isinstance(c, Collection) and len(c.members) > 0:
-            cm = session.query(CollectionModel).get(int(c.id))
+            cm = session.query(CollectionModel)\
+                        .get((int(c.id), conceptscheme.id))
             for mc in c.members:
-                mc = session.query(ThingModel).get(int(mc))
+                mc = session.query(ThingModel)\
+                            .get((int(mc), conceptscheme.id))
                 cm.members.add(mc)
 
 class VisitationCalculator(object):
@@ -72,6 +78,7 @@ class VisitationCalculator(object):
 
     def visit(self, conceptscheme):
         self.count = 0
+        self.depth = 0
         self.visitation = []
         topc = self.session\
                    .query(ConceptModel)\
@@ -85,10 +92,12 @@ class VisitationCalculator(object):
 
     def _visit_concept(self, concept):
         log.debug('Visiting concept %s.' % concept.id)
+        self.depth += 1
         self.count += 1
         v = {
             'id': concept.id,
-            'lft': self.count
+            'lft': self.count,
+            'depth': self.depth
         }
         if concept.type == 'concept':
             for nc in concept.narrower_concepts:
@@ -96,3 +105,4 @@ class VisitationCalculator(object):
         self.count += 1
         v['rght'] = self.count
         self.visitation.append(v)
+        self.depth -= 1

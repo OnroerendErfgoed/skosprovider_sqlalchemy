@@ -83,7 +83,8 @@ class Thing(Base):
         Integer, 
         ForeignKey('conceptscheme.id'),
         nullable=False,
-        index=True
+        index=True,
+        primary_key=True
     )
 
     def label(self, language='any'):

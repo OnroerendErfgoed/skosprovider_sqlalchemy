@@ -204,7 +204,7 @@ class ImportProviderTests(UtilsTestCase):
         self.session.add(cs)
         import_provider(csvprovider, cs, self.session)
         self.assertEqual(24, len(self.session.new))
-        lobster = self.session.query(ConceptModel).get(11)
+        lobster = self.session.query(ConceptModel).get((11,1))
         self.assertEqual(11, lobster.id)
         self.assertEqual('Lobster Thermidor', str(lobster.label()))
         self.assertEqual(1, len(lobster.notes))
@@ -219,17 +219,17 @@ class ImportProviderTests(UtilsTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(geoprovider, cs, self.session)
-        world = self.session.query(ConceptModel).get(1)
+        world = self.session.query(ConceptModel).get((1,1))
         self.assertEqual(1, world.id)
         self.assertEqual('World', str(world.label('en')))
         self.assertEqual(1, len(world.labels))
         self.assertEqual(2, len(world.narrower_concepts))
-        dutch = self.session.query(CollectionModel).get(333)
+        dutch = self.session.query(CollectionModel).get((333,1))
         self.assertEqual(333, dutch.id)
         self.assertEqual('collection', dutch.type)
         self.assertEqual(1, len(dutch.labels))
         self.assertEqual(4, len(dutch.members))
-        netherlands = self.session.query(ConceptModel).get(10)
+        netherlands = self.session.query(ConceptModel).get((10,1))
         self.assertEqual(10, netherlands.id)
         self.assertEqual('concept', netherlands.type)
         self.assertEqual(1, len(netherlands.labels))
@@ -245,9 +245,9 @@ class ImportProviderTests(UtilsTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(buildingprovider, cs, self.session)
-        castle = self.session.query(ConceptModel).get(2)
+        castle = self.session.query(ConceptModel).get((2,1))
         self.assertEqual(2, len(castle.broader_concepts))
-        hut = self.session.query(ConceptModel).get(4)
+        hut = self.session.query(ConceptModel).get((4,1))
         self.assertEqual(1, len(hut.broader_concepts))
 
 
@@ -284,6 +284,7 @@ class VisitationCalculatorTests(UtilsTestCase):
         self.assertEqual(11, len(visit))
         for v in visit:
             self.assertEqual(v['lft']+1, v['rght'])
+            self.assertEqual(1, v['depth'])
 
     def test_menu_sorted(self):
         from skosprovider_sqlalchemy.models import (
@@ -317,11 +318,14 @@ class VisitationCalculatorTests(UtilsTestCase):
         self.assertEqual(1, world['id'])
         self.assertEqual(1, world['lft'])
         self.assertEqual(20, world['rght'])
+        self.assertEqual(1, world['depth'])
         for v in visit:
             if v['id'] == 3:
                 self.assertEqual(v['lft']+3, v['rght'])
+                self.assertEqual(2, v['depth'])
             if v['id'] == 6:
                 self.assertEqual(v['lft']+1, v['rght'])
+                self.assertEqual(3, v['depth'])
 
     def test_buildings(self):
         from skosprovider_sqlalchemy.models import (
@@ -342,9 +346,12 @@ class VisitationCalculatorTests(UtilsTestCase):
             # Check that fortification has one child
             if v['id'] == 1:
                 self.assertEqual(v['lft']+3, v['rght'])
+                self.assertEqual(1, v['depth'])
             # Check that habitations has two children
             if v['id'] == 3:
                 self.assertEqual(v['lft']+5, v['rght'])
+                self.assertEqual(1, v['depth'])
             # Check that castle has no children
             if v['id'] == 2:
                 self.assertEqual(v['lft']+1, v['rght'])
+                self.assertEqual(2, v['depth'])
