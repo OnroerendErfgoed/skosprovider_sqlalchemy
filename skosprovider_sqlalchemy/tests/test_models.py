@@ -42,6 +42,7 @@ class ConceptTests(ModelTestCase):
         l = Label('Churches', 'prefLabel', 'en')
         c = self._get_target_class()(
             id=1,
+            concept_id=1,
             labels=[l]
         )
         self.assertEqual(1, c.id)
@@ -49,10 +50,12 @@ class ConceptTests(ModelTestCase):
 
     def test_related(self):
         c1 = self._get_target_class()(
-            id=1
+            id=1,
+            concept_id=1
         )
         c2 = self._get_target_class()(
-            id=2
+            id=2,
+            concept_id=2
         )
         c1.related_concepts.add(c2)
         self.session.flush()
@@ -84,10 +87,12 @@ class ConceptTests(ModelTestCase):
 
     def test_broader_narrower(self):
         c1 = self._get_target_class()(
-            id=1
+            id=1,
+            concept_id=1
         )
         c2 = self._get_target_class()(
-            id=2
+            id=2,
+            concept_id=2
         )
         c1.narrower_concepts.add(c2)
         self.session.flush()
@@ -99,10 +104,12 @@ class ConceptTests(ModelTestCase):
 
     def test_broader_narrower_duplicate(self):
         c1 = self._get_target_class()(
-            id=1
+            id=1,
+            concept_id=2
         )
         c2 = self._get_target_class()(
-            id=2
+            id=2,
+            concept_id=3
         )
         c1.narrower_concepts.add(c2)
         self.session.flush()
@@ -141,6 +148,7 @@ class CollectionTests(ModelTestCase):
         from ..models import Concept, Label
         return Concept(
             id=2,
+            concept_id=456,
             labels=[Label('Cathedrals', 'prefLabel', 'en')]
         )
 
@@ -149,6 +157,7 @@ class CollectionTests(ModelTestCase):
         l = Label('Churches by function', 'prefLabel', 'en')
         c = self._get_target_class()(
             id=1,
+            concept_id=253,
             labels=[l]
         )
         self.assertEqual(1, c.id)
@@ -156,7 +165,8 @@ class CollectionTests(ModelTestCase):
 
     def test_members(self):
         col = self._get_target_class()(
-            id=1
+            id=1,
+            concept_id=1
         )
         c = self._get_concept()
         col.members.add(c)
@@ -166,7 +176,8 @@ class CollectionTests(ModelTestCase):
 
     def test_duplicate_members(self):
         col = self._get_target_class()(
-            id=1
+            id=1,
+            concept_id=7
         )
         c = self._get_concept()
         col.members.add(c)

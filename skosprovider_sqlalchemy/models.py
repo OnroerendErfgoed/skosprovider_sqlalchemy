@@ -62,6 +62,11 @@ class Thing(Base):
     __tablename__ = 'concept'
     id = Column(Integer, primary_key=True)
     type = Column(String(30))
+    concept_id = Column(
+        Integer,
+        nullable=False,
+        index=True
+    )
     uri = Column(String(512))
     labels = relationship(
         'Label', 
@@ -83,8 +88,7 @@ class Thing(Base):
         Integer, 
         ForeignKey('conceptscheme.id'),
         nullable=False,
-        index=True,
-        primary_key=True
+        index=True
     )
 
     def label(self, language='any'):

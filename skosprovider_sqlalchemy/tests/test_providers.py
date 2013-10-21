@@ -55,6 +55,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(cs)
         con = Concept(
             id=1,
+            concept_id=1,
             conceptscheme=cs
         )
         self.session.add(con)
@@ -64,6 +65,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         con.labels.append(l)
         col = Collection(
             id=2,
+            concept_id=2,
             conceptscheme=cs
         )
         l = Label('Churches by function', 'prefLabel', 'en')
@@ -72,6 +74,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(col)
         chap = Concept(
             id=3,
+            concept_id=3,
             conceptscheme=cs
         )
         l = Label('Chapels', 'prefLabel', 'en')
@@ -80,6 +83,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         chap.related_concepts.add(con)
         cath = Concept(
             id=4,
+            concept_id=4,
             conceptscheme=cs
         )
         l = Label('Cathedrals', 'prefLabel', 'en')
