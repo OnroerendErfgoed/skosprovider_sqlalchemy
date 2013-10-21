@@ -23,7 +23,7 @@ def import_provider(provider, conceptscheme, session):
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
             cm = ConceptModel(
-                id=int(c.id),
+                concept_id=int(c.id),
                 conceptscheme=conceptscheme
             )
             for n in c.notes:
@@ -34,7 +34,7 @@ def import_provider(provider, conceptscheme, session):
                 ))
         elif isinstance(c, Collection):
             cm = CollectionModel(
-                id=int(c.id),
+                concept_id=int(c.id),
                 conceptscheme=conceptscheme
             )
         for l in c.labels:
@@ -45,30 +45,44 @@ def import_provider(provider, conceptscheme, session):
             ))
         session.add(cm)
 
+    session.flush()
+
     #Second pass: link
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept): 
             if len(c.narrower) > 0:
                 cm = session.query(ConceptModel)\
-                            .get((int(c.id), conceptscheme.id))
+                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                            .filter(ConceptModel.concept_id == int(c.id))\
+                            .one()
                 for nc in c.narrower:
                     nc = session.query(ConceptModel)\
-                                .get((int(nc), conceptscheme.id))
+                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                                .filter(ConceptModel.concept_id == int(nc))\
+                                .one()
                     cm.narrower_concepts.add(nc)
             if len(c.related) > 0:
                 cm = session.query(ConceptModel)\
-                            .get((int(c.id), conceptscheme.id))
+                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                            .filter(ConceptModel.concept_id == int(c.id))\
+                            .one()
                 for rc in c.related:
                     rc = session.query(ConceptModel)\
-                                .get((int(rc), conceptscheme.id))
+                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                                .filter(ConceptModel.concept_id == int(rc))\
+                                .one()
                     cm.related_concepts.add(rc)
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.query(CollectionModel)\
-                        .get((int(c.id), conceptscheme.id))
+                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                        .filter(ConceptModel.concept_id == int(c.id))\
+                        .one()
             for mc in c.members:
                 mc = session.query(ThingModel)\
-                            .get((int(mc), conceptscheme.id))
+                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                            .filter(ConceptModel.concept_id == int(mc))\
+                            .one()
                 cm.members.add(mc)
 
 class VisitationCalculator(object):

@@ -204,7 +204,10 @@ class ImportProviderTests(UtilsTestCase):
         self.session.add(cs)
         import_provider(csvprovider, cs, self.session)
         self.assertEqual(24, len(self.session.new))
-        lobster = self.session.query(ConceptModel).get((11,1))
+        lobster = self.session.query(ConceptModel)\
+                              .filter(ConceptModel.conceptscheme == cs)\
+                              .filter(ConceptModel.concept_id == 11)\
+                              .one()
         self.assertEqual(11, lobster.id)
         self.assertEqual('Lobster Thermidor', str(lobster.label()))
         self.assertEqual(1, len(lobster.notes))
@@ -219,21 +222,30 @@ class ImportProviderTests(UtilsTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(geoprovider, cs, self.session)
-        world = self.session.query(ConceptModel).get((1,1))
-        self.assertEqual(1, world.id)
+        world = self.session.query(ConceptModel)\
+                            .filter(ConceptModel.conceptscheme == cs)\
+                            .filter(ConceptModel.concept_id == 1)\
+                            .one()
+        self.assertEqual(1, world.concept_id)
         self.assertEqual('World', str(world.label('en')))
         self.assertEqual(1, len(world.labels))
         self.assertEqual(2, len(world.narrower_concepts))
-        dutch = self.session.query(CollectionModel).get((333,1))
-        self.assertEqual(333, dutch.id)
+        dutch = self.session.query(CollectionModel)\
+                            .filter(CollectionModel.conceptscheme == cs)\
+                            .filter(CollectionModel.concept_id == 333)\
+                            .one()
+        self.assertEqual(333, dutch.concept_id)
         self.assertEqual('collection', dutch.type)
         self.assertEqual(1, len(dutch.labels))
         self.assertEqual(4, len(dutch.members))
-        netherlands = self.session.query(ConceptModel).get((10,1))
-        self.assertEqual(10, netherlands.id)
+        netherlands = self.session.query(ConceptModel)\
+                            .filter(ConceptModel.conceptscheme == cs)\
+                            .filter(ConceptModel.concept_id == 10)\
+                            .one()
+        self.assertEqual(10, netherlands.concept_id)
         self.assertEqual('concept', netherlands.type)
         self.assertEqual(1, len(netherlands.labels))
-        self.assertEqual(2, netherlands.broader_concepts.pop().id)
+        self.assertEqual(2, netherlands.broader_concepts.pop().concept_id)
         self.assertEqual(1, len(netherlands.related_concepts))
 
     def test_buildings(self):
@@ -245,9 +257,15 @@ class ImportProviderTests(UtilsTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(buildingprovider, cs, self.session)
-        castle = self.session.query(ConceptModel).get((2,1))
+        castle = self.session.query(ConceptModel)\
+                             .filter(ConceptModel.conceptscheme == cs)\
+                             .filter(ConceptModel.concept_id == 2)\
+                             .one()
         self.assertEqual(2, len(castle.broader_concepts))
-        hut = self.session.query(ConceptModel).get((4,1))
+        hut = self.session.query(ConceptModel)\
+                          .filter(ConceptModel.conceptscheme == cs)\
+                          .filter(ConceptModel.concept_id == 4)\
+                          .one()
         self.assertEqual(1, len(hut.broader_concepts))
 
 
