@@ -47,5 +47,6 @@ setup(
     entry_points="""\
     [console_scripts]
     init_skos_db = skosprovider_sqlalchemy.scripts.init_skos_db:main
+    calc_visitation = skosprovider_sqlalchemy.scripts.calc_visitation:main
     """,
 )
