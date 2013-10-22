@@ -5,7 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from ..models import (
-    ConceptScheme
+    ConceptScheme,
+    Visitation
 )
 
 from ..utils import (
@@ -30,4 +31,15 @@ def main(argv=sys.argv):
     vc = VisitationCalculator(session)
     cs = session.query(ConceptScheme).get(scheme_id)
     visit = vc.visit(cs)
-    print(visit)
+    for v in visit:
+        vrow = Visitation(
+            conceptscheme=cs,
+            concept_id=v['id'],
+            lft=v['lft'],
+            rght=v['rght'],
+            depth=v['depth']
+        )
+        session.add(vrow)
+    session.commit()
+    session.commit()
+
