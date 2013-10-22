@@ -188,12 +188,16 @@ class ImportProviderTests(UtilsTestCase):
         )
 
     def test_empty_provider(self):
+        from skosprovider_sqlalchemy.models import (
+            ConceptScheme as ConceptSchemeModel
+        )
         from skosprovider.providers import DictionaryProvider
         p = DictionaryProvider({'id':'EMPTY'},[])
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(p, cs, self.session)
-        self.assertEqual(1, len(self.session.new))
+        scheme = self.session.query(ConceptSchemeModel).get(1)
+        self.assertEqual(scheme, cs)
 
     def test_menu(self):
         from skosprovider_sqlalchemy.models import (
@@ -203,7 +207,6 @@ class ImportProviderTests(UtilsTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(csvprovider, cs, self.session)
-        self.assertEqual(24, len(self.session.new))
         lobster = self.session.query(ConceptModel)\
                               .filter(ConceptModel.conceptscheme == cs)\
                               .filter(ConceptModel.concept_id == 11)\
