@@ -42,7 +42,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         if thing.type and thing.type == 'collection':
             return Collection(
-                thing.id,
+                thing.concept_id,
                 [
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -51,7 +51,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             )
         else:
             return Concept(
-                thing.id,
+                thing.concept_id,
                 [
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -67,7 +67,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             thing = self.session\
                         .query(Thing)\
                         .filter(
-                            Thing.id == id,
+                            Thing.concept_id == id,
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:
@@ -81,7 +81,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         l = c.label(lan)
         return {
-            'id': c.id,
+            'id': c.concept_id,
             'label': str(l) if l is not None else None
         }
 
@@ -106,7 +106,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'You are searching for items in an unexisting collection.'
                 )
             q = q.filter(
-                Thing.collections.any(Thing.id == query['collection']['id'])
+                Thing.collections.any(Thing.concept_id == query['collection']['id'])
             )
         all = q.all()
         return [self._get_id_and_label(c, lan) for c in all]
@@ -128,7 +128,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             thing = self.session\
                         .query(Thing)\
                         .filter(
-                            Thing.id == id,
+                            Thing.concept_id == id,
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:
