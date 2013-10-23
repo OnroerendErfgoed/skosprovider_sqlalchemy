@@ -13,11 +13,13 @@ from ..utils import (
     VisitationCalculator
 )
 
+
 def usage(argv):
     cmd = os.path.basename(argv[0])
     print('usage: %s <connect_uri> <concept_scheme_id>\n'
-            '(example: "%s sqlite:///skos.db 1")' % (cmd, cmd)) 
+          '(example: "%s sqlite:///skos.db 1")' % (cmd, cmd))
     sys.exit(1)
+
 
 def main(argv=sys.argv):
     if len(argv) != 3:
@@ -41,4 +43,3 @@ def main(argv=sys.argv):
         )
         session.add(vrow)
     session.commit()
-

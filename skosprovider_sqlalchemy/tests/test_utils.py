@@ -14,6 +14,7 @@ from skosprovider_sqlalchemy.utils import (
     VisitationCalculator
 )
 
+
 def _get_menu():
     from skosprovider.providers import (
         SimpleCsvProvider
@@ -84,25 +85,41 @@ def _get_geo():
             }, {
                 'id': 7,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Flanders'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Flanders'
+                    }
                 ],
                 'broader': [4]
             }, {
                 'id': 8,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Brussels'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Brussels'
+                    }
                 ],
                 'broader': [4]
             }, {
                 'id': 9,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Wallonie'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Wallonie'
+                    }
                 ],
                 'broader': [4]
             }, {
                 'id': 10,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'nl', 'label': 'Nederland'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'nl',
+                        'label': 'Nederland'
+                    }
                 ],
                 'related': [4]
             }, {
@@ -114,7 +131,7 @@ def _get_geo():
                         'label': 'Places where dutch is spoken'
                     }
                 ],
-                'members': ['4', '7', 8,10]
+                'members': ['4', '7', 8, 10]
             }
         ]
     )
@@ -129,7 +146,11 @@ def _get_buildings():
             {
                 'id': '1',
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Fortifications'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Fortifications'
+                    }
                 ],
                 'narrower': [2]
             }, {
@@ -141,7 +162,11 @@ def _get_buildings():
             }, {
                 'id': 3,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Habitations'}
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Habitations'
+                    }
                 ],
                 'narrower': [2, 4]
             }, {
@@ -192,7 +217,7 @@ class ImportProviderTests(UtilsTestCase):
             ConceptScheme as ConceptSchemeModel
         )
         from skosprovider.providers import DictionaryProvider
-        p = DictionaryProvider({'id':'EMPTY'},[])
+        p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(p, cs, self.session)
@@ -214,7 +239,6 @@ class ImportProviderTests(UtilsTestCase):
         self.assertEqual(11, lobster.id)
         self.assertEqual('Lobster Thermidor', str(lobster.label()))
         self.assertEqual(1, len(lobster.notes))
-
 
     def test_geo(self):
         from skosprovider_sqlalchemy.models import (
@@ -241,10 +265,11 @@ class ImportProviderTests(UtilsTestCase):
         self.assertEqual('collection', dutch.type)
         self.assertEqual(1, len(dutch.labels))
         self.assertEqual(4, len(dutch.members))
-        netherlands = self.session.query(ConceptModel)\
-                            .filter(ConceptModel.conceptscheme == cs)\
-                            .filter(ConceptModel.concept_id == 10)\
-                            .one()
+        netherlands = self.session\
+                          .query(ConceptModel)\
+                          .filter(ConceptModel.conceptscheme == cs)\
+                          .filter(ConceptModel.concept_id == 10)\
+                          .one()
         self.assertEqual(10, netherlands.concept_id)
         self.assertEqual('concept', netherlands.type)
         self.assertEqual(1, len(netherlands.labels))
@@ -253,8 +278,7 @@ class ImportProviderTests(UtilsTestCase):
 
     def test_buildings(self):
         from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel,
-            Collection as CollectionModel
+            Concept as ConceptModel
         )
         buildingprovider = _get_buildings()
         cs = self._get_cs()
@@ -284,7 +308,7 @@ class VisitationCalculatorTests(UtilsTestCase):
 
     def test_empty_provider(self):
         from skosprovider.providers import DictionaryProvider
-        p = DictionaryProvider({'id':'EMPTY'},[])
+        p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(p, cs, self.session)
@@ -293,9 +317,6 @@ class VisitationCalculatorTests(UtilsTestCase):
         self.assertEqual(0, len(v))
 
     def test_menu(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
@@ -308,9 +329,6 @@ class VisitationCalculatorTests(UtilsTestCase):
             self.assertEqual(1, v['depth'])
 
     def test_menu_sorted(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
@@ -324,10 +342,6 @@ class VisitationCalculatorTests(UtilsTestCase):
             left += 2
 
     def test_geo(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel,
-            Collection as CollectionModel
-        )
         geoprovider = _get_geo()
         cs = self._get_cs()
         self.session.add(cs)
@@ -349,10 +363,6 @@ class VisitationCalculatorTests(UtilsTestCase):
                 self.assertEqual(3, v['depth'])
 
     def test_buildings(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel,
-            Collection as CollectionModel
-        )
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)

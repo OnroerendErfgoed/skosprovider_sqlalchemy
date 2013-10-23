@@ -244,8 +244,7 @@ class SQLAlchemyProviderExpandVisitTests(unittest.TestCase):
             Concept,
             ConceptScheme,
             Collection,
-            Label,
-            Visitation
+            Label
         )
         cs = ConceptScheme(
             id=2
@@ -325,6 +324,7 @@ class SQLAlchemyProviderExpandVisitTests(unittest.TestCase):
     def test_expand_unexisting_visit(self):
         ids = self.provider.expand(404)
         self.assertFalse(ids)
+
 
 class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
 
