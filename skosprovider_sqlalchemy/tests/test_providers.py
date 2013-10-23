@@ -35,12 +35,12 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         # Set up provider
         self.provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session
+            self.session,
         )
 
     def tearDown(self):
-        self.session.close()
         self.trans.rollback()
+        self.session.close()
 
     def _create_test_data(self):
         from ..models import (
@@ -91,6 +91,27 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(cath)
         cath.broader_concepts.add(con)
         self.session.flush()
+
+    def test_default_recurse_strategy(self):
+        self.assertEqual('recurse', self.provider.expand_strategy)
+
+    def test_override_expand_strategy(self):
+        # Set up provider
+        self.provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 1},
+            self.session,
+            expand_strategy='visit'
+        )
+        self.assertEqual('visit', self.provider.expand_strategy)
+
+    def test_set_invalid_expand_strategy(self):
+        self.assertRaises(
+            ValueError,
+            self.provider.__init__,
+            {'id': 'SOORTEN', 'conceptscheme_id': 1},
+            self.session,
+            expand_strategy='invalid'
+        )
 
     def test_get_vocabulary_id(self):
         self.assertEquals('SOORTEN', self.provider.get_vocabulary_id())
@@ -184,5 +205,218 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEquals([3], ids)
 
     def test_expand_unexisting(self):
+        ids = self.provider.expand(404)
+        self.assertFalse(ids)
+
+
+class SQLAlchemyProviderExpandVisitTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = engine
+
+    def setUp(self):
+        connection = self.engine.connect()
+        self.trans = connection.begin()
+
+        # Setting up SQLAlchemy
+        from skosprovider_sqlalchemy.models import Base
+        Base.metadata.bind = engine
+        sm = sessionmaker(bind=engine)
+        self.session = sm()
+
+        # Set up testdata
+        self._create_test_data()
+
+        # Set up provider
+        self.provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 2},
+            self.session,
+            expand_strategy='visit'
+        )
+
+    def tearDown(self):
+        self.session.close()
+        self.trans.rollback()
+
+    def _create_test_data(self):
+        from ..models import (
+            Concept,
+            ConceptScheme,
+            Collection,
+            Label,
+            Visitation
+        )
+        cs = ConceptScheme(
+            id=2
+        )
+        self.session.add(cs)
+        con = Concept(
+            id=1,
+            concept_id=1,
+            conceptscheme=cs
+        )
+        self.session.add(con)
+        l = Label('Churches', 'prefLabel', 'en')
+        con.labels.append(l)
+        l = Label('Kerken', 'prefLabel', 'nl')
+        con.labels.append(l)
+        col = Collection(
+            id=2,
+            concept_id=2,
+            conceptscheme=cs
+        )
+        l = Label('Churches by function', 'prefLabel', 'en')
+        col.labels.append(l)
+        col.members.add(con)
+        self.session.add(col)
+        chap = Concept(
+            id=3,
+            concept_id=3,
+            conceptscheme=cs
+        )
+        l = Label('Chapels', 'prefLabel', 'en')
+        chap.labels.append(l)
+        self.session.add(chap)
+        chap.related_concepts.add(con)
+        cath = Concept(
+            id=4,
+            concept_id=4,
+            conceptscheme=cs
+        )
+        l = Label('Cathedrals', 'prefLabel', 'en')
+        cath.labels.append(l)
+        self.session.add(cath)
+        cath.broader_concepts.add(con)
+        self._create_visitation(cs)
+
+    def _create_visitation(self, cs):
+        from ..utils import (
+            VisitationCalculator
+        )
+        from ..models import (
+            Visitation
+        )
+
+        vc = VisitationCalculator(self.session)
+        visit = vc.visit(cs)
+        for v in visit:
+            vrow = Visitation(
+                conceptscheme=cs,
+                concept_id=v['id'],
+                lft=v['lft'],
+                rght=v['rght'],
+                depth=v['depth']
+            )
+            self.session.add(vrow)
+
+    def test_expand_concept_visit(self):
+        ids = self.provider.expand_concept(1)
+        self.assertEquals([1, 4], ids)
+
+    def test_expand_collection_visit(self):
+        ids = self.provider.expand(2)
+        self.assertEquals([1, 4], ids)
+
+    def test_expand_concept_without_narrower_visit(self):
+        ids = self.provider.expand(3)
+        self.assertEquals([3], ids)
+
+    def test_expand_unexisting_visit(self):
+        ids = self.provider.expand(404)
+        self.assertFalse(ids)
+
+class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = engine
+
+    def setUp(self):
+        connection = self.engine.connect()
+        self.trans = connection.begin()
+
+        # Setting up SQLAlchemy
+        from skosprovider_sqlalchemy.models import Base
+        Base.metadata.bind = engine
+        sm = sessionmaker(bind=engine)
+        self.session = sm()
+
+        # Set up testdata
+        self._create_test_data()
+
+        # Set up provider
+        self.provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 2},
+            self.session,
+            expand_strategy='visit'
+        )
+
+    def tearDown(self):
+        self.session.close()
+        self.trans.rollback()
+
+    def _create_test_data(self):
+        from ..models import (
+            Concept,
+            ConceptScheme,
+            Collection,
+            Label
+        )
+        cs = ConceptScheme(
+            id=2
+        )
+        self.session.add(cs)
+        con = Concept(
+            id=1,
+            concept_id=1,
+            conceptscheme=cs
+        )
+        self.session.add(con)
+        l = Label('Churches', 'prefLabel', 'en')
+        con.labels.append(l)
+        l = Label('Kerken', 'prefLabel', 'nl')
+        con.labels.append(l)
+        col = Collection(
+            id=2,
+            concept_id=2,
+            conceptscheme=cs
+        )
+        l = Label('Churches by function', 'prefLabel', 'en')
+        col.labels.append(l)
+        col.members.add(con)
+        self.session.add(col)
+        chap = Concept(
+            id=3,
+            concept_id=3,
+            conceptscheme=cs
+        )
+        l = Label('Chapels', 'prefLabel', 'en')
+        chap.labels.append(l)
+        self.session.add(chap)
+        chap.related_concepts.add(con)
+        cath = Concept(
+            id=4,
+            concept_id=4,
+            conceptscheme=cs
+        )
+        l = Label('Cathedrals', 'prefLabel', 'en')
+        cath.labels.append(l)
+        self.session.add(cath)
+        cath.broader_concepts.add(con)
+
+    def test_expand_concept(self):
+        ids = self.provider.expand_concept(1)
+        self.assertFalse(ids)
+
+    def test_expand_collection_visit(self):
+        ids = self.provider.expand(2)
+        self.assertFalse(ids)
+
+    def test_expand_concept_without_narrower_visit(self):
+        ids = self.provider.expand(3)
+        self.assertFalse(ids)
+
+    def test_expand_unexisting_visit(self):
         ids = self.provider.expand(404)
         self.assertFalse(ids)

@@ -13,7 +13,8 @@ from skosprovider.skos import (
 
 from skosprovider_sqlalchemy.models import (
     Thing,
-    Label as LabelModel
+    Label as LabelModel,
+    Visitation
 )
 
 from sqlalchemy.orm import (
@@ -27,12 +28,21 @@ from sqlalchemy.orm.exc import (
 
 class SQLAlchemyProvider(VocabularyProvider):
 
-    def __init__(self, metadata, session):
+    expand_strategy = 'recurse'
+
+    def __init__(self, metadata, session, **kwargs):
         super(SQLAlchemyProvider, self).__init__(metadata)
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
         )
         self.session = session
+        if 'expand_strategy' in kwargs:
+            if kwargs['expand_strategy'] in ['recurse', 'visit']:
+                self.expand_strategy = kwargs['expand_strategy']
+            else:
+                raise ValueError(
+                    'Unknown expand strategy.'
+                )
 
     def _from_thing(self, thing):
         '''
@@ -133,12 +143,45 @@ class SQLAlchemyProvider(VocabularyProvider):
                         ).one()
         except NoResultFound:
             return False
+
+        if self.expand_strategy == 'visit':
+            return self._expand_visit(thing)
+        elif self.expand_strategy == 'recurse':
+            return self._expand_recurse(thing)
+
+    def _expand_recurse(self, thing):
         ret = []
         if thing.type == 'collection':
             for m in thing.members:
-                ret = ret + self.expand(m.id)
+                ret += self._expand_recurse(m)
         else:
             ret.append(thing.id)
             for n in thing.narrower_concepts:
-                ret = ret + self.expand(n.id)
+                ret += self._expand_recurse(n)
+        return list(set(ret))
+
+    def _expand_visit(self, thing):
+        if thing.type == 'collection':
+            ret = []
+            for m in thing.members:
+                try:
+                    ret += self._expand_visit(m)
+                except TypeError:
+                    return False
+        else:
+            try:
+                cov = self.session\
+                          .query(Visitation.lft, Visitation.rght)\
+                          .filter(Visitation.conceptscheme_id == self.conceptscheme_id)\
+                          .filter(Visitation.concept_id == thing.id)\
+                          .one()
+            except NoResultFound:
+                return False
+
+            ids = self.session\
+                      .query(Visitation.concept_id)\
+                      .filter(Visitation.conceptscheme_id == self.conceptscheme_id)\
+                      .filter(Visitation.lft.between(cov[0],cov[1]))\
+                      .all()
+            ret = [id[0] for id in ids]
         return list(set(ret))

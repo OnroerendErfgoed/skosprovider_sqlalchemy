@@ -41,5 +41,4 @@ def main(argv=sys.argv):
         )
         session.add(vrow)
     session.commit()
-    session.commit()
 
