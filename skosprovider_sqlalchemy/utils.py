@@ -16,6 +16,7 @@ from skosprovider_sqlalchemy.models import (
     Note as NoteModel
 )
 
+
 def import_provider(provider, conceptscheme, session):
 
     #First pass: load all concepts and collections
@@ -50,7 +51,7 @@ def import_provider(provider, conceptscheme, session):
     #Second pass: link
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
-        if isinstance(c, Concept): 
+        if isinstance(c, Concept):
             if len(c.narrower) > 0:
                 cm = session.query(ConceptModel)\
                             .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
@@ -84,6 +85,7 @@ def import_provider(provider, conceptscheme, session):
                             .filter(ConceptModel.concept_id == int(mc))\
                             .one()
                 cm.members.add(mc)
+
 
 class VisitationCalculator(object):
 

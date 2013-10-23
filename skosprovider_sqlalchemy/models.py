@@ -11,50 +11,99 @@ from sqlalchemy import (
     ForeignKey,
     Table,
     event
-    )
+)
 
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     relationship,
     backref
-    )
+)
 
 Base = declarative_base()
 
-concept_label = Table('concept_label', Base.metadata,
+concept_label = Table(
+    'concept_label',
+    Base.metadata,
     Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True),
     Column('label_id', Integer, ForeignKey('label.id'), primary_key=True)
 )
 
-conceptscheme_label = Table('conceptscheme_label', Base.metadata,
-    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id'), primary_key=True),
+conceptscheme_label = Table(
+    'conceptscheme_label',
+    Base.metadata,
+    Column(
+        'conceptscheme_id',
+        Integer,
+        ForeignKey('conceptscheme.id'),
+        primary_key=True
+    ),
     Column('label_id', Integer, ForeignKey('label.id'), primary_key=True)
 )
 
-concept_note = Table('concept_note', Base.metadata,
+concept_note = Table(
+    'concept_note',
+    Base.metadata,
     Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True),
     Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
-conceptscheme_note = Table('conceptscheme_note', Base.metadata,
-    Column('conceptscheme_id', Integer, ForeignKey('conceptscheme.id'), primary_key=True),
+conceptscheme_note = Table(
+    'conceptscheme_note',
+    Base.metadata,
+    Column(
+        'conceptscheme_id',
+        Integer,
+        ForeignKey('conceptscheme.id'),
+        primary_key=True
+    ),
     Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
-collection_concept = Table('collection_concept', Base.metadata,
-    Column('collection_id', Integer, ForeignKey('concept.id'), primary_key = True),
-    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key = True)
+collection_concept = Table(
+    'collection_concept',
+    Base.metadata,
+    Column(
+        'collection_id',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    ),
+    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True)
 )
 
-concept_related_concept = Table('concept_related_concept', Base.metadata,
-    Column('concept_id_from', Integer, ForeignKey('concept.id'), primary_key=True),
-    Column('concept_id_to', Integer, ForeignKey('concept.id'), primary_key=True)
+concept_related_concept = Table(
+    'concept_related_concept',
+    Base.metadata,
+    Column(
+        'concept_id_from',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    ),
+    Column(
+        'concept_id_to',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    )
 )
 
-concept_hierarchy_concept  = Table('concept_hierarchy_concept', Base.metadata,
-    Column('concept_id_broader', Integer, ForeignKey('concept.id'), primary_key=True),
-    Column('concept_id_narrower', Integer, ForeignKey('concept.id'), primary_key=True)
+concept_hierarchy_concept = Table(
+    'concept_hierarchy_concept', 
+    Base.metadata,
+    Column(
+        'concept_id_broader',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    ),
+    Column(
+        'concept_id_narrower',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    )
 )
 
 
@@ -69,15 +118,15 @@ class Thing(Base):
     )
     uri = Column(String(512))
     labels = relationship(
-        'Label', 
-        secondary=concept_label, 
+        'Label',
+        secondary=concept_label,
         backref=backref('concept', uselist=False),
         cascade='all, delete-orphan',
         single_parent=True
     )
     notes = relationship(
-        'Note', 
-        secondary=concept_note, 
+        'Note',
+        secondary=concept_note,
         backref=backref('concept', uselist=False),
         cascade='all, delete-orphan',
         single_parent=True
@@ -85,7 +134,7 @@ class Thing(Base):
 
     conceptscheme = relationship('ConceptScheme', backref='concepts')
     conceptscheme_id = Column(
-        Integer, 
+        Integer,
         ForeignKey('conceptscheme.id'),
         nullable=False,
         index=True
@@ -103,15 +152,15 @@ class Thing(Base):
 class Concept(Thing):
 
     related_concepts = relationship(
-        'Concept', 
-        secondary=concept_related_concept, 
+        'Concept',
+        secondary=concept_related_concept,
         primaryjoin='Concept.id==concept_related_concept.c.concept_id_to',
         secondaryjoin='Concept.id==concept_related_concept.c.concept_id_from',
         collection_class=set
     )
 
     narrower_concepts = relationship(
-        'Concept', 
+        'Concept',
         secondary=concept_hierarchy_concept,
         backref=backref('broader_concepts', collection_class=set),
         primaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_broader',
@@ -134,7 +183,11 @@ def related_concepts_append_listener(target, value, initiator):
     if (target) not in getattr(value, '__related_to__', set()):
         value.related_concepts.add(target)
 
-event.listen(Concept.related_concepts, 'append', related_concepts_append_listener)
+event.listen(
+    Concept.related_concepts,
+    'append',
+    related_concepts_append_listener
+)
 
 
 def related_concepts_remove_listener(target, value, initiator):
@@ -148,7 +201,7 @@ def related_concepts_remove_listener(target, value, initiator):
     target.__removed_from__.add(value)
 
     if target in value.related_concepts and target not in getattr(value, '__removed_from__', set()):
-        value.related_concepts.remove(target)
+            value.related_concepts.remove(target)
 
 event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listener)
 
@@ -160,8 +213,8 @@ class Collection(Thing):
     }
 
     members = relationship(
-        'Thing', 
-        secondary=collection_concept, 
+        'Thing',
+        secondary=collection_concept,
         backref=backref('collections'),
         primaryjoin='Thing.id==collection_concept.c.collection_id',
         secondaryjoin='Thing.id==collection_concept.c.concept_id',
@@ -196,7 +249,6 @@ class Language(Base):
 
 class LabelType(Base):
     __tablename__ = 'labeltype'
-    
     name = Column(String(20), primary_key=True)
     description = Column(Text)
 
@@ -211,20 +263,20 @@ class LabelType(Base):
 class Label(Base):
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
-    label= Column(
+    label = Column(
         String(512),
         nullable=False
     )
 
-    labeltype = relationship('LabelType', uselist = False)
-    language = relationship('Language', uselist = False)
+    labeltype = relationship('LabelType', uselist=False)
+    language = relationship('Language', uselist=False)
 
     labeltype_id = Column(
-        String(20), 
+        String(20),
         ForeignKey('labeltype.name'),
         nullable=False,
         index=True
-    ) 
+    )
     language_id = Column(
         String(10),
         ForeignKey('language.id'),
@@ -232,7 +284,7 @@ class Label(Base):
         index=True
     )
 
-    def __init__(self, label, labeltype_id = 'prefLabel', language_id = None):
+    def __init__(self, label, labeltype_id='prefLabel', language_id=None):
         self.labeltype_id = labeltype_id
         self.language_id = language_id
         self.label = label
@@ -243,12 +295,11 @@ class Label(Base):
 
 class NoteType(Base):
     __tablename__ = 'notetype'
-    
+
     name = Column(String(20), primary_key=True)
     description = Column(Text)
 
     def __init__(self, name, description):
-        
         self.name = name
         self.description = description
 
@@ -264,15 +315,15 @@ class Note(Base):
         nullable=False
     )
 
-    notetype = relationship('NoteType', uselist = False)
+    notetype = relationship('NoteType', uselist=False)
     notetype_id = Column(
-        String(20), 
+        String(20),
         ForeignKey('notetype.name'),
         nullable=False,
         index=True
     )
 
-    language = relationship('Language', uselist = False)
+    language = relationship('Language', uselist=False)
     language_id = Column(
         String(10),
         ForeignKey('language.id'),
@@ -298,7 +349,7 @@ class Visitation(Base):
 
     conceptscheme = relationship('ConceptScheme')
     conceptscheme_id = Column(
-        Integer, 
+        Integer,
         ForeignKey('conceptscheme.id'),
         nullable=False,
         index=True
@@ -349,15 +400,13 @@ def label(labels=[], language='any'):
         return None
 
 
-
-
 class Initialiser(object):
     '''
     Initialises a database.
 
     Adds necessary values for labelType, noteType and language to the database.
 
-    The list of languages added by default is very small and will probably need 
+    The list of languages added by default is very small and will probably need
     to be expanded for your local needs.
     '''
 

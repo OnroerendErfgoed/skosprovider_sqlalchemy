@@ -116,7 +116,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'You are searching for items in an unexisting collection.'
                 )
             q = q.filter(
-                Thing.collections.any(Thing.concept_id == query['collection']['id'])
+                Thing.collections.any(Thing.concept_id == coll.id)
             )
         all = q.all()
         return [self._get_id_and_label(c, lan) for c in all]
@@ -181,7 +181,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             ids = self.session\
                       .query(Visitation.concept_id)\
                       .filter(Visitation.conceptscheme_id == self.conceptscheme_id)\
-                      .filter(Visitation.lft.between(cov[0],cov[1]))\
+                      .filter(Visitation.lft.between(cov[0], cov[1]))\
                       .all()
             ret = [id[0] for id in ids]
         return list(set(ret))
