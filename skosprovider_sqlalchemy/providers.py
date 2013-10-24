@@ -27,10 +27,32 @@ from sqlalchemy.orm.exc import (
 
 
 class SQLAlchemyProvider(VocabularyProvider):
+    '''
+    A :class:`skosprovider.providers.VocabularyProvider` that uses SQLAlchemy 
+    as backend.
+    '''
 
     expand_strategy = 'recurse'
+    '''
+    Determines how the expand method will operate. Options are:
+
+    - `recurse`: Determine all narrower concepts by recursivly querying the 
+        database. Can take a long time for concepts that are at the top of a 
+        large hierarchy.
+    - 'visit': Query the database's `Visitation` table. This table contains a
+        nested set representation of each conceptscheme. Actually creating the 
+        data in this table needs to be scheduled.
+    '''
 
     def __init__(self, metadata, session, **kwargs):
+        '''
+        Create a new provider
+
+        :param dict metadata: Metadata about the provider. Apart from the usual
+        id, a conceptscheme_id can also be passed.
+        :param :class:`sqlachemy.orm.session.Session` session: The database 
+        session.
+        '''
         super(SQLAlchemyProvider, self).__init__(metadata)
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
@@ -48,7 +70,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         Load one concept or collection from the database.
 
-        :param skosprovider_sqlalchemy.models.Thing thing: Thing to load.
+        :param :class:`skosprovider_sqlalchemy.models.Thing` thing: Thing to load.
         '''
         if thing.type and thing.type == 'collection':
             return Collection(
@@ -73,6 +95,11 @@ class SQLAlchemyProvider(VocabularyProvider):
             )
 
     def get_by_id(self, id):
+        '''
+        :param string id: An id for a Concept or Collection.
+        :rtype: :class:`skosprovider.skos.concept` or 
+            :class:`skosprovider.skos.Collection`.
+        '''
         try:
             thing = self.session\
                         .query(Thing)\

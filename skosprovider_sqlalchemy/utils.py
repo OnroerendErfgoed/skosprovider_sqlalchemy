@@ -88,11 +88,22 @@ def import_provider(provider, conceptscheme, session):
 
 
 class VisitationCalculator(object):
+    '''
+    Generates a nested set for a conceptscheme.
+    '''
 
     def __init__(self, session):
+        '''
+        :param :class:`sqlalchemy.orm.session.Session` session: A database 
+            session.
+        '''
         self.session = session
 
     def visit(self, conceptscheme):
+        '''
+        Visit a :class:`skosprovider_sqlalchemy.models.Conceptscheme` and
+        calculate a nested set representation.
+        '''
         self.count = 0
         self.depth = 0
         self.visitation = []
