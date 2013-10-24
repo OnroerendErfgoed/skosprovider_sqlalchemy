@@ -108,6 +108,9 @@ concept_hierarchy_concept = Table(
 
 
 class Thing(Base):
+    '''
+    Abstract class for both :class:`Concept` and :class:`Collection`.
+    '''
     __tablename__ = 'concept'
     id = Column(Integer, primary_key=True)
     type = Column(String(30))
@@ -150,6 +153,9 @@ class Thing(Base):
 
 
 class Concept(Thing):
+    '''
+    A concept as know by :term:`SKOS`.
+    '''
 
     related_concepts = relationship(
         'Concept',
@@ -174,6 +180,10 @@ class Concept(Thing):
 
 
 def related_concepts_append_listener(target, value, initiator):
+    '''
+    Listener that make sure that related concepts have a bidirectional 
+    relationship.
+    '''
 
     if not hasattr(target, '__related_to_'):
         target.__related_to__ = set()
@@ -191,6 +201,9 @@ event.listen(
 
 
 def related_concepts_remove_listener(target, value, initiator):
+    '''
+    Listener to remove a related concept from both ends of the relationship.
+    '''
 
     if (value) in getattr(target, '__related_to__', set()):
         target.__related_to__.remove(value)
@@ -207,6 +220,9 @@ event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listene
 
 
 class Collection(Thing):
+    '''
+    A collection as know by :term:`SKOS`.
+    '''
 
     __mapper_args__ = {
         'polymorphic_identity': 'collection'
@@ -223,6 +239,9 @@ class Collection(Thing):
 
 
 class ConceptScheme(Base):
+    '''
+    A :term:`SKOS` conceptscheme.
+    '''
     __tablename__ = 'conceptscheme'
     id = Column(Integer, primary_key=True)
     uri = Column(String(512))
@@ -235,6 +254,9 @@ class ConceptScheme(Base):
 
 
 class Language(Base):
+    '''
+    A Language.
+    '''
     __tablename__ = 'language'
     id = Column(String(10), primary_key=True)
     name = Column(String(255))
@@ -248,6 +270,9 @@ class Language(Base):
 
 
 class LabelType(Base):
+    '''
+    A labelType according to :term:`SKOS`.
+    '''
     __tablename__ = 'labeltype'
     name = Column(String(20), primary_key=True)
     description = Column(Text)
@@ -261,6 +286,10 @@ class LabelType(Base):
 
 
 class Label(Base):
+    '''
+    A label for a :class:`Concept`, :class:`Collection` or 
+    :class:`ConceptScheme`.
+    '''
     __tablename__ = 'label'
     id = Column(Integer, primary_key=True)
     label = Column(
@@ -294,6 +323,9 @@ class Label(Base):
 
 
 class NoteType(Base):
+    '''
+    A noteType according to :term:`SKOS`.
+    '''
     __tablename__ = 'notetype'
 
     name = Column(String(20), primary_key=True)
@@ -308,6 +340,10 @@ class NoteType(Base):
 
 
 class Note(Base):
+    '''
+    A note for a :class:`Concept`, :class:`Collection` or 
+    :class:`ConceptScheme`.
+    '''
     __tablename__ = 'note'
     id = Column(Integer, primary_key=True)
     note = Column(
@@ -341,6 +377,15 @@ class Note(Base):
 
 
 class Visitation(Base):
+    '''
+    Holds several nested sets.
+
+    The visitation object and table hold several nested sets. Each
+    :class:`skosprovider_sqlalchemy.models.Visitation` holds the positional
+    information for one conceptplacement in a certain nested set.
+
+    Each conceptscheme gets its own separate nested set.
+    '''
     __tablename__ = 'visitation'
     id = Column(Integer, primary_key=True)
     lft = Column(Integer, index=True, nullable=False)
@@ -408,17 +453,24 @@ class Initialiser(object):
 
     The list of languages added by default is very small and will probably need
     to be expanded for your local needs.
+
     '''
 
     def __init__(self, session):
         self.session = session
 
     def init_all(self):
+        '''
+        Initialise all objects (labeltype, notetype, language).
+        '''
         self.init_labeltype()
         self.init_notetype()
         self.init_languages()
 
     def init_notetype(self):
+        '''
+        Initialise the notetypes.
+        '''
         notetypes = [
             ('changeNote', 'A change note.'),
             ('definition', 'A definition.'),
@@ -433,6 +485,9 @@ class Initialiser(object):
             self.session.add(nt)
 
     def init_labeltype(self):
+        '''
+        Initialise the labeltypes.
+        '''
         labeltypes = [
             ('hiddenLabel', 'A hidden label.'),
             ('altLabel', 'An alternative label.'),
@@ -443,6 +498,12 @@ class Initialiser(object):
             self.session.add(lt)
 
     def init_languages(self):
+        '''
+        Initialise the languages.
+
+        Only adds a small set of languages. Will probably not be sufficient
+        for most use cases.
+        '''
         languages = [
             ('la', 'Latin'),
             ('nl', 'Dutch'),
