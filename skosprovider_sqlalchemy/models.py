@@ -90,7 +90,7 @@ concept_related_concept = Table(
 )
 
 concept_hierarchy_concept = Table(
-    'concept_hierarchy_concept', 
+    'concept_hierarchy_concept',
     Base.metadata,
     Column(
         'concept_id_broader',
@@ -181,7 +181,7 @@ class Concept(Thing):
 
 def related_concepts_append_listener(target, value, initiator):
     '''
-    Listener that make sure that related concepts have a bidirectional 
+    Listener that make sure that related concepts have a bidirectional
     relationship.
     '''
 
@@ -246,8 +246,16 @@ class ConceptScheme(Base):
     id = Column(Integer, primary_key=True)
     uri = Column(String(512))
 
-    labels = relationship('Label', secondary=conceptscheme_label, backref=backref('conceptscheme', uselist=False))
-    notes = relationship('Note', secondary=conceptscheme_note, backref=backref('conceptscheme', uselist=False))
+    labels = relationship(
+        'Label',
+        secondary=conceptscheme_label,
+        backref=backref('conceptscheme', uselist=False)
+    )
+    notes = relationship(
+        'Note',
+        secondary=conceptscheme_note,
+        backref=backref('conceptscheme', uselist=False)
+    )
 
     def label(self, language='any'):
         return label(self.labels, language)
@@ -287,7 +295,7 @@ class LabelType(Base):
 
 class Label(Base):
     '''
-    A label for a :class:`Concept`, :class:`Collection` or 
+    A label for a :class:`Concept`, :class:`Collection` or
     :class:`ConceptScheme`.
     '''
     __tablename__ = 'label'
@@ -341,7 +349,7 @@ class NoteType(Base):
 
 class Note(Base):
     '''
-    A note for a :class:`Concept`, :class:`Collection` or 
+    A note for a :class:`Concept`, :class:`Collection` or
     :class:`ConceptScheme`.
     '''
     __tablename__ = 'note'

@@ -24,9 +24,9 @@ def import_provider(provider, conceptscheme, session):
     :param provider: The :class:`skosprovider.providers.VocabularyProvider`
         to import. Since the SQLAlchemy backend uses integers as
         keys, this backend should have id values that can be cast to int.
-    :param conceptscheme: A 
-        :class:`skosprovider_sqlalchemy.models.Conceptscheme` to import 
-        the provider into. This should be an empty scheme so that there are 
+    :param conceptscheme: A
+        :class:`skosprovider_sqlalchemy.models.Conceptscheme` to import
+        the provider into. This should be an empty scheme so that there are
         no possible id clashes.
     :param session:  A :class:`sqlalchemy.orm.session.Session`.
 
@@ -107,7 +107,7 @@ class VisitationCalculator(object):
 
     def __init__(self, session):
         '''
-        :param :class:`sqlalchemy.orm.session.Session` session: A database 
+        :param :class:`sqlalchemy.orm.session.Session` session: A database
             session.
         '''
         self.session = session

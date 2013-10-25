@@ -28,7 +28,7 @@ from sqlalchemy.orm.exc import (
 
 class SQLAlchemyProvider(VocabularyProvider):
     '''
-    A :class:`skosprovider.providers.VocabularyProvider` that uses SQLAlchemy 
+    A :class:`skosprovider.providers.VocabularyProvider` that uses SQLAlchemy
     as backend.
     '''
 
@@ -36,11 +36,11 @@ class SQLAlchemyProvider(VocabularyProvider):
     '''
     Determines how the expand method will operate. Options are:
 
-    - `recurse`: Determine all narrower concepts by recursivly querying the 
-        database. Can take a long time for concepts that are at the top of a 
+    - `recurse`: Determine all narrower concepts by recursivly querying the
+        database. Can take a long time for concepts that are at the top of a
         large hierarchy.
     - `visit`: Query the database's `Visitation` table. This table contains a
-        nested set representation of each conceptscheme. Actually creating the 
+        nested set representation of each conceptscheme. Actually creating the
         data in this table needs to be scheduled.
     '''
 
@@ -50,7 +50,7 @@ class SQLAlchemyProvider(VocabularyProvider):
 
         :param dict metadata: Metadata about the provider. Apart from the usual
         id, a conceptscheme_id can also be passed.
-        :param :class:`sqlachemy.orm.session.Session` session: The database 
+        :param :class:`sqlachemy.orm.session.Session` session: The database
         session.
         '''
         super(SQLAlchemyProvider, self).__init__(metadata)
@@ -70,7 +70,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         Load one concept or collection from the database.
 
-        :param :class:`skosprovider_sqlalchemy.models.Thing` thing: Thing to load.
+        :param :class:`skosprovider_sqlalchemy.models.Thing` thing: Thing
+            to load.
         '''
         if thing.type and thing.type == 'collection':
             return Collection(
