@@ -6,6 +6,10 @@
 Welcome to Skosprovider_sqlalchemy's documentation!
 ===================================================
 
+This library offers an implementation of the Skosprovider interface that uses
+a SQLALchemy backend. While a Skosprovider is a read-only interface, the 
+underlying SQLAlchemy domain model is fully writeable.
+
 Contents:
 
 .. toctree::

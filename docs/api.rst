@@ -2,16 +2,16 @@
 API Documentation
 =================
 
-Models module
--------------
-
-.. automodule:: skosprovider_sqlalchemy.models
-   :members:
-
 Providers module
 ----------------
 
 .. automodule:: skosprovider_sqlalchemy.providers
+   :members:
+
+Models module
+-------------
+
+.. automodule:: skosprovider_sqlalchemy.models
    :members:
 
 Utils module

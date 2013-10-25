@@ -39,7 +39,7 @@ class SQLAlchemyProvider(VocabularyProvider):
     - `recurse`: Determine all narrower concepts by recursivly querying the 
         database. Can take a long time for concepts that are at the top of a 
         large hierarchy.
-    - 'visit': Query the database's `Visitation` table. This table contains a
+    - `visit`: Query the database's `Visitation` table. This table contains a
         nested set representation of each conceptscheme. Actually creating the 
         data in this table needs to be scheduled.
     '''
@@ -95,11 +95,6 @@ class SQLAlchemyProvider(VocabularyProvider):
             )
 
     def get_by_id(self, id):
-        '''
-        :param string id: An id for a Concept or Collection.
-        :rtype: :class:`skosprovider.skos.concept` or 
-            :class:`skosprovider.skos.Collection`.
-        '''
         try:
             thing = self.session\
                         .query(Thing)\

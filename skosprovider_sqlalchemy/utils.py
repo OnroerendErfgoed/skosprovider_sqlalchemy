@@ -18,6 +18,19 @@ from skosprovider_sqlalchemy.models import (
 
 
 def import_provider(provider, conceptscheme, session):
+    '''
+    Import a provider into a SQLAlchemy database.
+
+    :param provider: The :class:`skosprovider.providers.VocabularyProvider`
+        to import. Since the SQLAlchemy backend uses integers as
+        keys, this backend should have id values that can be cast to int.
+    :param conceptscheme: A 
+        :class:`skosprovider_sqlalchemy.models.Conceptscheme` to import 
+        the provider into. This should be an empty scheme so that there are 
+        no possible id clashes.
+    :param session:  A :class:`sqlalchemy.orm.session.Session`.
+
+    '''
 
     #First pass: load all concepts and collections
     for stuff in provider.get_all():
@@ -103,6 +116,10 @@ class VisitationCalculator(object):
         '''
         Visit a :class:`skosprovider_sqlalchemy.models.Conceptscheme` and
         calculate a nested set representation.
+
+        :param conceptscheme: A
+            :class:`skosprovider_sqlalchemy.models.Conceptscheme` for which
+            the nested set will be calculated.
         '''
         self.count = 0
         self.depth = 0
