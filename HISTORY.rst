@@ -6,5 +6,5 @@
 - Implementation of a :class:`skosprovider.providers.VocabularyProvider` that 
   uses this model.
 - Can query a hierarchy recursively or using nested sets.
-- Utilty function to import a :class:`skosprovider.providers.VocabularyProvider`
+- Utility function to import a :class:`skosprovider.providers.VocabularyProvider`
   in a database.
