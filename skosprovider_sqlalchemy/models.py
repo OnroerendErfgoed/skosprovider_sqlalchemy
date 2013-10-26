@@ -154,7 +154,7 @@ class Thing(Base):
 
 class Concept(Thing):
     '''
-    A concept as know by :term:`SKOS`.
+    A concept as know by :term:`skosprovider:SKOS`.
     '''
 
     related_concepts = relationship(
@@ -181,7 +181,7 @@ class Concept(Thing):
 
 def related_concepts_append_listener(target, value, initiator):
     '''
-    Listener that make sure that related concepts have a bidirectional
+    Listener that ensures related concepts have a bidirectional
     relationship.
     '''
 
@@ -221,7 +221,7 @@ event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listene
 
 class Collection(Thing):
     '''
-    A collection as know by :term:`SKOS`.
+    A collection as know by :term:`skosprovider:SKOS`.
     '''
 
     __mapper_args__ = {
@@ -240,7 +240,7 @@ class Collection(Thing):
 
 class ConceptScheme(Base):
     '''
-    A :term:`SKOS` conceptscheme.
+    A :term:`skosprovider:SKOS` conceptscheme.
     '''
     __tablename__ = 'conceptscheme'
     id = Column(Integer, primary_key=True)
@@ -279,7 +279,7 @@ class Language(Base):
 
 class LabelType(Base):
     '''
-    A labelType according to :term:`SKOS`.
+    A labelType according to :term:`skosprovider:SKOS`.
     '''
     __tablename__ = 'labeltype'
     name = Column(String(20), primary_key=True)
@@ -332,7 +332,7 @@ class Label(Base):
 
 class NoteType(Base):
     '''
-    A noteType according to :term:`SKOS`.
+    A noteType according to :term:`skosprovider:SKOS`.
     '''
     __tablename__ = 'notetype'
 
@@ -435,7 +435,12 @@ def label(labels=[], language='any'):
     If a language or None was specified, and no label could be found, this
     method will automatically try to find a label in some other language.
 
-    Finally, if no label could be found, None is returned.
+    Finally, if no label could be found, `None` is returned.
+
+    :param list labels: A list of :class:`labels <Label>`.
+    :param str language: The language for which a label should preferentially 
+        be returned.
+    :rtype: A :class:`Label` or `None` if no label could be found.
     '''
     alt = None
     for l in labels:

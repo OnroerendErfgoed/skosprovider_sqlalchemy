@@ -6,9 +6,12 @@
 Welcome to Skosprovider_sqlalchemy's documentation!
 ===================================================
 
-This library offers an implementation of the Skosprovider interface that uses
-a SQLALchemy backend. While a Skosprovider is a read-only interface, the 
-underlying SQLAlchemy domain model is fully writeable.
+This library offers an implementation of the 
+:class:`skosprovider.providers.VocabularyProvider`
+interface that uses a SQLALchemy_ backend. While a 
+:class:`VocabularyProvider <skosprovider.providers.VocabularyProvider>` is
+a read-only interface, the underlying SQLAlchemy_ domain model is fully 
+writeable.
 
 Contents:
 
@@ -17,9 +20,8 @@ Contents:
 
    api
    changes
-   glossary
 
-
+.. _SQLAlchemy: http://docs.sqlalchemy.org/
 
 Indices and tables
 ==================

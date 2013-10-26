@@ -36,12 +36,13 @@ class SQLAlchemyProvider(VocabularyProvider):
     '''
     Determines how the expand method will operate. Options are:
 
-    - `recurse`: Determine all narrower concepts by recursivly querying the
-        database. Can take a long time for concepts that are at the top of a
-        large hierarchy.
-    - `visit`: Query the database's `Visitation` table. This table contains a
-        nested set representation of each conceptscheme. Actually creating the
-        data in this table needs to be scheduled.
+    * `recurse`: Determine all narrower concepts by recursivly querying the
+      database. Can take a long time for concepts that are at the top of a
+      large hierarchy.
+    * `visit`: Query the database's 
+      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table. 
+      This table contains a nested set representation of each conceptscheme. 
+      Actually creating the data in this table needs to be scheduled.
     '''
 
     def __init__(self, metadata, session, **kwargs):

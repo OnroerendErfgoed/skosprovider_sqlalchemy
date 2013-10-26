@@ -286,4 +286,7 @@ epub_copyright = u'2013, Koen Van Daele'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/', None),
+    'skosprovider': ('http://skosprovider.readthedocs.org/en/latest', None)
+}
