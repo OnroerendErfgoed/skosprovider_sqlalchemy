@@ -1,8 +1,8 @@
-0.1.1
------
+0.1.1 (28-11-2013)
+------------------
 
-* Fixed a bug with collection members being passed in stead of their ids.
-* Fixed another bug where model ids were used in stead of concept ids.
+* Fixed a bug with collection members being passed instead of their ids.
+* Fixed another bug where model ids were used instead of concept ids.
 
 0.1.0
 -----
