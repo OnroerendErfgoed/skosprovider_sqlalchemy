@@ -81,7 +81,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                thing.members if hasattr(thing, 'members') else []
+                [member.id for member in thing.members] if hasattr(thing, 'members') else []
             )
         else:
             return Concept(
