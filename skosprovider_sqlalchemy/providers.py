@@ -81,7 +81,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                [member.id for member in thing.members] if hasattr(thing, 'members') else []
+                [member.concept_id for member in thing.members] if hasattr(thing, 'members') else []
             )
         else:
             return Concept(
@@ -91,9 +91,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                     for l in thing.labels
                 ],
                 thing.notes if hasattr(thing, 'notes') else [],
-                [c.id for c in thing.broader_concepts],
-                [c.id for c in thing.narrower_concepts],
-                [c.id for c in thing.related_concepts],
+                [c.concept_id for c in thing.broader_concepts],
+                [c.concept_id for c in thing.narrower_concepts],
+                [c.concept_id for c in thing.related_concepts],
             )
 
     def get_by_id(self, id):
