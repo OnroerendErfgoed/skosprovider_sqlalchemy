@@ -179,7 +179,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             for m in thing.members:
                 ret += self._expand_recurse(m)
         else:
-            ret.append(thing.id)
+            ret.append(thing.concept_id)
             for n in thing.narrower_concepts:
                 ret += self._expand_recurse(n)
         return list(set(ret))

@@ -54,7 +54,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         )
         self.session.add(cs)
         con = Concept(
-            id=1,
+            id=10,
             concept_id=1,
             conceptscheme=cs
         )
@@ -64,7 +64,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         l = Label('Kerken', 'prefLabel', 'nl')
         con.labels.append(l)
         col = Collection(
-            id=2,
+            id=20,
             concept_id=2,
             conceptscheme=cs
         )
@@ -73,7 +73,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         col.members.add(con)
         self.session.add(col)
         chap = Concept(
-            id=3,
+            id=30,
             concept_id=3,
             conceptscheme=cs
         )
@@ -82,7 +82,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(chap)
         chap.related_concepts.add(con)
         cath = Concept(
-            id=4,
+            id=40,
             concept_id=4,
             conceptscheme=cs
         )
@@ -133,6 +133,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         col = self.provider.get_by_id(2)
         self.assertIsInstance(col, Collection)
         self.assertEquals(2, col.id)
+        self.assertEquals([1], col.members)
 
     def test_get_all(self):
         all = self.provider.get_all()
@@ -368,7 +369,7 @@ class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
         )
         self.session.add(cs)
         con = Concept(
-            id=1,
+            id=89,
             concept_id=1,
             conceptscheme=cs
         )
@@ -378,7 +379,7 @@ class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
         l = Label('Kerken', 'prefLabel', 'nl')
         con.labels.append(l)
         col = Collection(
-            id=2,
+            id=250,
             concept_id=2,
             conceptscheme=cs
         )
@@ -387,7 +388,7 @@ class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
         col.members.add(con)
         self.session.add(col)
         chap = Concept(
-            id=3,
+            id=423,
             concept_id=3,
             conceptscheme=cs
         )
@@ -396,7 +397,7 @@ class SQLAlchemyProviderExpandVisitNoVisitationTests(unittest.TestCase):
         self.session.add(chap)
         chap.related_concepts.add(con)
         cath = Concept(
-            id=4,
+            id=214,
             concept_id=4,
             conceptscheme=cs
         )
