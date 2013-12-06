@@ -76,24 +76,24 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         if thing.type and thing.type == 'collection':
             return Collection(
-                thing.concept_id,
-                [
+                id=thing.concept_id,
+                labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                [member.concept_id for member in thing.members] if hasattr(thing, 'members') else []
+                members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else []
             )
         else:
             return Concept(
-                thing.concept_id,
-                [
+                id=thing.concept_id,
+                labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                thing.notes if hasattr(thing, 'notes') else [],
-                [c.concept_id for c in thing.broader_concepts],
-                [c.concept_id for c in thing.narrower_concepts],
-                [c.concept_id for c in thing.related_concepts],
+                notes=thing.notes if hasattr(thing, 'notes') else [],
+                broader=[c.concept_id for c in thing.broader_concepts],
+                narrower=[c.concept_id for c in thing.narrower_concepts],
+                related=[c.concept_id for c in thing.related_concepts],
             )
 
     def get_by_id(self, id):
