@@ -77,6 +77,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         if thing.type and thing.type == 'collection':
             return Collection(
                 id=thing.concept_id,
+                uri=thing.uri,
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -86,6 +87,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             return Concept(
                 id=thing.concept_id,
+                uri=thing.uri,
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -102,6 +104,18 @@ class SQLAlchemyProvider(VocabularyProvider):
                         .query(Thing)\
                         .filter(
                             Thing.concept_id == id,
+                            Thing.conceptscheme_id == self.conceptscheme_id
+                        ).one()
+        except NoResultFound:
+            return False
+        return self._from_thing(thing)
+
+    def get_by_uri(self, uri):
+        try:
+            thing = self.session\
+                        .query(Thing)\
+                        .filter(
+                            Thing.uri == uri,
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:

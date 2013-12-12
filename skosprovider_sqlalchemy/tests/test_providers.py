@@ -50,11 +50,13 @@ class SQLAlchemyProviderTests(unittest.TestCase):
             Label
         )
         cs = ConceptScheme(
-            id=1
+            id=1,
+            uri='urn:x-skosprovider:test'
         )
         self.session.add(cs)
         con = Concept(
             id=10,
+            uri='urn:x-skosprovider:test:1',
             concept_id=1,
             conceptscheme=cs
         )
@@ -65,6 +67,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         con.labels.append(l)
         col = Collection(
             id=20,
+            uri='urn:x-skosprovider:test:2',
             concept_id=2,
             conceptscheme=cs
         )
@@ -74,6 +77,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.session.add(col)
         chap = Concept(
             id=30,
+            uri='urn:x-skosprovider:test:3',
             concept_id=3,
             conceptscheme=cs
         )
@@ -83,6 +87,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         chap.related_concepts.add(con)
         cath = Concept(
             id=40,
+            uri='urn:x-skosprovider:test:4',
             concept_id=4,
             conceptscheme=cs
         )
@@ -128,12 +133,30 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         con = self.provider.get_by_id(404)
         self.assertFalse(con)
 
+    def test_get_concept_by_uri(self):
+        from skosprovider.skos import Concept
+        cona = self.provider.get_by_id(1)
+        conb = self.provider.get_by_uri('urn:x-skosprovider:test:1')
+        self.assertEqual(cona.id, conb.id)
+        self.assertEqual(cona.uri, conb.uri)
+
+    def test_get_unexisting_by_uri(self):
+        con = self.provider.get_by_uri('urn:x-skosprovider:test:404')
+        self.assertFalse(con)
+
     def test_get_collection_by_id(self):
         from skosprovider.skos import Collection
         col = self.provider.get_by_id(2)
         self.assertIsInstance(col, Collection)
         self.assertEquals(2, col.id)
         self.assertEquals([1], col.members)
+
+    def test_get_collection_by_uri(self):
+        from skosprovider.skos import Collection
+        cola = self.provider.get_by_id(2)
+        colb = self.provider.get_by_uri('urn:x-skosprovider:test:2')
+        self.assertEqual(cola.id, colb.id)
+        self.assertEqual(cola.uri, colb.uri)
 
     def test_get_all(self):
         all = self.provider.get_all()
