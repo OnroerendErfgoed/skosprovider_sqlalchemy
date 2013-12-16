@@ -13,6 +13,7 @@ from skosprovider.skos import (
 
 from skosprovider_sqlalchemy.models import (
     Thing,
+    Concept as ConceptModel,
     Label as LabelModel,
     Visitation
 )
@@ -167,6 +168,17 @@ class SQLAlchemyProvider(VocabularyProvider):
                   .all()
         lan = self._get_language(**kwargs)
         return [self._get_id_and_label(c, lan) for c in all]
+
+    def get_top_concepts(self, **kwargs):
+        top = self.session\
+                  .query(ConceptModel)\
+                  .options(joinedload('labels'))\
+                  .filter(
+                    ConceptModel.conceptscheme_id == self.conceptscheme_id,
+                    ConceptModel.broader_concepts == None
+                  ).all()
+        lan = self._get_language(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in top]
 
     def expand_concept(self, id):
         return self.expand(id)

@@ -166,6 +166,12 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertIn({'id': 3, 'label': 'Chapels'}, all)
         self.assertIn({'id': 4, 'label': 'Cathedrals'}, all)
 
+    def test_get_top_concepts(self):
+        all = self.provider.get_top_concepts()
+        self.assertEquals(2, len(all))
+        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
+
     def test_find_all(self):
         all = self.provider.find({})
         self.assertEquals(4, len(all))
