@@ -1,3 +1,10 @@
+0.2.0 (2013-12-??)
+------------------
+
+* Compatibility with skosprovider 0.3.0
+* Implement :meth:`skosprovider.providers.VocabularyProvider.get_by_uri`.
+* Implement :meth:`skosprovider.providers.VocabularyProvider.get_top_concepts`.
+
 0.1.2 (2013-12-06)
 ------------------
 
