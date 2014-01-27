@@ -106,6 +106,23 @@ concept_hierarchy_concept = Table(
     )
 )
 
+concept_hierarchy_collection = Table(
+    'concept_hierarchy_collection',
+    Base.metadata,
+    Column(
+        'concept_id_broader',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    ),
+    Column(
+        'collection_id_narrower',
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    )
+)
+
 
 class Thing(Base):
     '''
@@ -171,6 +188,15 @@ class Concept(Thing):
         backref=backref('broader_concepts', collection_class=set),
         primaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_broader',
         secondaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_narrower',
+        collection_class=set
+    )
+
+    narrower_collections = relationship(
+        'Collection',
+        secondary=concept_hierarchy_collection,
+        backref=backref('broader_concepts', collection_class=set),
+        primaryjoin='Concept.id==concept_hierarchy_collection.c.concept_id_broader',
+        secondaryjoin='Concept.id==concept_hierarchy_collection.c.collection_id_narrower',
         collection_class=set
     )
 

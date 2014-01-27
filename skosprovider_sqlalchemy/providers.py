@@ -14,6 +14,7 @@ from skosprovider.skos import (
 from skosprovider_sqlalchemy.models import (
     Thing,
     Concept as ConceptModel,
+    Collection as CollectionModel,
     Label as LabelModel,
     Visitation
 )
@@ -235,3 +236,60 @@ class SQLAlchemyProvider(VocabularyProvider):
                       .all()
             ret = [id[0] for id in ids]
         return list(set(ret))
+
+    def get_top_display(self, **kwargs):
+        '''
+        Returns all concepts or collections that form the top-level of a display
+        hierarchy.
+
+        As opposed to the :meth:`get_top_concepts`, this method can possibly
+        return both concepts and collections. 
+
+        :rtype: Returns a list of concepts and collections. For each an
+            id is present and a label. The label is determined by looking at 
+            the `**kwargs` parameter, the default language of the provider 
+            and falls back to `en` if nothing is present.
+        '''
+        tco = self.session\
+                  .query(ConceptModel)\
+                  .options(joinedload('labels'))\
+                  .filter(
+                    ConceptModel.conceptscheme_id == self.conceptscheme_id,
+                    ConceptModel.broader_concepts == None,
+                    ConceptModel.collections == None
+                  ).all()
+        tcl = self.session\
+                  .query(CollectionModel)\
+                  .options(joinedload('labels'))\
+                  .filter(
+                    CollectionModel.conceptscheme_id == self.conceptscheme_id
+                  ).all()
+        res = tco + tcl
+        lan = self._get_language(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in res]
+
+    def get_children_display(self, id, **kwargs):
+        '''
+        Return a list of concepts or collections that should be displayed
+        under this concept or collection.
+
+        :param id: A concept or collection id.
+        :rtype: A list of concepts and collections. For each an
+            id is present and a label. The label is determined by looking at
+            the `**kwargs` parameter, the default language of the provider 
+            and falls back to `en` if nothing is present. If the id does not 
+            exist, return `False`.
+        '''
+        c = self.get_by_id(id)
+        if not c:
+            return False
+        language = self._get_language(**kwargs)
+        ret = []
+        if isinstance(c, Concept):
+            display_children = c.narrower
+        else:
+            display_children = c.members
+        for id in display_children:
+            dc = self.get_by_id(id)
+            ret.append({'id': dc.id, 'label': dc.label(language).label})
+        return ret

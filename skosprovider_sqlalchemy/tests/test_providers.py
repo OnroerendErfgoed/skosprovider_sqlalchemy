@@ -172,6 +172,26 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertIn({'id': 1, 'label': 'Churches'}, all)
         self.assertIn({'id': 3, 'label': 'Chapels'}, all)
 
+    def test_get_top_display(self):
+        all = self.provider.get_top_display()
+        self.assertEquals(2, len(all))
+        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
+        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+
+    def test_get_children_display_unexisting(self):
+        children = self.provider.get_children_display(700)
+        self.assertFalse(children)
+
+    def test_get_children_display_collection(self):
+        children = self.provider.get_children_display(2)
+        self.assertEquals(1, len(children))
+        self.assertIn({'id': 1, 'label': 'Churches'}, children)
+
+    def test_get_children_display_concept(self):
+        children = self.provider.get_children_display(1)
+        self.assertEquals(1, len(children))
+        self.assertIn({'id': 4, 'label': 'Cathedrals'}, children)
+
     def test_find_all(self):
         all = self.provider.find({})
         self.assertEquals(4, len(all))

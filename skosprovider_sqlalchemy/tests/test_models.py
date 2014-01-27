@@ -118,6 +118,25 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(1, len(c1.narrower_concepts))
         self.assertEqual(1, len(c2.broader_concepts))
 
+    def test_broader_narrower_collection(self):
+        c1 = self._get_target_class()(
+            id=1,
+            concept_id=2
+        )
+        c2 = self._get_target_class()(
+            id=7,
+            concept_id=253
+        )
+        from ..models import Collection
+        c3 = Collection(
+            id=2,
+            concept_id=3
+        )
+        c2.narrower_collections.add(c3)
+        self.session.flush()
+        self.assertEqual(1, len(c2.narrower_collections))
+        self.assertEqual(1, len(c3.broader_concepts))
+
 
 class ConceptSchemeTests(ModelTestCase):
 
