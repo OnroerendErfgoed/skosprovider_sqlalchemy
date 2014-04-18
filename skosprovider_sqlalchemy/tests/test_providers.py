@@ -47,7 +47,8 @@ class SQLAlchemyProviderTests(unittest.TestCase):
             Concept,
             ConceptScheme,
             Collection,
-            Label
+            Label,
+            Note
         )
         cs = ConceptScheme(
             id=1,
@@ -93,6 +94,12 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         )
         l = Label('Cathedrals', 'prefLabel', 'en')
         cath.labels.append(l)
+        n = Note(
+            'A cathedral is a church which contains the seat of a bishop.',
+            'definition',
+            'en'
+        )
+        cath.notes.append(n)
         self.session.add(cath)
         cath.broader_concepts.add(con)
         self.session.flush()
@@ -143,6 +150,13 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_get_unexisting_by_uri(self):
         con = self.provider.get_by_uri('urn:x-skosprovider:test:404')
         self.assertFalse(con)
+
+
+    def test_concept_has_correct_note(self):
+        from skosprovider.skos import Note
+        cath = self.provider.get_by_id(4)
+        self.assertEqual(1, len(cath.notes))
+        self.assertIsInstance(cath.notes[0], Note) 
 
     def test_get_collection_by_id(self):
         from skosprovider.skos import Collection

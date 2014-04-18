@@ -8,7 +8,8 @@ from skosprovider.providers import VocabularyProvider
 from skosprovider.skos import (
     Concept,
     Collection,
-    Label
+    Label,
+    Note
 )
 
 from skosprovider_sqlalchemy.models import (
@@ -94,7 +95,10 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                notes=thing.notes if hasattr(thing, 'notes') else [],
+                notes=[
+                    Note(n.note, n.notetype_id, n.language_id)
+                    for n in thing.notes
+                ],
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],
                 related=[c.concept_id for c in thing.related_concepts],
