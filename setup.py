@@ -19,7 +19,7 @@ requires = [
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='0.2.0a1',
+    version='0.2.0a2',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read() + '\n\n' +
                      open('HISTORY.rst').read(),
@@ -42,6 +42,7 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
     ],
     test_suite='nose.collector',
     entry_points="""\
