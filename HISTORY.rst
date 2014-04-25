@@ -6,6 +6,7 @@
 * Implement :meth:`skosprovider.providers.VocabularyProvider.get_top_concepts`.
 * Implement :meth:`skosprovider.providers.VocabularyProvider.get_top_display`
   and :meth:`skosprovider.providers.VocabularyProvider.get_children_display`.
+* Add a UniqueConstraint(conceptscheme_id, concept_id) to Thing. (#3)
 
 0.1.2 (2013-12-06)
 ------------------
