@@ -9,6 +9,7 @@ from sqlalchemy import (
     Text,
     String,
     ForeignKey,
+    UniqueConstraint,
     Table,
     event
 )
@@ -129,6 +130,9 @@ class Thing(Base):
     Abstract class for both :class:`Concept` and :class:`Collection`.
     '''
     __tablename__ = 'concept'
+    __table_args__ = (
+        UniqueConstraint('conceptscheme_id', 'concept_id'),
+    )
     id = Column(Integer, primary_key=True)
     type = Column(String(30))
     concept_id = Column(
@@ -159,6 +163,7 @@ class Thing(Base):
         nullable=False,
         index=True
     )
+
 
     def label(self, language='any'):
         return label(self.labels, language)
