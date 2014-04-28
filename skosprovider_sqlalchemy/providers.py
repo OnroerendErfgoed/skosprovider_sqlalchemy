@@ -136,7 +136,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         l = c.label(lan)
         return {
             'id': c.concept_id,
-            'label': str(l) if l is not None else None
+            'label': l.label if l is not None else None
         }
 
     def find(self, query, **kwargs):
