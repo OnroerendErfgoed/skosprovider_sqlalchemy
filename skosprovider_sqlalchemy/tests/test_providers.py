@@ -136,6 +136,14 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEqual([3], con.related)
         self.assertEqual([4], con.narrower)
 
+    def test_get_concept_by_id_string(self):
+        from skosprovider.skos import Concept
+        con = self.provider.get_by_id('1')
+        self.assertIsInstance(con, Concept)
+        self.assertEqual(1, con.id)
+        self.assertEqual([3], con.related)
+        self.assertEqual([4], con.narrower)
+
     def test_get_unexisting_by_id(self):
         con = self.provider.get_by_id(404)
         self.assertFalse(con)

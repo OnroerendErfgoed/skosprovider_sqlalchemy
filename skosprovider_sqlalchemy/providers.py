@@ -109,7 +109,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             thing = self.session\
                         .query(Thing)\
                         .filter(
-                            Thing.concept_id == id,
+                            Thing.concept_id == int(id),
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:
