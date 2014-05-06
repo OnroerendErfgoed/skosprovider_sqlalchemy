@@ -190,7 +190,7 @@ class CollectionTests(ModelTestCase):
         col.members.add(c)
         self.session.flush()
         self.assertEqual(1, len(c.collections))
-        self.assertEqual(col, c.collections[0])
+        self.assertIn(col, c.collections)
 
     def test_duplicate_members(self):
         col = self._get_target_class()(
