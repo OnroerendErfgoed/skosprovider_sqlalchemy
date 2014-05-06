@@ -266,7 +266,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                   .query(CollectionModel)\
                   .options(joinedload('labels'))\
                   .filter(
-                    CollectionModel.conceptscheme_id == self.conceptscheme_id
+                    CollectionModel.conceptscheme_id == self.conceptscheme_id,
+                    CollectionModel.collections == None
                   ).all()
         res = tco + tcl
         lan = self._get_language(**kwargs)
