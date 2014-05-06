@@ -237,6 +237,7 @@ class ImportProviderTests(UtilsTestCase):
                               .filter(ConceptModel.concept_id == 11)\
                               .one()
         self.assertEqual(11, lobster.id)
+        self.assertEqual('urn:x-skosprovider:menu:11', lobster.uri)
         self.assertEqual('Lobster Thermidor', str(lobster.label()))
         self.assertEqual(1, len(lobster.notes))
 
@@ -254,6 +255,7 @@ class ImportProviderTests(UtilsTestCase):
                             .filter(ConceptModel.concept_id == 1)\
                             .one()
         self.assertEqual(1, world.concept_id)
+        self.assertEqual('urn:x-skosprovider:geography:1', world.uri)
         self.assertEqual('World', str(world.label('en')))
         self.assertEqual(1, len(world.labels))
         self.assertEqual(2, len(world.narrower_concepts))
@@ -262,6 +264,7 @@ class ImportProviderTests(UtilsTestCase):
                             .filter(CollectionModel.concept_id == 333)\
                             .one()
         self.assertEqual(333, dutch.concept_id)
+        self.assertEqual('urn:x-skosprovider:geography:333', dutch.uri)
         self.assertEqual('collection', dutch.type)
         self.assertEqual(1, len(dutch.labels))
         self.assertEqual(4, len(dutch.members))

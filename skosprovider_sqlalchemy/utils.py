@@ -38,6 +38,7 @@ def import_provider(provider, conceptscheme, session):
         if isinstance(c, Concept):
             cm = ConceptModel(
                 concept_id=int(c.id),
+                uri=c.uri,
                 conceptscheme=conceptscheme
             )
             for n in c.notes:
@@ -49,6 +50,7 @@ def import_provider(provider, conceptscheme, session):
         elif isinstance(c, Collection):
             cm = CollectionModel(
                 concept_id=int(c.id),
+                uri=c.uri,
                 conceptscheme=conceptscheme
             )
         for l in c.labels:
