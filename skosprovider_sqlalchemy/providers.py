@@ -136,6 +136,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         l = c.label(lan)
         return {
             'id': c.concept_id,
+            'uri': c.uri,
+            'type': c.type,
             'label': l.label if l is not None else None
         }
 
@@ -285,16 +287,22 @@ class SQLAlchemyProvider(VocabularyProvider):
             and falls back to `en` if nothing is present. If the id does not 
             exist, return `False`.
         '''
-        c = self.get_by_id(id)
-        if not c:
+        try:
+            thing = self.session\
+                        .query(Thing)\
+                        .filter(
+                            Thing.concept_id == int(id),
+                            Thing.conceptscheme_id == self.conceptscheme_id
+                        ).one()
+        except NoResultFound:
             return False
-        language = self._get_language(**kwargs)
         ret = []
-        if isinstance(c, Concept):
-            display_children = c.narrower
-        else:
-            display_children = c.members
-        for id in display_children:
-            dc = self.get_by_id(id)
-            ret.append({'id': dc.id, 'label': dc.label(language).label})
+        lan = self._get_language(**kwargs)
+        display_children = []
+        if hasattr(thing, 'narrower_concepts'):
+            display_children = thing.narrower_concepts
+        elif hasattr(thing, 'members'):
+            display_children = thing.members
+        for c in display_children:
+            ret.append(self._get_id_and_label(c, lan))
         return ret

@@ -183,22 +183,86 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_get_all(self):
         all = self.provider.get_all()
         self.assertEquals(4, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
-        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
-        self.assertIn({'id': 4, 'label': 'Cathedrals'}, all)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            all
+        )
+        self.assertIn(
+            {
+                'id': 2,
+                'uri': 'urn:x-skosprovider:test:2',
+                'type': 'collection',
+                'label': 'Churches by function'
+            }, 
+            all
+        )
+        self.assertIn(
+            {
+                'id': 3,
+                'uri': 'urn:x-skosprovider:test:3',
+                'type': 'concept',
+                'label': 'Chapels'
+            },
+            all
+        )
+        self.assertIn(
+            {
+                'id': 4,
+                'uri': 'urn:x-skosprovider:test:4',
+                'type': 'concept',
+                'label': 'Cathedrals'
+            },
+            all
+        )
 
     def test_get_top_concepts(self):
         all = self.provider.get_top_concepts()
         self.assertEquals(2, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            all
+        )
+        self.assertIn(
+            {
+                'id': 3,
+                'uri': 'urn:x-skosprovider:test:3',
+                'type': 'concept',
+                'label': 'Chapels'
+            },
+            all
+        )
 
     def test_get_top_display(self):
         all = self.provider.get_top_display()
         self.assertEquals(2, len(all))
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
-        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+        self.assertIn(
+            {
+                'id': 3,
+                'uri': 'urn:x-skosprovider:test:3',
+                'type': 'concept',
+                'label': 'Chapels'
+            },
+            all
+        )
+        self.assertIn(
+            {
+                'id': 2,
+                'uri': 'urn:x-skosprovider:test:2',
+                'type': 'collection',
+                'label': 'Churches by function'
+            }, 
+            all
+        )
 
     def test_get_children_display_unexisting(self):
         children = self.provider.get_children_display(700)
@@ -207,50 +271,88 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_get_children_display_collection(self):
         children = self.provider.get_children_display(2)
         self.assertEquals(1, len(children))
-        self.assertIn({'id': 1, 'label': 'Churches'}, children)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            children
+        )
 
     def test_get_children_display_concept(self):
         children = self.provider.get_children_display(1)
         self.assertEquals(1, len(children))
-        self.assertIn({'id': 4, 'label': 'Cathedrals'}, children)
+        self.assertIn(
+            {
+                'id': 4,
+                'uri': 'urn:x-skosprovider:test:4',
+                'type': 'concept',
+                'label': 'Cathedrals'
+            },
+            children
+        )
 
     def test_find_all(self):
         all = self.provider.find({})
         self.assertEquals(4, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
-        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
-        self.assertIn({'id': 4, 'label': 'Cathedrals'}, all)
 
     def test_find_type_all(self):
         all = self.provider.find({'type': 'all'})
         self.assertEquals(4, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
-        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
-        self.assertIn({'id': 4, 'label': 'Cathedrals'}, all)
 
     def test_find_type_concept(self):
         all = self.provider.find({'type': 'concept'})
         self.assertEquals(3, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
-        self.assertIn({'id': 3, 'label': 'Chapels'}, all)
-        self.assertIn({'id': 4, 'label': 'Cathedrals'}, all)
+        self.assertNotIn(
+            {
+                'id': 2,
+                'uri': 'urn:x-skosprovider:test:2',
+                'type': 'collection',
+                'label': 'Churches by function'
+            }, 
+            all
+        )
 
     def test_find_type_collection(self):
         all = self.provider.find({'type': 'collection'})
         self.assertEquals(1, len(all))
-        self.assertIn({'id': 2, 'label': 'Churches by function'}, all)
+        self.assertIn(
+            {
+                'id': 2,
+                'uri': 'urn:x-skosprovider:test:2',
+                'type': 'collection',
+                'label': 'Churches by function'
+            }, 
+            all
+        )
 
     def test_find_label_kerken(self):
         all = self.provider.find({'label': 'kerken'})
         self.assertEquals(1, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            all
+        )
 
     def test_find_label_churches_type_concept(self):
         all = self.provider.find({'label': 'churches', 'type': 'concept'})
         self.assertEquals(1, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            all
+        )
 
     def test_find_collection_unexisting(self):
         self.assertRaises(
@@ -262,7 +364,15 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_find_collection_2_no_depth(self):
         all = self.provider.find({'collection': {'id': 2}})
         self.assertEquals(1, len(all))
-        self.assertIn({'id': 1, 'label': 'Churches'}, all)
+        self.assertIn(
+            {
+                'id': 1,
+                'uri': 'urn:x-skosprovider:test:1',
+                'type': 'concept',
+                'label': 'Churches'
+            }, 
+            all
+        )
 
     def test_expand_concept(self):
         ids = self.provider.expand_concept(1)
