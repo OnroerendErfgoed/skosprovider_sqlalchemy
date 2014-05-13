@@ -85,7 +85,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
-                members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else []
+                members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
+                member_of=[member_of.concept_id for member_of in thing.member_of]
             )
         else:
             return Concept(
@@ -102,6 +103,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],
                 related=[c.concept_id for c in thing.related_concepts],
+                member_of=[member_of.concept_id for member_of in thing.member_of]
             )
 
     def get_by_id(self, id):
@@ -162,7 +164,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'You are searching for items in an unexisting collection.'
                 )
             q = q.filter(
-                Thing.collections.any(Thing.concept_id == coll.id)
+                Thing.member_of.any(Thing.concept_id == coll.id)
             )
         all = q.all()
         return [self._get_id_and_label(c, lan) for c in all]
@@ -262,14 +264,14 @@ class SQLAlchemyProvider(VocabularyProvider):
                   .filter(
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None,
-                    ConceptModel.collections == None
+                    ConceptModel.member_of == None
                   ).all()
         tcl = self.session\
                   .query(CollectionModel)\
                   .options(joinedload('labels'))\
                   .filter(
                     CollectionModel.conceptscheme_id == self.conceptscheme_id,
-                    CollectionModel.collections == None
+                    CollectionModel.member_of == None
                   ).all()
         res = tco + tcl
         lan = self._get_language(**kwargs)

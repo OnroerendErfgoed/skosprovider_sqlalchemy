@@ -7,6 +7,8 @@
 * Implement :meth:`skosprovider.providers.VocabularyProvider.get_top_display`
   and :meth:`skosprovider.providers.VocabularyProvider.get_children_display`.
 * Add a UniqueConstraint(conceptscheme_id, concept_id) to Thing. (#3)
+* Rename the `colletions` attribute of :class:`skosprovider_sqlalchemy.models.Thing`
+  to `member_of`. (#7)
 
 0.1.2 (2013-12-06)
 ------------------

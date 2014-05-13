@@ -148,6 +148,7 @@ class SQLAlchemyProviderTests(unittest.TestCase):
         self.assertEqual(1, con.id)
         self.assertEqual([3], con.related)
         self.assertEqual([4], con.narrower)
+        self.assertEqual([2], con.member_of)
 
     def test_get_concept_by_id_string(self):
         from skosprovider.skos import Concept

@@ -189,8 +189,8 @@ class CollectionTests(ModelTestCase):
         c = self._get_concept()
         col.members.add(c)
         self.session.flush()
-        self.assertEqual(1, len(c.collections))
-        self.assertIn(col, c.collections)
+        self.assertEqual(1, len(c.member_of))
+        self.assertIn(col, c.member_of)
 
     def test_duplicate_members(self):
         col = self._get_target_class()(
@@ -200,9 +200,9 @@ class CollectionTests(ModelTestCase):
         c = self._get_concept()
         col.members.add(c)
         self.session.flush()
-        self.assertEqual(1, len(c.collections))
+        self.assertEqual(1, len(c.member_of))
         col.members.add(c)
-        self.assertEqual(1, len(c.collections))
+        self.assertEqual(1, len(c.member_of))
 
 
 class LabelTests(ModelTestCase):

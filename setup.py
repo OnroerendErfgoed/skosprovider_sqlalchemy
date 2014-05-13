@@ -13,7 +13,7 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=0.3.0a1',
+    'skosprovider>=0.3.0b1',
     'sqlalchemy',
 ]
 
