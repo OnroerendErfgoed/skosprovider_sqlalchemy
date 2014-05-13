@@ -57,7 +57,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param :class:`sqlachemy.orm.session.Session` session: The database
         session.
         '''
-        super(SQLAlchemyProvider, self).__init__(metadata)
+        super(SQLAlchemyProvider, self).__init__(metadata, **kwargs)
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
         )

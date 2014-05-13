@@ -128,6 +128,19 @@ class SQLAlchemyProviderTests(unittest.TestCase):
     def test_get_vocabulary_id(self):
         self.assertEquals('SOORTEN', self.provider.get_vocabulary_id())
 
+    def test_set_uri_generator(self):
+        from skosprovider.uri import UriPatternGenerator
+        # Set up provider
+        self.provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 1},
+            self.session,
+            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
+        )
+        self.assertEqual(
+            'http://id.example.com/trees/1',
+            self.provider.uri_generator.generate(id=1)
+        )
+
     def test_get_concept_by_id(self):
         from skosprovider.skos import Concept
         con = self.provider.get_by_id(1)
