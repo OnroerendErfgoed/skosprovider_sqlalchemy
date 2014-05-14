@@ -13,8 +13,6 @@ interface that uses a SQLALchemy_ backend. While a
 a read-only interface, the underlying SQLAlchemy_ domain model is fully 
 writeable.
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 

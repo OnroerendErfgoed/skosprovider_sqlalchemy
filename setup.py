@@ -13,13 +13,13 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=0.3.0b1',
+    'skosprovider>=0.3.0',
     'sqlalchemy',
 ]
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='0.2.0a2',
+    version='0.2.0',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read() + '\n\n' +
                      open('HISTORY.rst').read(),
@@ -34,7 +34,7 @@ setup(
     license='MIT',
     zip_safe=False,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
@@ -43,6 +43,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4'
     ],
     test_suite='nose.collector',
     entry_points="""\
