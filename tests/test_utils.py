@@ -181,125 +181,105 @@ def _get_buildings():
     return buildings
 
 
-class UtilsTestCase(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.engine = engine
-
-    def setUp(self):
-        connection = self.engine.connect()
-        self.trans = connection.begin()
-
-        # Setting up SQLAlchemy
-        from skosprovider_sqlalchemy.models import Base
-        Base.metadata.bind = engine
-        sm = sessionmaker(bind=engine)
-        self.session = sm()
-
-    def tearDown(self):
-        self.session.close()
-        self.trans.rollback()
-
-
-class ImportProviderTests(UtilsTestCase):
+class TestImportProviderTests:
 
     def _get_cs(self):
         from skosprovider_sqlalchemy.models import (
             ConceptScheme as ConceptSchemeModel
         )
         return ConceptSchemeModel(
-            id=1
+            id=68
         )
 
-    def test_empty_provider(self):
+    def test_empty_provider(self, session):
         from skosprovider_sqlalchemy.models import (
             ConceptScheme as ConceptSchemeModel
         )
         from skosprovider.providers import DictionaryProvider
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(p, cs, self.session)
-        scheme = self.session.query(ConceptSchemeModel).get(1)
-        self.assertEqual(scheme, cs)
+        session.add(cs)
+        import_provider(p, cs, session)
+        scheme = session.query(ConceptSchemeModel).get(68)
+        assert scheme == cs
 
-    def test_menu(self):
+    def test_menu(self, session):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
         csvprovider = _get_menu()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
-        lobster = self.session.query(ConceptModel)\
-                              .filter(ConceptModel.conceptscheme == cs)\
-                              .filter(ConceptModel.concept_id == 11)\
-                              .one()
-        self.assertEqual(11, lobster.id)
-        self.assertEqual('urn:x-skosprovider:menu:11', lobster.uri)
-        self.assertEqual('Lobster Thermidor', str(lobster.label()))
-        self.assertEqual(1, len(lobster.notes))
+        session.add(cs)
+        import_provider(csvprovider, cs, session)
+        lobster = session.query(ConceptModel)\
+                         .filter(ConceptModel.conceptscheme == cs)\
+                         .filter(ConceptModel.concept_id == 11)\
+                         .one()
+        assert 11 == lobster.id
+        assert 'urn:x-skosprovider:menu:11' == lobster.uri
+        assert 'Lobster Thermidor' == str(lobster.label())
+        assert 1 == len(lobster.notes)
 
-    def test_geo(self):
+    def test_geo(self, session):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel,
             Collection as CollectionModel
         )
         geoprovider = _get_geo()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(geoprovider, cs, self.session)
-        world = self.session.query(ConceptModel)\
-                            .filter(ConceptModel.conceptscheme == cs)\
-                            .filter(ConceptModel.concept_id == 1)\
-                            .one()
-        self.assertEqual(1, world.concept_id)
-        self.assertEqual('urn:x-skosprovider:geography:1', world.uri)
-        self.assertEqual('World', str(world.label('en')))
-        self.assertEqual(1, len(world.labels))
-        self.assertEqual(2, len(world.narrower_concepts))
-        dutch = self.session.query(CollectionModel)\
-                            .filter(CollectionModel.conceptscheme == cs)\
-                            .filter(CollectionModel.concept_id == 333)\
-                            .one()
-        self.assertEqual(333, dutch.concept_id)
-        self.assertEqual('urn:x-skosprovider:geography:333', dutch.uri)
-        self.assertEqual('collection', dutch.type)
-        self.assertEqual(1, len(dutch.labels))
-        self.assertEqual(4, len(dutch.members))
-        netherlands = self.session\
-                          .query(ConceptModel)\
-                          .filter(ConceptModel.conceptscheme == cs)\
-                          .filter(ConceptModel.concept_id == 10)\
-                          .one()
-        self.assertEqual(10, netherlands.concept_id)
-        self.assertEqual('concept', netherlands.type)
-        self.assertEqual(1, len(netherlands.labels))
-        self.assertEqual(2, netherlands.broader_concepts.pop().concept_id)
-        self.assertEqual(1, len(netherlands.related_concepts))
+        session.add(cs)
+        import_provider(geoprovider, cs, session)
+        world = session.query(ConceptModel)\
+                       .filter(ConceptModel.conceptscheme == cs)\
+                       .filter(ConceptModel.concept_id == 1)\
+                       .one()
+        assert world.concept_id == 1
+        assert 'urn:x-skosprovider:geography:1' == world.uri
+        assert 'World' == str(world.label('en'))
+        assert 1 == len(world.labels)
+        assert 2 == len(world.narrower_concepts)
 
-    def test_buildings(self):
+        dutch = session.query(CollectionModel)\
+                       .filter(CollectionModel.conceptscheme == cs)\
+                       .filter(CollectionModel.concept_id == 333)\
+                       .one()
+        assert 333 == dutch.concept_id
+        assert 'urn:x-skosprovider:geography:333' == dutch.uri
+        assert 'collection' == dutch.type
+        assert 1 == len(dutch.labels)
+        assert 4 == len(dutch.members)
+
+        netherlands = session.query(ConceptModel)\
+                             .filter(ConceptModel.conceptscheme == cs)\
+                             .filter(ConceptModel.concept_id == 10)\
+                             .one()
+        assert 10 == netherlands.concept_id
+        assert 'concept' == netherlands.type
+        assert 1 == len(netherlands.labels)
+        assert 2 == netherlands.broader_concepts.pop().concept_id
+        assert 1 == len(netherlands.related_concepts)
+
+    def test_buildings(self, session):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
         buildingprovider = _get_buildings()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(buildingprovider, cs, self.session)
-        castle = self.session.query(ConceptModel)\
-                             .filter(ConceptModel.conceptscheme == cs)\
-                             .filter(ConceptModel.concept_id == 2)\
-                             .one()
-        self.assertEqual(2, len(castle.broader_concepts))
-        hut = self.session.query(ConceptModel)\
-                          .filter(ConceptModel.conceptscheme == cs)\
-                          .filter(ConceptModel.concept_id == 4)\
-                          .one()
-        self.assertEqual(1, len(hut.broader_concepts))
+        session.add(cs)
+        import_provider(buildingprovider, cs, session)
+        castle = session.query(ConceptModel)\
+                        .filter(ConceptModel.conceptscheme == cs)\
+                        .filter(ConceptModel.concept_id == 2)\
+                        .one()
+        assert 2 == len(castle.broader_concepts)
+        hut = session.query(ConceptModel)\
+                     .filter(ConceptModel.conceptscheme == cs)\
+                     .filter(ConceptModel.concept_id == 4)\
+                     .one()
+        assert 1 == len(hut.broader_concepts)
 
 
-class VisitationCalculatorTests(UtilsTestCase):
+class TestVisitationCalculator:
 
     def _get_cs(self):
         from skosprovider_sqlalchemy.models import (
@@ -309,83 +289,83 @@ class VisitationCalculatorTests(UtilsTestCase):
             id=1
         )
 
-    def test_empty_provider(self):
+    def test_empty_provider(self, session):
         from skosprovider.providers import DictionaryProvider
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(p, cs, self.session)
-        vc = VisitationCalculator(self.session)
+        session.add(cs)
+        import_provider(p, cs, session)
+        vc = VisitationCalculator(session)
         v = vc.visit(cs)
-        self.assertEqual(0, len(v))
+        assert 0 == len(v)
 
-    def test_menu(self):
+    def test_menu(self, session):
         csvprovider = _get_menu()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
-        vc = VisitationCalculator(self.session)
+        session.add(cs)
+        import_provider(csvprovider, cs, session)
+        vc = VisitationCalculator(session)
         visit = vc.visit(cs)
-        self.assertEqual(11, len(visit))
+        assert 11 == len(visit)
         for v in visit:
-            self.assertEqual(v['lft']+1, v['rght'])
-            self.assertEqual(1, v['depth'])
+            assert v['lft']+1 == v['rght']
+            assert 1 == v['depth']
 
-    def test_menu_sorted(self):
+    def test_menu_sorted(self, session):
         csvprovider = _get_menu()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
-        vc = VisitationCalculator(self.session)
+        session.add(cs)
+        import_provider(csvprovider, cs, session)
+        vc = VisitationCalculator(session)
         visit = vc.visit(cs)
-        self.assertEqual(11, len(visit))
+        assert 11 == len(visit)
         left = 1
         for v in visit:
-            self.assertEqual(v['lft'], left)
+            assert v['lft'] == left
             left += 2
 
-    def test_geo(self):
+    def test_geo(self, session):
         geoprovider = _get_geo()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(geoprovider, cs, self.session)
-        vc = VisitationCalculator(self.session)
+        session.add(cs)
+        import_provider(geoprovider, cs, session)
+        vc = VisitationCalculator(session)
         visit = vc.visit(cs)
-        self.assertEqual(10, len(visit))
+        assert 10 == len(visit)
         world = visit[0]
-        self.assertEqual(1, world['id'])
-        self.assertEqual(1, world['lft'])
-        self.assertEqual(20, world['rght'])
-        self.assertEqual(1, world['depth'])
+        assert 1 == world['id']
+        assert 1 == world['lft']
+        assert 20 == world['rght']
+        assert 1 == world['depth']
         for v in visit:
             if v['id'] == 3:
-                self.assertEqual(v['lft']+3, v['rght'])
-                self.assertEqual(2, v['depth'])
+                assert v['lft']+3 == v['rght']
+                assert 2 == v['depth']
             if v['id'] == 6:
-                self.assertEqual(v['lft']+1, v['rght'])
-                self.assertEqual(3, v['depth'])
+                assert v['lft']+1 == v['rght']
+                assert 3 == v['depth']
 
-    def test_buildings(self):
+    def test_buildings(self, session):
         buildingprovider = _get_buildings()
         cs = self._get_cs()
-        self.session.add(cs)
-        import_provider(buildingprovider, cs, self.session)
-        vc = VisitationCalculator(self.session)
+        session.add(cs)
+        import_provider(buildingprovider, cs, session)
+        vc = VisitationCalculator(session)
         visit = vc.visit(cs)
-        self.assertEqual(5, len(visit))
+        assert len(visit) == 5
         # Check that castle is present twice
         ids = [v['id'] for v in visit]
-        self.assertEqual(2, ids.count(2))
+        assert ids.count(2) == 2
         for v in visit:
             # Check that fortification has one child
             if v['id'] == 1:
-                self.assertEqual(v['lft']+3, v['rght'])
-                self.assertEqual(1, v['depth'])
+                assert v['lft']+3 == v['rght']
+                assert 1 == v['depth']
             # Check that habitations has two children
             if v['id'] == 3:
-                self.assertEqual(v['lft']+5, v['rght'])
-                self.assertEqual(1, v['depth'])
+                assert v['lft']+5 == v['rght']
+                assert 1 == v['depth']
             # Check that castle has no children
             if v['id'] == 2:
-                self.assertEqual(v['lft']+1, v['rght'])
-                self.assertEqual(2, v['depth'])
+                assert v['lft']+1 == v['rght']
+                assert 2 == v['depth']
