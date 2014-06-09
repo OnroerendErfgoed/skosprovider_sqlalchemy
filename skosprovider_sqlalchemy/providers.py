@@ -238,8 +238,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                 return False
 
             ids = self.session\
-                      .query(Visitation.concept_id)\
-                      .filter(Visitation.conceptscheme_id == self.conceptscheme_id)\
+                      .query(Thing.concept_id)\
+                      .join(Visitation)\
+                      .filter(Thing.conceptscheme_id == self.conceptscheme_id)\
                       .filter(Visitation.lft.between(cov[0], cov[1]))\
                       .all()
             ret = [id[0] for id in ids]
