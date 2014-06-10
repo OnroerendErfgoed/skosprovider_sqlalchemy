@@ -325,6 +325,9 @@ class TestVisitationCalculator:
             left += 2
 
     def test_geo(self, session):
+        from skosprovider_sqlalchemy.models import (
+            Concept as ConceptModel
+        )
         geoprovider = _get_geo()
         cs = self._get_cs()
         session.add(cs)
@@ -333,7 +336,7 @@ class TestVisitationCalculator:
         visit = vc.visit(cs)
         assert 10 == len(visit)
         world = visit[0]
-        assert 1 == world['id']
+        assert session.query(ConceptModel).get(world['id']).concept_id == 1
         assert 1 == world['lft']
         assert 20 == world['rght']
         assert 1 == world['depth']
@@ -346,6 +349,9 @@ class TestVisitationCalculator:
                 assert 3 == v['depth']
 
     def test_buildings(self, session):
+        from skosprovider_sqlalchemy.models import (
+            Concept as ConceptModel
+        )
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         session.add(cs)
@@ -354,7 +360,7 @@ class TestVisitationCalculator:
         visit = vc.visit(cs)
         assert len(visit) == 5
         # Check that castle is present twice
-        ids = [v['id'] for v in visit]
+        ids = [session.query(ConceptModel).get(v['id']).concept_id for v in visit]
         assert ids.count(2) == 2
         for v in visit:
             # Check that fortification has one child
