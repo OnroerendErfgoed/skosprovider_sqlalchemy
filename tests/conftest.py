@@ -11,10 +11,14 @@ from skosprovider_sqlalchemy.providers import (
     SQLAlchemyProvider
 )
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session',
+                params=[
+                    {'url': 'sqlite:///:memory:'},
+                    {'url': 'postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy'}
+                ])
 def engine(request):
     engine = create_engine(
-        'sqlite:///:memory:',
+        request.param['url'],
         echo=True
     )
     Base.metadata.create_all(engine)
