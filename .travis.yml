@@ -10,5 +10,7 @@ install:
  - pip install -r requirements-dev.txt
  # Install unittest2 on 2.6
  - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi"
+before_script:
+ - psql -c 'create database skosprovider_sqlalchemy;' -U postgres
 script: py.test -v --cov skosprovider_sqlalchemy
 after_success: coveralls
