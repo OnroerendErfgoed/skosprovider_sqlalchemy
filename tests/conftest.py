@@ -11,14 +11,18 @@ from skosprovider_sqlalchemy.providers import (
     SQLAlchemyProvider
 )
 
-@pytest.fixture(scope='session',
-                params=[
-                    {'url': 'sqlite:///:memory:'},
-                    {'url': 'postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy'}
-                ])
+def pytest_addoption(parser):
+    parser.addoption(
+        '--sqlalchemy_url',
+        action='store',
+        default='sqlite:///:memory:',
+        help='SQLAlchemy connection url to database under test.'
+    )
+
+@pytest.fixture(scope='session')
 def engine(request):
     engine = create_engine(
-        request.param['url'],
+        request.config.getoption('--sqlalchemy_url'),
         echo=True
     )
     Base.metadata.create_all(engine)
