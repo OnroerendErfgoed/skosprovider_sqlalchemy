@@ -5,12 +5,16 @@ python:
  - 3.2
  - 3.3
  - 3.4
+env:
+ - DB=sqlite SAURL=sqlite:///:memory:
+ - DB=postgres SAURL=postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy
 install:
  - python setup.py -q develop
  - pip install -r requirements-dev.txt
  # Install unittest2 on 2.6
  - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi"
 before_script:
- - psql -c 'create database skosprovider_sqlalchemy;' -U postgres
-script: py.test -v --cov skosprovider_sqlalchemy
+ - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database skosprovider_sqlalchemy;' -U postgres; fi"
+script: 
+ - py.test --sqlalchemy_url $SAURL -v --cov skosprovider_sqlalchemy
 after_success: coveralls
