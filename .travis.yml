@@ -6,8 +6,8 @@ python:
  - 3.3
  - 3.4
 env:
- - DB=sqlite SAURL=sqlite:///:memory:
- - DB=postgres SAURL=postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy
+ - DB=sqlite SAURL="sqlite:///:memory:"
+ - DB=postgres SAURL="postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy"
 install:
  - python setup.py -q develop
  - pip install -r requirements-dev.txt
