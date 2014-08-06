@@ -1,0 +1,19 @@
+# Runtime requirements
+--requirement requirements.txt
+
+# Postgresql database access
+psycopg2==2.5.3
+
+# Documentation
+Sphinx==1.2.2
+
+# Testing
+pytest==2.5.2
+pytest-cov==1.7.0
+coveralls=0.4.2
+
+# Linting
+flake8==2.2.2
+mccabe==0.2.1
+pep8==1.5.7
+pyflakes==0.8.1
