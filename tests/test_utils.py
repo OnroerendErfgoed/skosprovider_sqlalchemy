@@ -180,6 +180,30 @@ def _get_buildings():
     )
     return buildings
 
+def _get_heritage_types():
+    import json
+    typology_data = json.load(open("/home/tinne/Projects/skosprovider_sqlalchemy/tests/data/typologie.txt"))['typologie']
+    from skosprovider.providers import DictionaryProvider
+    from skosprovider.uri import UriPatternGenerator
+    heritage_types = DictionaryProvider(
+                {'id': 'HERITAGE_TYPES'},
+                typology_data,
+                uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s')
+            )
+    return heritage_types
+
+def _get_event_types():
+    import json
+    event_data = json.load(open("/home/tinne/Projects/skosprovider_sqlalchemy/tests/data/gebeurtenis.txt"))['gebeurtenis']
+    from skosprovider.providers import DictionaryProvider
+    from skosprovider.uri import UriPatternGenerator
+    heritage_types = DictionaryProvider(
+                {'id': 'EVENT_TYPES'},
+                event_data,
+                uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/gebeurtenistypes/%s')
+            )
+    return heritage_types
+
 
 class TestImportProviderTests:
 
@@ -277,6 +301,34 @@ class TestImportProviderTests:
                      .filter(ConceptModel.concept_id == 4)\
                      .one()
         assert 1 == len(hut.broader_concepts)
+
+    def test_heritage_types(self, session):
+        from skosprovider_sqlalchemy.models import (
+            Concept as ConceptModel,
+        )
+        heritagetypesprovider = _get_heritage_types()
+        cs = self._get_cs()
+        session.add(cs)
+        import_provider(heritagetypesprovider, cs, session)
+        bomen = session.query(ConceptModel)\
+                     .filter(ConceptModel.conceptscheme == cs)\
+                     .filter(ConceptModel.concept_id == 72)\
+                     .one()
+        assert 2 == len(bomen.narrower_collections)
+
+    def test_event_types(self, session):
+        from skosprovider_sqlalchemy.models import (
+            Concept as ConceptModel,
+        )
+        eventtypesprovider = _get_event_types()
+        cs = self._get_cs()
+        session.add(cs)
+        import_provider(eventtypesprovider, cs, session)
+        archeologische_opgravingen = session.query(ConceptModel)\
+                     .filter(ConceptModel.conceptscheme == cs)\
+                     .filter(ConceptModel.concept_id == 38)\
+                     .one()
+        assert 3 == len(archeologische_opgravingen.narrower_collections)
 
 
 class TestVisitationCalculator:
