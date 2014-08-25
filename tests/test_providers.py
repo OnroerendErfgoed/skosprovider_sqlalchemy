@@ -46,6 +46,21 @@ class TestSQLAlchemyProvider:
         )
         assert 'http://id.example.com/trees/1' == provider.uri_generator.generate(id=1)
 
+    def test_gen_uri(self, session):
+        from skosprovider_sqlalchemy.models import Concept
+        from skosprovider.uri import UriPatternGenerator
+        # Set up provider
+        provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 1},
+            session,
+            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
+        )
+        c1 = Concept(concept_id=1, conceptscheme_id=1)
+        session.add(c1)
+        assert c1.uri is None
+        c2 = provider.get_by_id(1)
+        assert c2.uri == 'http://id.example.com/trees/1'
+
     def test_get_concept_by_id(self, provider):
         from skosprovider.skos import Concept
         con = provider.get_by_id(1)

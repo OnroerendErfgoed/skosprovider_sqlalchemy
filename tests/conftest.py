@@ -55,9 +55,11 @@ def session(request, engine):
 
 @pytest.fixture()
 def provider(request, test_data, session):
+    from skosprovider.uri import UriPatternGenerator
     provider = SQLAlchemyProvider(
         {'id': 'SOORTEN', 'conceptscheme_id': 1},
         session,
+        uri_generator=UriPatternGenerator('urn:x-skosprovider-sa:test:%s')
     )
     return provider
 

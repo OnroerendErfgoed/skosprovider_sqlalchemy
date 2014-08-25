@@ -80,7 +80,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         if thing.type and thing.type == 'collection':
             return Collection(
                 id=thing.concept_id,
-                uri=thing.uri,
+                uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='collection', id=thing.concept_id),
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -91,7 +91,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             return Concept(
                 id=thing.concept_id,
-                uri=thing.uri,
+                uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='concept', id=thing.concept_id),
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
