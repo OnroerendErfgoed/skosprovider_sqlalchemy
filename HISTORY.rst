@@ -1,3 +1,14 @@
+0.2.1 (2014-08-25)
+------------------
+
+* Switch to py.test
+* Add `Coveralls <https://coveralls.io>`_ support for code coverage.
+* Add ability to configure the SQLAlchemy URL used for testing. Allows testing
+  on multiple RDBMS systems.
+* Run `Travis <https://travis-ci.org>`_ tests for both SQLite and Postgresql.
+* Fix a bug in :meth:`skosprovider_sqlalchemy.utils.import_provider` when 
+  dealing with narrower collections (#8). [cahytinne]
+
 0.2.0 (2014-05-14)
 ------------------
 
