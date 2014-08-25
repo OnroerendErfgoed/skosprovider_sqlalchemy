@@ -243,7 +243,7 @@ class TestImportProviderTests:
                          .filter(ConceptModel.conceptscheme == cs)\
                          .filter(ConceptModel.concept_id == 11)\
                          .one()
-        assert 11 == lobster.id
+        assert 11 == lobster.concept_id
         assert 'urn:x-skosprovider:menu:11' == lobster.uri
         assert 'Lobster Thermidor' == str(lobster.label())
         assert 1 == len(lobster.notes)
