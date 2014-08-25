@@ -8,6 +8,8 @@
 * Run `Travis <https://travis-ci.org>`_ tests for both SQLite and Postgresql.
 * Fix a bug in :meth:`skosprovider_sqlalchemy.utils.import_provider` when 
   dealing with narrower collections (#8). [cahytinne]
+* Make the provider actually generate a :term:`URI` if there's none in the 
+  database.
 
 0.2.0 (2014-05-14)
 ------------------
