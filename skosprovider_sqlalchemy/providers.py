@@ -119,6 +119,18 @@ class SQLAlchemyProvider(VocabularyProvider):
         return self._from_thing(thing)
 
     def get_by_uri(self, uri):
+        '''Get all information on a concept or collection, based on a
+        :term:`URI`.
+
+        This method will only find concepts or collections whose :term:`URI` is 
+        actually stored in the database. It will not find anything that has
+        no :term:`URI` in the database, but does have a matching :term:`URI`
+        after generation.
+
+        :rtype: :class:`skosprovider.skos.Concept` or
+            :class:`skosprovider.skos.Collection` or `False` if the concept or
+            collection is unknown to the provider.
+        '''
         try:
             thing = self.session\
                         .query(Thing)\
