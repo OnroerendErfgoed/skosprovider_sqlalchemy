@@ -73,11 +73,15 @@ def import_provider(provider, conceptscheme, session):
                             .filter(ConceptModel.concept_id == int(c.id))\
                             .one()
                 for nc in c.narrower:
-                    nc = session.query(ConceptModel)\
-                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                                .filter(ConceptModel.concept_id == int(nc))\
-                                .one()
-                    cm.narrower_concepts.add(nc)
+                    for narrow_model, Model in \
+                            {'narrower_concepts': ConceptModel, 'narrower_collections': CollectionModel}.items():
+                        nc_query = session.query(Model) \
+                            .filter(Model.conceptscheme_id == conceptscheme.id) \
+                            .filter(Model.concept_id == int(nc))
+                        if session.query(nc_query.exists()).one()[0]:
+                            nc = nc_query.one()
+                            getattr(cm, narrow_model).add(nc)
+                            break
             if len(c.related) > 0:
                 cm = session.query(ConceptModel)\
                             .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
