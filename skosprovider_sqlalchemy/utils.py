@@ -32,7 +32,7 @@ def import_provider(provider, conceptscheme, session):
 
     '''
 
-    #First pass: load all concepts and collections
+    # First pass: load all concepts and collections
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
@@ -63,7 +63,12 @@ def import_provider(provider, conceptscheme, session):
 
     session.flush()
 
-    #Second pass: link
+    # Second pass: link
+    # Map for narrower concepts and collections
+    modelmap = {
+            'narrower_concepts': ConceptModel,
+            'narrower_collections': CollectionModel
+    }
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
@@ -73,8 +78,7 @@ def import_provider(provider, conceptscheme, session):
                             .filter(ConceptModel.concept_id == int(c.id))\
                             .one()
                 for nc in c.narrower:
-                    for narrow_model, Model in \
-                            {'narrower_concepts': ConceptModel, 'narrower_collections': CollectionModel}.items():
+                    for narrow_model, Model in modelmap.items():
                         nc_query = session.query(Model) \
                             .filter(Model.conceptscheme_id == conceptscheme.id) \
                             .filter(Model.concept_id == int(nc))

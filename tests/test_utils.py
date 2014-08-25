@@ -182,26 +182,30 @@ def _get_buildings():
 
 def _get_heritage_types():
     import json
-    typology_data = json.load(open("/home/tinne/Projects/skosprovider_sqlalchemy/tests/data/typologie.txt"))['typologie']
+    typology_data = json.load(
+        open(os.path.join(os.path.dirname(__file__), 'data', 'typologie.js')),
+    )['typologie']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
     heritage_types = DictionaryProvider(
-                {'id': 'HERITAGE_TYPES'},
-                typology_data,
-                uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s')
-            )
+        {'id': 'HERITAGE_TYPES'},
+        typology_data,
+        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s')
+    )
     return heritage_types
 
 def _get_event_types():
     import json
-    event_data = json.load(open("/home/tinne/Projects/skosprovider_sqlalchemy/tests/data/gebeurtenis.txt"))['gebeurtenis']
+    event_data = json.load(
+        open(os.path.join(os.path.dirname(__file__), 'data', 'gebeurtenis.js')),
+    )['gebeurtenis']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
     heritage_types = DictionaryProvider(
-                {'id': 'EVENT_TYPES'},
-                event_data,
-                uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/gebeurtenistypes/%s')
-            )
+        {'id': 'EVENT_TYPES'},
+        event_data,
+        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/gebeurtenistypes/%s')
+    )
     return heritage_types
 
 
