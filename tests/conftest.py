@@ -94,9 +94,9 @@ def test_data(request, session):
         concept_id=2,
         conceptscheme=cs
     )
+    col.broader_concepts.add(con)
     l = Label('Churches by function', 'prefLabel', 'en')
     col.labels.append(l)
-    col.members.add(con)
     session.add(col)
     chap = Concept(
         id=30,
@@ -108,6 +108,15 @@ def test_data(request, session):
     chap.labels.append(l)
     session.add(chap)
     chap.related_concepts.add(con)
+    tchap = Concept(
+        id=50,
+        uri='urn:x-skosprovider:test:5',
+        concept_id=5,
+        conceptscheme=cs
+    )
+    tchap.labels.append(Label('Boomkapellen', 'prefLabel', 'nl'))
+    session.add(tchap)
+    tchap.broader_concepts.add(chap)
     cath = Concept(
         id=40,
         uri='urn:x-skosprovider:test:4',
@@ -124,6 +133,7 @@ def test_data(request, session):
     cath.notes.append(n)
     session.add(cath)
     cath.broader_concepts.add(con)
+    cath.member_of.add(col)
 
 @pytest.fixture()
 def visitationprovider(request, test_data, session):
