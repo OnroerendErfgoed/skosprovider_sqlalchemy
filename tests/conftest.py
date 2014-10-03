@@ -95,6 +95,12 @@ def test_data(request, session):
         conceptscheme=cs
     )
     col.broader_concepts.add(con)
+    n = Note(
+        'Churches organised by function, as opposed to by shape or religion.',
+        'scopeNote',
+        'en'
+    )
+    col.notes.append(n)
     l = Label('Churches by function', 'prefLabel', 'en')
     col.labels.append(l)
     session.add(col)

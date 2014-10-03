@@ -113,6 +113,10 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
+                notes=[
+                    Note(n.note, n.notetype_id, n.language_id)
+                    for n in thing.notes
+                ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
                 superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
