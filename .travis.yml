@@ -1,8 +1,6 @@
 language: python
 python:
- - 2.6
  - 2.7
- - 3.2
  - 3.3
  - 3.4
 env:
@@ -12,8 +10,6 @@ env:
 install:
  - python setup.py -q develop
  - pip install -r requirements-dev.txt
- # Install unittest2 on 2.6
- - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi"
 before_script:
  - "if [[ $DB = 'postgres' ]]; then psql -U postgres -c 'create database skosprovider_sqlalchemy'; fi"
  - "if [[ $DB = 'mysql' ]]; then mysql -e 'create database skosprovider_sqlalchemy'; fi"

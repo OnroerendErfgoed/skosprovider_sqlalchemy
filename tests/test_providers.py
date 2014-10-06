@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-
-try:
-    import unittest2 as unittest
-except ImportError:  # pragma NO COVER
-    import unittest  # noqa
+import unittest
 
 from skosprovider_sqlalchemy.providers import (
     SQLAlchemyProvider
