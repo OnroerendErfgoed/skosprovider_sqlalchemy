@@ -415,6 +415,23 @@ class Note(Base):
         return self.note
 
 
+class MatchType(Base):
+    '''
+    A matchType according to :term:`skosprovider:SKOS`.
+    '''
+    __tablename__ = 'matchtype'
+
+    name = Column(String(20), primary_key=True)
+    description = Column(Text)
+
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+    def __str__(self):
+        return self.name
+
+
 class Visitation(Base):
     '''
     Holds several nested sets.
@@ -509,6 +526,7 @@ class Initialiser(object):
         '''
         self.init_labeltype()
         self.init_notetype()
+        self.init_matchtypes()
         self.init_languages()
 
     def init_notetype(self):
@@ -540,6 +558,21 @@ class Initialiser(object):
         for l in labeltypes:
             lt = LabelType(l[0], l[1])
             self.session.add(lt)
+
+    def init_matchtypes(self):
+        '''
+        Initialise the matchtypes.
+        '''
+        matchtypes = [
+            ('closeMatch', 'Indicates that two concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.'),
+            ('exactMatch', 'Indicates that there is a high degree of confidence that two concepts can be used interchangeably across a wide range of information retrieval applications.'),
+            ('broadMatch', 'Indicates that one concept has a broader match with another one.'),
+            ('narrowMatch', 'Indicates that one concept has a narrower match with another one.'),
+            ('relatedMatch', 'Indicates that there is an associative mapping between two concepts.')
+        ]
+        for m in matchtypes:
+            mt = MatchType(m[0], m[1])
+            self.session.add(mt)
 
     def init_languages(self):
         '''

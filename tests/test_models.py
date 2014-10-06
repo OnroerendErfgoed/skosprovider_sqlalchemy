@@ -288,6 +288,19 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.__str__())
 
 
+class MatchTypeTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import MatchType
+        return MatchType
+
+    def test_simple(self):
+        m = self._get_target_class()('closeMatch', 'Quite a close call.')
+        self.assertEqual('closeMatch', m.name)
+        self.assertEqual('Quite a close call.', m.description)
+        self.assertEqual(m.name, m.__str__())
+
+
 class LabelFunctionTest(ModelTestCase):
 
     def _get_fut(self):
