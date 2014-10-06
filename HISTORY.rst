@@ -1,3 +1,14 @@
+0.3.0 (2014-??-??)
+------------------
+
+* Update to skosprovider 0.4.0.
+* Add :class:`~skosprovider.skos.ConceptScheme` information to a provider so it
+  can be attached to :class:`~skosprovider.skos.Concept` object that are 
+  handled by the provider.
+* Let provider handle superordinates and subordinate arrays.
+* Let provider add notes to collections.
+
+
 0.2.1 (2014-08-25)
 ------------------
 
