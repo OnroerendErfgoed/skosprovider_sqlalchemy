@@ -41,12 +41,6 @@ def import_provider(provider, conceptscheme, session):
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
-            for n in c.notes:
-                cm.notes.append(NoteModel(
-                    note=n.note,
-                    notetype_id=n.type,
-                    language_id=n.language
-                ))
         elif isinstance(c, Collection):
             cm = CollectionModel(
                 concept_id=int(c.id),
@@ -58,6 +52,12 @@ def import_provider(provider, conceptscheme, session):
                 label=l.label,
                 labeltype_id=l.type,
                 language_id=l.language
+            ))
+        for n in c.notes:
+            cm.notes.append(NoteModel(
+                note=n.note,
+                notetype_id=n.type,
+                language_id=n.language
             ))
         session.add(cm)
 
