@@ -458,11 +458,6 @@ class Match(Base):
         primary_key=True
     )
 
-    def __init__(self, concept, matchtype_id, uri):
-        self.concept = concept
-        self.matchtype_id = matchtype_id
-        self.uri = uri
-
     def __str__(self):
         return self.uri
 

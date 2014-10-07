@@ -317,9 +317,9 @@ class TestMatch:
 
     def test_simple(self):
         m = self._get_target_class()(
-            self._get_concept(),
-            'closeMatch',
-            'urn:x-skosprovider:heron:grey'
+            concept = self._get_concept(),
+            matchtype_id = 'closeMatch',
+            uri = 'urn:x-skosprovider:heron:grey'
         )
         assert 'closeMatch' == m.matchtype_id
         assert 'urn:x-skosprovider:birds:8300' == m.concept.uri

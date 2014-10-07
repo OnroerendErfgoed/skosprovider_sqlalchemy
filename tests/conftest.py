@@ -70,7 +70,8 @@ def test_data(request, session):
         ConceptScheme,
         Collection,
         Label,
-        Note
+        Note,
+        Match
     )
     cs = ConceptScheme(
         id=1,
@@ -140,6 +141,11 @@ def test_data(request, session):
     session.add(cath)
     cath.broader_concepts.add(con)
     cath.member_of.add(col)
+    match = Match(
+        matchtype_id = 'closeMatch',
+        uri = 'http://aat:something'
+    )
+    cath.matches.append(match)
 
 @pytest.fixture()
 def visitationprovider(request, test_data, session):
