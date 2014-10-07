@@ -432,6 +432,40 @@ class MatchType(Base):
         return self.name
 
 
+class Match(Base):
+    '''
+    A match between a :class:`Concept` in one ConceptScheme and those in 
+    another one.
+    '''
+    __tablename__ = 'match'
+
+    concept = relationship('Concept', backref='matches')
+    concept_id = Column(
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    )
+
+    matchtype = relationship('MatchType', uselist=False)
+    matchtype_id = Column(
+        String(20),
+        ForeignKey('matchtype.name'),
+        primary_key=True
+    )
+
+    uri = Column(
+        String(512),
+        primary_key=True
+    )
+
+    def __init__(self, concept, matchtype_id, uri):
+        self.concept = concept
+        self.matchtype_id = matchtype_id
+        self.uri = uri
+
+    def __str__(self):
+        return self.uri
+
 class Visitation(Base):
     '''
     Holds several nested sets.

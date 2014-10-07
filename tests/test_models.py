@@ -288,7 +288,7 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.__str__())
 
 
-class MatchTypeTests(ModelTestCase):
+class TestMatchType:
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import MatchType
@@ -296,9 +296,35 @@ class MatchTypeTests(ModelTestCase):
 
     def test_simple(self):
         m = self._get_target_class()('closeMatch', 'Quite a close call.')
-        self.assertEqual('closeMatch', m.name)
-        self.assertEqual('Quite a close call.', m.description)
-        self.assertEqual(m.name, m.__str__())
+        assert 'closeMatch' == m.name
+        assert 'Quite a close call.' == m.description
+        assert m.name == m.__str__()
+
+
+class TestMatch:
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import Match
+        return Match
+
+    def _get_concept(self):
+        from skosprovider_sqlalchemy.models import Concept
+        return Concept(
+            id=1,
+            concept_id=1,
+            uri='urn:x-skosprovider:birds:8300'
+        )
+
+    def test_simple(self):
+        m = self._get_target_class()(
+            self._get_concept(),
+            'closeMatch',
+            'urn:x-skosprovider:heron:grey'
+        )
+        assert 'closeMatch' == m.matchtype_id
+        assert 'urn:x-skosprovider:birds:8300' == m.concept.uri
+        assert 'urn:x-skosprovider:heron:grey' == m.uri
+        assert m.uri == m.__str__()
 
 
 class LabelFunctionTest(ModelTestCase):
