@@ -143,7 +143,7 @@ def test_data(request, session):
     cath.member_of.add(col)
     match = Match(
         matchtype_id = 'closeMatch',
-        uri = 'http://aat:something'
+        uri = 'http://vocab.getty.edu/aat/300007501'
     )
     cath.matches.append(match)
 

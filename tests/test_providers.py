@@ -100,6 +100,12 @@ class TestSQLAlchemyProvider:
         assert len(cath.notes) == 1
         assert isinstance(cath.notes[0], Note) 
 
+    def test_concept_has_matches(self, provider):
+        cath = provider.get_by_id(4)
+        assert len(cath.matches.keys()) == 5
+        assert len(cath.matches['close']) == 1
+        assert cath.matches['close'][0] == 'http://vocab.getty.edu/aat/300007501'
+
     def test_get_collection_by_id(self, provider):
         from skosprovider.skos import Collection
         col = provider.get_by_id(2)

@@ -19,6 +19,7 @@ from skosprovider_sqlalchemy.models import (
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
+    MatchType as MatchTypeModel,
     Visitation
 )
 
@@ -122,6 +123,12 @@ class SQLAlchemyProvider(VocabularyProvider):
                 superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
             )
         else:
+            matches = {}
+            for m in thing.matches:
+                key = m.matchtype.name[:m.matchtype.name.find('Match')]
+                if not key in matches:
+                    matches[key] = []
+                matches[key].append(m.uri)
             return Concept(
                 id=thing.concept_id,
                 uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='concept', id=thing.concept_id),
@@ -137,7 +144,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                 narrower=[c.concept_id for c in thing.narrower_concepts],
                 related=[c.concept_id for c in thing.related_concepts],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
-                subordinate_arrays=[narrower_collection.concept_id for narrower_collection in thing.narrower_collections]
+                subordinate_arrays=[narrower_collection.concept_id for narrower_collection in thing.narrower_collections],
+                matches=matches
             )
 
     def get_by_id(self, id):
