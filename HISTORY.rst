@@ -8,7 +8,7 @@
 * Let provider handle superordinates and subordinate arrays.
 * Let provider add notes to collections.
 * Added a :class:`~skosprovider_sqlalchemy.models.Match` model to handle
-  matches.
+  matches. Expand the provider to actually provide information on these matches.
 
 0.2.1 (2014-08-25)
 ------------------

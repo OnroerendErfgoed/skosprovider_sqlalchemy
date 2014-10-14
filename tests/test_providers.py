@@ -114,6 +114,10 @@ class TestSQLAlchemyProvider:
         assert [4] == col.members
         assert [1] == col.superordinates
 
+    def test_collection_has_no_matches(self, provider):
+        col = provider.get_by_id(2)
+        assert not hasattr(col, 'matches')
+
     def test_get_collection_by_uri(self, provider):
         from skosprovider.skos import Collection
         cola = provider.get_by_id(2)
