@@ -301,7 +301,7 @@ class Language(Base):
     A Language.
     '''
     __tablename__ = 'language'
-    id = Column(String(10), primary_key=True)
+    id = Column(String(64), primary_key=True)
     name = Column(String(255))
 
     def __init__(self, id, name):
