@@ -1,2 +1,2 @@
 SQLAlchemy==0.9.7
-skosprovider==0.4.0
+skosprovider==0.4.1
