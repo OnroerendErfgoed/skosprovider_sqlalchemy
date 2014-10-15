@@ -6,6 +6,7 @@ log = logging.getLogger(__name__)
 from skosprovider.providers import VocabularyProvider
 
 from skosprovider.skos import (
+    ConceptScheme,
     Concept,
     Collection,
     Label,
@@ -14,9 +15,11 @@ from skosprovider.skos import (
 
 from skosprovider_sqlalchemy.models import (
     Thing,
+    ConceptScheme as ConceptSchemeModel,
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
+    MatchType as MatchTypeModel,
     Visitation
 )
 
@@ -26,6 +29,10 @@ from sqlalchemy.orm import (
 
 from sqlalchemy.orm.exc import (
     NoResultFound
+)
+
+from skosprovider.uri import (
+    DefaultConceptSchemeUrnGenerator
 )
 
 
@@ -58,10 +65,11 @@ class SQLAlchemyProvider(VocabularyProvider):
         session.
         '''
         super(SQLAlchemyProvider, self).__init__(metadata, **kwargs)
+        self.session = session
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
         )
-        self.session = session
+        self.concept_scheme = self._get_concept_scheme(self.conceptscheme_id)
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
@@ -69,6 +77,27 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'Unknown expand strategy.'
                 )
+
+    def _get_concept_scheme(self, id):
+        '''
+        Find a :class:`skosprovider.skos.ConceptScheme` for a certain id.
+
+        :param id: Id of a conceptscheme.
+        :rtype: :class:`skosprovider.skos.ConceptScheme`
+        '''
+        csm = self.session\
+                  .query(ConceptSchemeModel)\
+                  .get(id)
+        if csm:
+            return ConceptScheme(
+                uri=csm.uri
+            )
+        else:
+            return ConceptScheme(
+                uri=DefaultConceptSchemeUrnGenerator().generate(
+                    id=self.conceptscheme_id
+                )
+            )
 
     def _from_thing(self, thing):
         '''
@@ -85,10 +114,21 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
                 ],
+                notes=[
+                    Note(n.note, n.notetype_id, n.language_id)
+                    for n in thing.notes
+                ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
-                member_of=[member_of.concept_id for member_of in thing.member_of]
+                member_of=[member_of.concept_id for member_of in thing.member_of],
+                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
             )
         else:
+            matches = {}
+            for m in thing.matches:
+                key = m.matchtype.name[:m.matchtype.name.find('Match')]
+                if not key in matches:
+                    matches[key] = []
+                matches[key].append(m.uri)
             return Concept(
                 id=thing.concept_id,
                 uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='concept', id=thing.concept_id),
@@ -103,7 +143,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],
                 related=[c.concept_id for c in thing.related_concepts],
-                member_of=[member_of.concept_id for member_of in thing.member_of]
+                member_of=[member_of.concept_id for member_of in thing.member_of],
+                subordinate_arrays=[narrower_collection.concept_id for narrower_collection in thing.narrower_collections],
+                matches=matches
             )
 
     def get_by_id(self, id):
@@ -284,6 +326,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                   .options(joinedload('labels'))\
                   .filter(
                     CollectionModel.conceptscheme_id == self.conceptscheme_id,
+                    CollectionModel.broader_concepts == None,
                     CollectionModel.member_of == None
                   ).all()
         res = tco + tcl
@@ -314,10 +357,13 @@ class SQLAlchemyProvider(VocabularyProvider):
         ret = []
         lan = self._get_language(**kwargs)
         display_children = []
-        if hasattr(thing, 'narrower_concepts'):
-            display_children = thing.narrower_concepts
-        elif hasattr(thing, 'members'):
-            display_children = thing.members
+        if thing.type == 'concept':
+            if len(thing.narrower_collections) > 0:
+                display_children += thing.narrower_collections
+            elif len(thing.narrower_concepts)>0:
+                display_children += thing.narrower_concepts
+        if thing.type == 'collection' and hasattr(thing, 'members'):
+            display_children += thing.members
         for c in display_children:
             ret.append(self._get_id_and_label(c, lan))
         return ret

@@ -1,3 +1,18 @@
+0.3.0 (2014-??-??)
+------------------
+
+* Update to skosprovider 0.4.0.
+* Add :class:`~skosprovider.skos.ConceptScheme` information to a provider so it
+  can be attached to :class:`~skosprovider.skos.Concept` objects that are 
+  handled by the provider.
+* Let provider handle superordinates and subordinate arrays.
+* Let provider add notes to collections.
+* Added a :class:`~skosprovider_sqlalchemy.models.Match` model to handle
+  matches. Expand the provider to actually provide information on these matches.
+* Expand the field length for language identifiers. IANA suggests that 
+  identifiers up to 35 characters should be permitted. Update our field length
+  to 64 to have a bit of an extra buffer.
+
 0.2.1 (2014-08-25)
 ------------------
 

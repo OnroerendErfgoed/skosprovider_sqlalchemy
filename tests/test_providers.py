@@ -64,7 +64,7 @@ class TestSQLAlchemyProvider:
         assert 1 == con.id
         assert [3] == con.related
         assert [4] == con.narrower
-        assert [2] == con.member_of
+        assert [2] == con.subordinate_arrays
 
     def test_get_concept_by_id_string(self, provider):
         from skosprovider.skos import Concept
@@ -73,7 +73,7 @@ class TestSQLAlchemyProvider:
         assert 1 == con.id
         assert [3] == con.related
         assert [4] == con.narrower
-        assert [2] == con.member_of
+        assert [2] == con.subordinate_arrays
 
     def test_get_unexisting_by_id(self, provider):
         con = provider.get_by_id(404)
@@ -96,12 +96,23 @@ class TestSQLAlchemyProvider:
         assert len(cath.notes) == 1
         assert isinstance(cath.notes[0], Note) 
 
+    def test_concept_has_matches(self, provider):
+        cath = provider.get_by_id(4)
+        assert len(cath.matches.keys()) == 5
+        assert len(cath.matches['close']) == 1
+        assert cath.matches['close'][0] == 'http://vocab.getty.edu/aat/300007501'
+
     def test_get_collection_by_id(self, provider):
         from skosprovider.skos import Collection
         col = provider.get_by_id(2)
         assert isinstance(col, Collection)
         assert 2 == col.id
-        assert [1] == col.members
+        assert [4] == col.members
+        assert [1] == col.superordinates
+
+    def test_collection_has_no_matches(self, provider):
+        col = provider.get_by_id(2)
+        assert not hasattr(col, 'matches')
 
     def test_get_collection_by_uri(self, provider):
         from skosprovider.skos import Collection
@@ -113,7 +124,7 @@ class TestSQLAlchemyProvider:
 
     def test_get_all(self, provider):
         all = provider.get_all()
-        assert len(all) == 4
+        assert len(all) == 5
         assert {
             'id': 1,
             'uri': 'urn:x-skosprovider:test:1',
@@ -140,6 +151,13 @@ class TestSQLAlchemyProvider:
             'uri': 'urn:x-skosprovider:test:4',
             'type': 'concept',
             'label': 'Cathedrals'
+        } in all
+
+        assert {
+            'id': 5,
+            'uri': 'urn:x-skosprovider:test:5',
+            'type': 'concept',
+            'label': 'Boomkapellen'
         } in all
 
     def test_get_top_concepts(self, provider):
@@ -171,10 +189,10 @@ class TestSQLAlchemyProvider:
         } in all
 
         assert {
-            'id': 2,
-            'uri': 'urn:x-skosprovider:test:2',
-            'type': 'collection',
-            'label': 'Churches by function'
+            'id': 1,
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches'
         } in all
 
     def test_get_children_display_unexisting(self, provider):
@@ -185,33 +203,47 @@ class TestSQLAlchemyProvider:
         children = provider.get_children_display(2)
         assert len(children) == 1
         assert {
-            'id': 1,
-            'uri': 'urn:x-skosprovider:test:1',
-            'type': 'concept',
-            'label': 'Churches'
-        } in children
-
-    def test_get_children_display_concept(self, provider):
-        children = provider.get_children_display(1)
-        assert len(children) == 1
-        assert {
             'id': 4,
             'uri': 'urn:x-skosprovider:test:4',
             'type': 'concept',
             'label': 'Cathedrals'
         } in children
 
+    def test_get_children_display_concept_with_narrower_collection(self, provider):
+        children = provider.get_children_display(1)
+        assert len(children) == 1
+        assert {
+            'id': 2,
+            'uri': 'urn:x-skosprovider:test:2',
+            'type': 'collection',
+            'label': 'Churches by function'
+        } in children
+
+    def test_get_children_display_concept_with_narrower_concept(self, provider):
+        children = provider.get_children_display(3)
+        assert len(children) == 1
+        assert {
+            'id': 5,
+            'uri': 'urn:x-skosprovider:test:5',
+            'type': 'concept',
+            'label': 'Boomkapellen'
+        } in children
+
+    def test_get_children_display_concept_with_no_narrower(self, provider):
+        children = provider.get_children_display(4)
+        assert len(children) == 0
+
     def test_find_all(self, provider):
         all = provider.find({})
-        assert len(all) == 4
+        assert len(all) == 5
 
     def test_find_type_all(self, provider):
         all = provider.find({'type': 'all'})
-        assert len(all) == 4
+        assert len(all) == 5
 
     def test_find_type_concept(self, provider):
         all = provider.find({'type': 'concept'})
-        assert len(all) == 3
+        assert len(all) == 4
         assert {
             'id': 2,
             'uri': 'urn:x-skosprovider:test:2',
@@ -257,10 +289,10 @@ class TestSQLAlchemyProvider:
         all = provider.find({'collection': {'id': 2}})
         assert len(all) == 1
         assert {
-            'id': 1,
-            'uri': 'urn:x-skosprovider:test:1',
+            'id': 4,
+            'uri': 'urn:x-skosprovider:test:4',
             'type': 'concept',
-            'label': 'Churches'
+            'label': 'Cathedrals'
         } in all
 
     def test_expand_concept(self, provider):
@@ -269,11 +301,11 @@ class TestSQLAlchemyProvider:
 
     def test_expand_collection(self, provider):
         ids = provider.expand(2)
-        assert [1, 4] == ids
+        assert [4] == ids
 
     def test_expand_concept_without_narrower(self, provider):
-        ids = provider.expand(3)
-        assert [3] == ids
+        ids = provider.expand(5)
+        assert [5] == ids
 
     def test_expand_unexisting(self, provider):
         ids = provider.expand(404)
@@ -288,11 +320,11 @@ class TestSQLAlchemyProviderExpandVisit:
 
     def test_expand_collection_visit(self, create_visitation, visitationprovider):
         ids = visitationprovider.expand(2)
-        assert ids == [1, 4]
+        assert ids == [4]
 
     def test_expand_concept_without_narrower_visit(self, create_visitation, visitationprovider):
-        ids = visitationprovider.expand(3)
-        assert ids == [3]
+        ids = visitationprovider.expand(4)
+        assert ids == [4]
 
     def test_expand_unexisting_visit(self, create_visitation, visitationprovider):
         ids = visitationprovider.expand(404)

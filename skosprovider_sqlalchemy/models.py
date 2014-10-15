@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import logging
 log = logging.getLogger(__name__)
+
+from language_tags import tags
 
 from sqlalchemy import (
     Column,
@@ -297,7 +301,7 @@ class Language(Base):
     A Language.
     '''
     __tablename__ = 'language'
-    id = Column(String(10), primary_key=True)
+    id = Column(String(64), primary_key=True)
     name = Column(String(255))
 
     def __init__(self, id, name):
@@ -415,6 +419,52 @@ class Note(Base):
         return self.note
 
 
+class MatchType(Base):
+    '''
+    A matchType according to :term:`skosprovider:SKOS`.
+    '''
+    __tablename__ = 'matchtype'
+
+    name = Column(String(20), primary_key=True)
+    description = Column(Text)
+
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+    def __str__(self):
+        return self.name
+
+
+class Match(Base):
+    '''
+    A match between a :class:`Concept` in one ConceptScheme and those in 
+    another one.
+    '''
+    __tablename__ = 'match'
+
+    concept = relationship('Concept', backref='matches')
+    concept_id = Column(
+        Integer,
+        ForeignKey('concept.id'),
+        primary_key=True
+    )
+
+    matchtype = relationship('MatchType', uselist=False)
+    matchtype_id = Column(
+        String(20),
+        ForeignKey('matchtype.name'),
+        primary_key=True
+    )
+
+    uri = Column(
+        String(512),
+        primary_key=True
+    )
+
+    def __str__(self):
+        return self.uri
+
 class Visitation(Base):
     '''
     Holds several nested sets.
@@ -458,6 +508,14 @@ def label(labels=[], language='any'):
     a pref label for the specified language. If there's no pref label,
     it looks for an alt label. It disregards hidden labels.
 
+    While matching languages, preference will be given to exact matches. But,
+    if no exact match is present, an inexact match will be attempted. This might
+    be because a label in language `nl-BE` is being requested, but only `nl` or
+    even `nl-NL` is present. Similarly, when requesting `nl`, a label with
+    language `nl-NL` or even `nl-Latn-NL` will also be considered, 
+    providing no label is present that has an exact match with the 
+    requested language.
+
     If language 'any' was specified, all labels will be considered,
     regardless of language.
 
@@ -466,27 +524,37 @@ def label(labels=[], language='any'):
     If a language or None was specified, and no label could be found, this
     method will automatically try to find a label in some other language.
 
-    Finally, if no label could be found, `None` is returned.
+    Finally, if no label could be found, None is returned.
 
     :param list labels: A list of :class:`labels <Label>`.
     :param str language: The language for which a label should preferentially 
-        be returned.
+        be returned. This should be a valid IANA language tag.
     :rtype: A :class:`Label` or `None` if no label could be found.
     '''
+    # Normalise the tag
+    broader_language_tag = None
+    if language != 'any':
+        language = tags.tag(language).format
+        broader_language_tag = tags.tag(language).language
+    pref = None
     alt = None
     for l in labels:
+        labeltype = l.labeltype_id or l.labeltype.name
         if language == 'any' or l.language_id == language:
-            labeltype = l.labeltype_id or l.labeltype.name
-            if labeltype == 'prefLabel':
-                return l
-            if alt is None and labeltype == 'altLabel':
+            if labeltype == 'prefLabel' and (pref is None or pref.language_id != language):
+                pref = l
+            if labeltype == 'altLabel' and (alt is None or alt.language_id != language):
                 alt = l
-    if alt is not None:
+        if broader_language_tag and tags.tag(l.language_id).language and tags.tag(l.language_id).language.format == broader_language_tag.format:
+            if labeltype == 'prefLabel' and pref is None:
+                pref = l
+            if labeltype == 'altLabel' and alt is None:
+                alt = l
+    if pref is not None:
+        return pref
+    elif alt is not None:
         return alt
-    elif language != 'any':
-        return label(labels, 'any')
-    else:
-        return None
+    return label(labels, 'any') if language != 'any' else None
 
 
 class Initialiser(object):
@@ -509,6 +577,7 @@ class Initialiser(object):
         '''
         self.init_labeltype()
         self.init_notetype()
+        self.init_matchtypes()
         self.init_languages()
 
     def init_notetype(self):
@@ -540,6 +609,21 @@ class Initialiser(object):
         for l in labeltypes:
             lt = LabelType(l[0], l[1])
             self.session.add(lt)
+
+    def init_matchtypes(self):
+        '''
+        Initialise the matchtypes.
+        '''
+        matchtypes = [
+            ('closeMatch', 'Indicates that two concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.'),
+            ('exactMatch', 'Indicates that there is a high degree of confidence that two concepts can be used interchangeably across a wide range of information retrieval applications.'),
+            ('broadMatch', 'Indicates that one concept has a broader match with another one.'),
+            ('narrowMatch', 'Indicates that one concept has a narrower match with another one.'),
+            ('relatedMatch', 'Indicates that there is an associative mapping between two concepts.')
+        ]
+        for m in matchtypes:
+            mt = MatchType(m[0], m[1])
+            self.session.add(mt)
 
     def init_languages(self):
         '''

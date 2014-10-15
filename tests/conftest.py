@@ -70,7 +70,8 @@ def test_data(request, session):
         ConceptScheme,
         Collection,
         Label,
-        Note
+        Note,
+        Match
     )
     cs = ConceptScheme(
         id=1,
@@ -94,9 +95,15 @@ def test_data(request, session):
         concept_id=2,
         conceptscheme=cs
     )
+    col.broader_concepts.add(con)
+    n = Note(
+        'Churches organised by function, as opposed to by shape or religion.',
+        'scopeNote',
+        'en'
+    )
+    col.notes.append(n)
     l = Label('Churches by function', 'prefLabel', 'en')
     col.labels.append(l)
-    col.members.add(con)
     session.add(col)
     chap = Concept(
         id=30,
@@ -108,6 +115,15 @@ def test_data(request, session):
     chap.labels.append(l)
     session.add(chap)
     chap.related_concepts.add(con)
+    tchap = Concept(
+        id=50,
+        uri='urn:x-skosprovider:test:5',
+        concept_id=5,
+        conceptscheme=cs
+    )
+    tchap.labels.append(Label('Boomkapellen', 'prefLabel', 'nl'))
+    session.add(tchap)
+    tchap.broader_concepts.add(chap)
     cath = Concept(
         id=40,
         uri='urn:x-skosprovider:test:4',
@@ -124,6 +140,12 @@ def test_data(request, session):
     cath.notes.append(n)
     session.add(cath)
     cath.broader_concepts.add(con)
+    cath.member_of.add(col)
+    match = Match(
+        matchtype_id = 'closeMatch',
+        uri = 'http://vocab.getty.edu/aat/300007501'
+    )
+    cath.matches.append(match)
 
 @pytest.fixture()
 def visitationprovider(request, test_data, session):

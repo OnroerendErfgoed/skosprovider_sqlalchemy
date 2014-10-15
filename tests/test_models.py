@@ -284,6 +284,45 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.__str__())
 
 
+class TestMatchType:
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import MatchType
+        return MatchType
+
+    def test_simple(self):
+        m = self._get_target_class()('closeMatch', 'Quite a close call.')
+        assert 'closeMatch' == m.name
+        assert 'Quite a close call.' == m.description
+        assert m.name == m.__str__()
+
+
+class TestMatch:
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import Match
+        return Match
+
+    def _get_concept(self):
+        from skosprovider_sqlalchemy.models import Concept
+        return Concept(
+            id=1,
+            concept_id=1,
+            uri='urn:x-skosprovider:birds:8300'
+        )
+
+    def test_simple(self):
+        m = self._get_target_class()(
+            concept = self._get_concept(),
+            matchtype_id = 'closeMatch',
+            uri = 'urn:x-skosprovider:heron:grey'
+        )
+        assert 'closeMatch' == m.matchtype_id
+        assert 'urn:x-skosprovider:birds:8300' == m.concept.uri
+        assert 'urn:x-skosprovider:heron:grey' == m.uri
+        assert m.uri == m.__str__()
+
+
 class LabelFunctionTest(ModelTestCase):
 
     def _get_fut(self):
@@ -292,15 +331,15 @@ class LabelFunctionTest(ModelTestCase):
 
     def _get_knokke_heist_nl(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Knokke-Heist', "prefLabel", 'nl')
+        return Label('Knokke-Heist', "prefLabel", 'nl-BE')
 
     def _get_cnocke_heyst_nl(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Cnock-Heyst', "altLabel", 'nl')
+        return Label('Cnock-Heyst', "altLabel", 'nl-BE')
 
     def _get_knokke_heist_en(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Knocke-Heyst', "prefLabel", 'en')
+        return Label('Knocke-Heyst', "prefLabel", 'en-GB')
 
     def test_label_empty(self):
         label = self._get_fut()
@@ -313,8 +352,8 @@ class LabelFunctionTest(ModelTestCase):
         kh = self._get_knokke_heist_nl()
         labels = [kh]
         self.assertEqual(kh, label(labels))
-        self.assertEqual(kh, label(labels, 'nl'))
-        self.assertEqual(kh, label(labels, 'en'))
+        self.assertEqual(kh, label(labels, 'nl-BE'))
+        self.assertEqual(kh, label(labels, 'en-GB'))
         self.assertEqual(kh, label(labels, None))
 
     def test_label_pref_nl_and_en(self):
@@ -345,3 +384,27 @@ class LabelFunctionTest(ModelTestCase):
         self.assertEqual(kh, label(labels, 'nl'))
         self.assertEqual(kh, label(labels, 'en'))
         self.assertEqual(kh, label(labels, None))
+
+    def test_label_inexact_language_match(self):
+        label = self._get_fut()
+        kh = self._get_knokke_heist_nl()
+        ch = self._get_cnocke_heyst_nl()
+        khen = self._get_knokke_heist_en()
+        labels = [kh, ch, khen]
+        assert khen == label(labels, 'en')
+        assert kh == label(labels, 'nl')
+        assert label(labels, None) in [kh, khen]
+
+    def test_exact_precedes_inexact_match(self):
+        label = self._get_fut()
+        from skosprovider_sqlalchemy.models import Label
+        khnl = Label('Knokke-Heist', "prefLabel", 'nl')
+        chnl = Label('Cnock-Heyst', "altLabel", 'nl')
+        khen = Label('Knocke-Heyst', "prefLabel", 'en')
+        khnlbe = self._get_knokke_heist_nl()
+        chnlbe = self._get_cnocke_heyst_nl()
+        khengb = self._get_knokke_heist_en()
+        labels = [chnl, khen, khnlbe, khnl, chnlbe, khengb]
+        assert khnlbe == label(labels, 'nl-BE')
+        assert khnl == label(labels, 'nl')
+        assert label(labels, 'en-US') in [khen, khengb]
