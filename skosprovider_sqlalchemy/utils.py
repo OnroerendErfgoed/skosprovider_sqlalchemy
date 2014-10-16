@@ -71,33 +71,28 @@ def import_provider(provider, conceptscheme, session):
     session.flush()
 
     # Second pass: link
-    # Map for narrower concepts and collections
-    modelmap = {
-            'narrower_concepts': ConceptModel,
-            'narrower_collections': CollectionModel
-    }
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
+            cm = session.query(ConceptModel)\
+                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
+                        .filter(ConceptModel.concept_id == int(c.id))\
+                        .one()
             if len(c.narrower) > 0:
-                cm = session.query(ConceptModel)\
-                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                            .filter(ConceptModel.concept_id == int(c.id))\
-                            .one()
                 for nc in c.narrower:
-                    for narrow_model, Model in modelmap.items():
-                        nc_query = session.query(Model) \
-                            .filter(Model.conceptscheme_id == conceptscheme.id) \
-                            .filter(Model.concept_id == int(nc))
-                        if session.query(nc_query.exists()).one()[0]:
-                            nc = nc_query.one()
-                            getattr(cm, narrow_model).add(nc)
-                            break
+                    nc = session.query(ConceptModel) \
+                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                                .filter(ConceptModel.concept_id == int(nc))\
+                                .one()
+                    cm.narrower_concepts.add(nc)
+            if len(c.subordinate_arrays) > 0:
+                for sa in c.subordinate_arrays:
+                    sa = session.query(CollectionModel) \
+                                .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
+                                .filter(CollectionModel.concept_id == int(sa))\
+                                .one()
+                    cm.narrower_collections.add(sa)
             if len(c.related) > 0:
-                cm = session.query(ConceptModel)\
-                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                            .filter(ConceptModel.concept_id == int(c.id))\
-                            .one()
                 for rc in c.related:
                     rc = session.query(ConceptModel)\
                                 .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
