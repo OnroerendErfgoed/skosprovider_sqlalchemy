@@ -13,7 +13,8 @@ from skosprovider_sqlalchemy.models import (
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
-    Note as NoteModel
+    Note as NoteModel,
+    Match as MatchModel
 )
 
 
@@ -59,6 +60,12 @@ def import_provider(provider, conceptscheme, session):
                 notetype_id=n.type,
                 language_id=n.language
             ))
+        if hasattr(c, 'matches'):
+            for mt in c.matches:
+                matchtype = mt + 'Match'
+                for m in c.matches[mt]:
+                    match = MatchModel(matchtype_id=matchtype, uri=m)
+                    cm.matches.append(match)
         session.add(cm)
 
     session.flush()

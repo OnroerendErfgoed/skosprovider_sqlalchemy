@@ -152,13 +152,19 @@ def _get_buildings():
                         'label': 'Fortifications'
                     }
                 ],
-                'narrower': [2]
+                'narrower': [2],
+                'matches': {
+                    'exact': ['http://vocab.getty.edu/aat/300006888']
+                }
             }, {
                 'id': 2,
                 'labels': [
                     {'type': 'prefLabel', 'language': 'en', 'label': 'Castle'}
                 ],
-                'broader': [1, 3]
+                'broader': [1, 3],
+                'matches': {
+                    'broad': ['http://vocab.getty.edu/aat/300006888']
+                }
             }, {
                 'id': 3,
                 'labels': [
@@ -168,13 +174,19 @@ def _get_buildings():
                         'label': 'Habitations'
                     }
                 ],
-                'narrower': [2, 4]
+                'narrower': [2, 4],
+                'matches': {
+                    'close': ['http://vocab.getty.edu/aat/300005425']
+                }
             }, {
                 'id': 4,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Hut'}
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Huts'}
                 ],
-                'broader': [3]
+                'broader': [3],
+                'matches': {
+                    'exact': ['http://vocab.getty.edu/aat/300004824']
+                }
             }
         ]
     )
@@ -305,6 +317,10 @@ class TestImportProviderTests:
                      .filter(ConceptModel.concept_id == 4)\
                      .one()
         assert 1 == len(hut.broader_concepts)
+        assert 1 == len(hut.matches)
+        assert 'exactMatch' == hut.matches[0].matchtype_id
+        assert 'http://vocab.getty.edu/aat/300004824' == hut.matches[0].uri
+
 
     def test_heritage_types(self, session):
         from skosprovider_sqlalchemy.models import (
