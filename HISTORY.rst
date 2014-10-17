@@ -1,4 +1,4 @@
-0.3.0 (2014-??-??)
+0.3.0 (2014-10-17)
 ------------------
 
 * Update to skosprovider 0.4.0.
@@ -10,7 +10,7 @@
 * Added a :class:`~skosprovider_sqlalchemy.models.Match` model to handle
   matches. Expand the provider to actually provide information on these matches.
 * Expand the field length for language identifiers. IANA suggests that 
-  identifiers up to 35 characters should be permitted. Update our field length
+  identifiers up to 35 characters should be permitted. Updated our field length
   to 64 to have a bit of an extra buffer.
 
 0.2.1 (2014-08-25)
