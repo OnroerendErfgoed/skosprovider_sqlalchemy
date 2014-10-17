@@ -13,6 +13,9 @@ interface that uses a SQLALchemy_ backend. While a
 a read-only interface, the underlying SQLAlchemy_ domain model is fully 
 writeable.
 
+This library is fully integrated into Atramhasis_, an online open source
+editor for :term:`SKOS` vocabularies.
+
 .. toctree::
    :maxdepth: 2
 
@@ -20,6 +23,7 @@ writeable.
    changes
 
 .. _SQLAlchemy: http://docs.sqlalchemy.org/
+.. _Atramhasis: https://atramhasis.readthedocs.org
 
 Indices and tables
 ==================
