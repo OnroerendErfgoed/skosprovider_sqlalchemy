@@ -32,6 +32,7 @@ from sqlalchemy.orm.exc import (
 )
 
 from skosprovider.uri import (
+    DefaultUrnGenerator,
     DefaultConceptSchemeUrnGenerator
 )
 
@@ -64,12 +65,17 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param :class:`sqlachemy.orm.session.Session` session: The database
         session.
         '''
-        super(SQLAlchemyProvider, self).__init__(metadata, **kwargs)
+        if not 'subject' in metadata:
+            metadata['subject'] = []
+        self.metadata = metadata
+        if 'uri_generator' in kwargs:
+            self.uri_generator = kwargs.get('uri_generator')
+        else:
+            self.uri_generator = DefaultUrnGenerator(self.metadata.get('id'))
         self.session = session
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
         )
-        self.concept_scheme = self._get_concept_scheme(self.conceptscheme_id)
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
@@ -78,16 +84,19 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'Unknown expand strategy.'
                 )
 
-    def _get_concept_scheme(self, id):
+    @property
+    def concept_scheme(self):
+        return self._get_concept_scheme()
+
+    def _get_concept_scheme(self):
         '''
         Find a :class:`skosprovider.skos.ConceptScheme` for a certain id.
 
-        :param id: Id of a conceptscheme.
         :rtype: :class:`skosprovider.skos.ConceptScheme`
         '''
         csm = self.session\
                   .query(ConceptSchemeModel)\
-                  .get(id)
+                  .get(self.conceptscheme_id)
         if csm:
             return ConceptScheme(
                 uri=csm.uri
@@ -110,6 +119,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             return Collection(
                 id=thing.concept_id,
                 uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='collection', id=thing.concept_id),
+                concept_scheme=self.concept_scheme,
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels
@@ -132,6 +142,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             return Concept(
                 id=thing.concept_id,
                 uri=thing.uri if thing.uri is not None else self.uri_generator.generate(type='concept', id=thing.concept_id),
+                concept_scheme=self.concept_scheme,
                 labels=[
                     Label(l.label, l.labeltype_id, l.language_id)
                     for l in thing.labels

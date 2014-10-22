@@ -29,6 +29,17 @@ class TestSQLAlchemyProvider:
                 expand_strategy='invalid'
             )
 
+    def test_provider_without_cs_id_has_cs(self, session):
+        from skosprovider.skos import (
+            ConceptScheme
+        )
+        provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN'},
+            session
+        )
+        cs = provider.concept_scheme
+        assert isinstance(cs, ConceptScheme)
+
     def test_get_vocabulary_id(self, provider):
         assert 'SOORTEN' == provider.get_vocabulary_id()
 
@@ -58,13 +69,24 @@ class TestSQLAlchemyProvider:
         assert c2.uri == 'http://id.example.com/trees/1'
 
     def test_get_concept_by_id(self, provider):
-        from skosprovider.skos import Concept
+        from skosprovider.skos import (
+            Concept
+        )
         con = provider.get_by_id(1)
         assert isinstance(con, Concept)
         assert 1 == con.id
         assert [3] == con.related
         assert [4] == con.narrower
         assert [2] == con.subordinate_arrays
+
+    def test_concept_has_concept_scheme(self, provider):
+        from skosprovider.skos import (
+            Concept,
+            ConceptScheme
+        )
+        con = provider.get_by_id(1)
+        assert isinstance(con.concept_scheme, ConceptScheme)
+        assert 'urn:x-skosprovider:test' == con.concept_scheme.uri
 
     def test_get_concept_by_id_string(self, provider):
         from skosprovider.skos import Concept

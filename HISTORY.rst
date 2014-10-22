@@ -1,3 +1,11 @@
+next version
+------------
+
+* Different way of fetching the :class:`~skosprovider.skos.ConceptScheme` 
+  for a provider. No longer fetches a conceptscheme at provider instantiation, 
+  but when needed. Otherwise we end up with a possibly very long cached version 
+  of a conceptscheme.
+
 0.3.0 (2014-10-17)
 ------------------
 
