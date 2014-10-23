@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from skosprovider_sqlalchemy.utils import session_factory
+
 log = logging.getLogger(__name__)
 
 from skosprovider.providers import VocabularyProvider
@@ -55,7 +57,7 @@ class SQLAlchemyProvider(VocabularyProvider):
       Actually creating the data in this table needs to be scheduled.
     '''
 
-    def __init__(self, metadata, session, **kwargs):
+    def __init__(self, metadata, session_maker, **kwargs):
         '''
         Create a new provider
 
@@ -65,7 +67,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         session.
         '''
         super(SQLAlchemyProvider, self).__init__(metadata, **kwargs)
-        self.session = session
+        self.session_maker = session_maker
         self.conceptscheme_id = metadata.get(
             'conceptscheme_id', metadata.get('id')
         )
@@ -78,6 +80,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'Unknown expand strategy.'
                 )
 
+    @session_factory('session_maker')
     def _get_concept_scheme(self, id):
         '''
         Find a :class:`skosprovider.skos.ConceptScheme` for a certain id.
@@ -148,6 +151,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 matches=matches
             )
 
+    @session_factory('session_maker')
     def get_by_id(self, id):
         try:
             thing = self.session\
@@ -160,6 +164,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             return False
         return self._from_thing(thing)
 
+    @session_factory('session_maker')
     def get_by_uri(self, uri):
         '''Get all information on a concept or collection, based on a
         :term:`URI`.
@@ -197,6 +202,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             'label': l.label if l is not None else None
         }
 
+    @session_factory('session_maker')
     def find(self, query, **kwargs):
         lan = self._get_language(**kwargs)
         q = self.session\
@@ -223,6 +229,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         all = q.all()
         return [self._get_id_and_label(c, lan) for c in all]
 
+    @session_factory('session_maker')
     def get_all(self, **kwargs):
         all = self.session\
                   .query(Thing)\
@@ -232,6 +239,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         lan = self._get_language(**kwargs)
         return [self._get_id_and_label(c, lan) for c in all]
 
+    @session_factory('session_maker')
     def get_top_concepts(self, **kwargs):
         top = self.session\
                   .query(ConceptModel)\
@@ -246,6 +254,7 @@ class SQLAlchemyProvider(VocabularyProvider):
     def expand_concept(self, id):
         return self.expand(id)
 
+    @session_factory('session_maker')
     def expand(self, id):
         try:
             thing = self.session\
@@ -273,6 +282,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 ret += self._expand_recurse(n)
         return list(set(ret))
 
+    @session_factory('session_maker')
     def _expand_visit(self, thing):
         if thing.type == 'collection':
             ret = []
@@ -300,6 +310,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             ret = [id[0] for id in ids]
         return list(set(ret))
 
+    @session_factory('session_maker')
     def get_top_display(self, **kwargs):
         '''
         Returns all concepts or collections that form the top-level of a display
@@ -333,6 +344,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         lan = self._get_language(**kwargs)
         return [self._get_id_and_label(c, lan) for c in res]
 
+    @session_factory('session_maker')
     def get_children_display(self, id, **kwargs):
         '''
         Return a list of concepts or collections that should be displayed

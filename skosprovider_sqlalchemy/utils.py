@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 log = logging.getLogger(__name__)
 
 from skosprovider.skos import (
@@ -74,41 +75,41 @@ def import_provider(provider, conceptscheme, session):
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
-            cm = session.query(ConceptModel)\
-                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                        .filter(ConceptModel.concept_id == int(c.id))\
-                        .one()
+            cm = session.query(ConceptModel) \
+                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                .filter(ConceptModel.concept_id == int(c.id)) \
+                .one()
             if len(c.narrower) > 0:
                 for nc in c.narrower:
                     nc = session.query(ConceptModel) \
-                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                                .filter(ConceptModel.concept_id == int(nc))\
-                                .one()
+                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                        .filter(ConceptModel.concept_id == int(nc)) \
+                        .one()
                     cm.narrower_concepts.add(nc)
             if len(c.subordinate_arrays) > 0:
                 for sa in c.subordinate_arrays:
                     sa = session.query(CollectionModel) \
-                                .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
-                                .filter(CollectionModel.concept_id == int(sa))\
-                                .one()
+                        .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
+                        .filter(CollectionModel.concept_id == int(sa)) \
+                        .one()
                     cm.narrower_collections.add(sa)
             if len(c.related) > 0:
                 for rc in c.related:
-                    rc = session.query(ConceptModel)\
-                                .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                                .filter(ConceptModel.concept_id == int(rc))\
-                                .one()
+                    rc = session.query(ConceptModel) \
+                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                        .filter(ConceptModel.concept_id == int(rc)) \
+                        .one()
                     cm.related_concepts.add(rc)
         elif isinstance(c, Collection) and len(c.members) > 0:
-            cm = session.query(CollectionModel)\
-                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                        .filter(ConceptModel.concept_id == int(c.id))\
-                        .one()
+            cm = session.query(CollectionModel) \
+                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                .filter(ConceptModel.concept_id == int(c.id)) \
+                .one()
             for mc in c.members:
-                mc = session.query(ThingModel)\
-                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id)\
-                            .filter(ConceptModel.concept_id == int(mc))\
-                            .one()
+                mc = session.query(ThingModel) \
+                    .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                    .filter(ConceptModel.concept_id == int(mc)) \
+                    .one()
                 cm.members.add(mc)
 
 
@@ -136,11 +137,11 @@ class VisitationCalculator(object):
         self.count = 0
         self.depth = 0
         self.visitation = []
-        topc = self.session\
-                   .query(ConceptModel)\
-                   .filter(ConceptModel.conceptscheme == conceptscheme)\
-                   .filter(ConceptModel.broader_concepts == None)\
-                   .all()
+        topc = self.session \
+            .query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == conceptscheme) \
+            .filter(ConceptModel.broader_concepts == None) \
+            .all()
         for tc in topc:
             self._visit_concept(tc)
         self.visitation.sort(key=lambda v: v['lft'])
@@ -162,3 +163,27 @@ class VisitationCalculator(object):
         v['rght'] = self.count
         self.visitation.append(v)
         self.depth -= 1
+
+
+def session_factory(session_maker_name):
+    def with_session(fn):
+        def go(self, *args, **kw):
+            if hasattr(self, session_maker_name):
+                session_maker = getattr(self, session_maker_name)
+                session = session_maker()
+                self.session = session
+                try:
+                    self.session.begin(subtransactions=True)
+                    ret = fn(self, *args, **kw)
+                    self.session.commit()
+                    return ret
+                except:
+                    self.session.rollback()
+                    raise
+                finally:
+                    self.session.close()
+            else:
+                raise Exception('session_maker %s not found' % session_maker_name)
+
+        return go
+    return with_session
