@@ -11,7 +11,7 @@ def pytest_addoption(parser):
     parser.addoption(
         '--sqlalchemy_url',
         action='store',
-        default='sqlite:///dbtest.sqlite',
+        default='sqlite:///:memory:',
         help='SQLAlchemy connection url to database under test.'
     )
 
