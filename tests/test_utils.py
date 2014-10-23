@@ -6,17 +6,19 @@ import csv
 import unittest
 
 import pytest
+from sqlalchemy.orm import Session
 
 from skosprovider_sqlalchemy.utils import (
     import_provider,
-    VisitationCalculator
-)
+    VisitationCalculator,
+    session_factory)
 
 
 def _get_menu():
     from skosprovider.providers import (
         SimpleCsvProvider
     )
+
     ifile = open(
         os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'),
         "r"
@@ -32,6 +34,7 @@ def _get_menu():
 
 def _get_geo():
     from skosprovider.providers import DictionaryProvider
+
     geo = DictionaryProvider(
         {'id': 'GEOGRAPHY'},
         [
@@ -138,6 +141,7 @@ def _get_geo():
 
 def _get_buildings():
     from skosprovider.providers import DictionaryProvider
+
     buildings = DictionaryProvider(
         {'id': 'BUILDINGS'},
         [
@@ -190,13 +194,16 @@ def _get_buildings():
     )
     return buildings
 
+
 def _get_heritage_types():
     import json
+
     typology_data = json.load(
         open(os.path.join(os.path.dirname(__file__), 'data', 'typologie.js')),
     )['typologie']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
+
     heritage_types = DictionaryProvider(
         {'id': 'HERITAGE_TYPES'},
         typology_data,
@@ -204,13 +211,16 @@ def _get_heritage_types():
     )
     return heritage_types
 
+
 def _get_event_types():
     import json
+
     event_data = json.load(
         open(os.path.join(os.path.dirname(__file__), 'data', 'gebeurtenis.js')),
     )['gebeurtenis']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
+
     heritage_types = DictionaryProvider(
         {'id': 'EVENT_TYPES'},
         event_data,
@@ -220,7 +230,6 @@ def _get_event_types():
 
 
 class TestImportProviderTests(unittest.TestCase):
-
     @pytest.fixture(autouse=True)
     def init(self, session_maker):
         self.session_maker = session_maker
@@ -236,6 +245,7 @@ class TestImportProviderTests(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             ConceptScheme as ConceptSchemeModel
         )
+
         return ConceptSchemeModel(
             id=68
         )
@@ -245,6 +255,7 @@ class TestImportProviderTests(unittest.TestCase):
             ConceptScheme as ConceptSchemeModel
         )
         from skosprovider.providers import DictionaryProvider
+
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
@@ -256,14 +267,15 @@ class TestImportProviderTests(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
+
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(csvprovider, cs, self.session)
-        lobster = self.session.query(ConceptModel)\
-                         .filter(ConceptModel.conceptscheme == cs)\
-                         .filter(ConceptModel.concept_id == 11)\
-                         .one()
+        lobster = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 11) \
+            .one()
         assert 11 == lobster.concept_id
         assert 'urn:x-skosprovider:menu:11' == lobster.uri
         assert 'Lobster Thermidor' == str(lobster.label())
@@ -274,34 +286,35 @@ class TestImportProviderTests(unittest.TestCase):
             Concept as ConceptModel,
             Collection as CollectionModel
         )
+
         geoprovider = _get_geo()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(geoprovider, cs, self.session)
-        world = self.session.query(ConceptModel)\
-                       .filter(ConceptModel.conceptscheme == cs)\
-                       .filter(ConceptModel.concept_id == 1)\
-                       .one()
+        world = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 1) \
+            .one()
         assert world.concept_id == 1
         assert 'urn:x-skosprovider:geography:1' == world.uri
         assert 'World' == str(world.label('en'))
         assert 1 == len(world.labels)
         assert 2 == len(world.narrower_concepts)
 
-        dutch = self.session.query(CollectionModel)\
-                       .filter(CollectionModel.conceptscheme == cs)\
-                       .filter(CollectionModel.concept_id == 333)\
-                       .one()
+        dutch = self.session.query(CollectionModel) \
+            .filter(CollectionModel.conceptscheme == cs) \
+            .filter(CollectionModel.concept_id == 333) \
+            .one()
         assert 333 == dutch.concept_id
         assert 'urn:x-skosprovider:geography:333' == dutch.uri
         assert 'collection' == dutch.type
         assert 1 == len(dutch.labels)
         assert 4 == len(dutch.members)
 
-        netherlands = self.session.query(ConceptModel)\
-                             .filter(ConceptModel.conceptscheme == cs)\
-                             .filter(ConceptModel.concept_id == 10)\
-                             .one()
+        netherlands = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 10) \
+            .one()
         assert 10 == netherlands.concept_id
         assert 'concept' == netherlands.type
         assert 1 == len(netherlands.labels)
@@ -312,19 +325,20 @@ class TestImportProviderTests(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
+
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(buildingprovider, cs, self.session)
-        castle = self.session.query(ConceptModel)\
-                        .filter(ConceptModel.conceptscheme == cs)\
-                        .filter(ConceptModel.concept_id == 2)\
-                        .one()
+        castle = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 2) \
+            .one()
         assert 2 == len(castle.broader_concepts)
-        hut = self.session.query(ConceptModel)\
-                     .filter(ConceptModel.conceptscheme == cs)\
-                     .filter(ConceptModel.concept_id == 4)\
-                     .one()
+        hut = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 4) \
+            .one()
         assert 1 == len(hut.broader_concepts)
         assert 1 == len(hut.matches)
         assert 'exactMatch' == hut.matches[0].matchtype_id
@@ -334,33 +348,34 @@ class TestImportProviderTests(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel,
         )
+
         heritagetypesprovider = _get_heritage_types()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(heritagetypesprovider, cs, self.session)
-        bomen = self.session.query(ConceptModel)\
-                     .filter(ConceptModel.conceptscheme == cs)\
-                     .filter(ConceptModel.concept_id == 72)\
-                     .one()
+        bomen = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 72) \
+            .one()
         assert 2 == len(bomen.narrower_collections)
 
     def test_event_types(self):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel,
         )
+
         eventtypesprovider = _get_event_types()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(eventtypesprovider, cs, self.session)
-        archeologische_opgravingen = self.session.query(ConceptModel)\
-                     .filter(ConceptModel.conceptscheme == cs)\
-                     .filter(ConceptModel.concept_id == 38)\
-                     .one()
+        archeologische_opgravingen = self.session.query(ConceptModel) \
+            .filter(ConceptModel.conceptscheme == cs) \
+            .filter(ConceptModel.concept_id == 38) \
+            .one()
         assert 3 == len(archeologische_opgravingen.narrower_collections)
 
 
 class TestVisitationCalculator(unittest.TestCase):
-
     @pytest.fixture(autouse=True)
     def init(self, session_maker):
         self.session_maker = session_maker
@@ -376,12 +391,14 @@ class TestVisitationCalculator(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             ConceptScheme as ConceptSchemeModel
         )
+
         return ConceptSchemeModel(
             id=1
         )
 
     def test_empty_provider(self):
         from skosprovider.providers import DictionaryProvider
+
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
@@ -399,7 +416,7 @@ class TestVisitationCalculator(unittest.TestCase):
         visit = vc.visit(cs)
         assert 11 == len(visit)
         for v in visit:
-            assert v['lft']+1 == v['rght']
+            assert v['lft'] + 1 == v['rght']
             assert 1 == v['depth']
 
     def test_menu_sorted(self):
@@ -419,6 +436,7 @@ class TestVisitationCalculator(unittest.TestCase):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
+
         geoprovider = _get_geo()
         cs = self._get_cs()
         self.session.add(cs)
@@ -433,16 +451,17 @@ class TestVisitationCalculator(unittest.TestCase):
         assert 1 == world['depth']
         for v in visit:
             if v['id'] == 3:
-                assert v['lft']+3 == v['rght']
+                assert v['lft'] + 3 == v['rght']
                 assert 2 == v['depth']
             if v['id'] == 6:
-                assert v['lft']+1 == v['rght']
+                assert v['lft'] + 1 == v['rght']
                 assert 3 == v['depth']
 
     def test_buildings(self):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
         )
+
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)
@@ -456,13 +475,48 @@ class TestVisitationCalculator(unittest.TestCase):
         for v in visit:
             # Check that fortification has one child
             if v['id'] == 1:
-                assert v['lft']+3 == v['rght']
+                assert v['lft'] + 3 == v['rght']
                 assert 1 == v['depth']
             # Check that habitations has two children
             if v['id'] == 3:
-                assert v['lft']+5 == v['rght']
+                assert v['lft'] + 5 == v['rght']
                 assert 1 == v['depth']
             # Check that castle has no children
             if v['id'] == 2:
-                assert v['lft']+1 == v['rght']
+                assert v['lft'] + 1 == v['rght']
                 assert 2 == v['depth']
+
+
+class TestObject(object):
+    def __init__(self, session_maker):
+        self.session_maker = session_maker
+
+    @session_factory('test')
+    def some_method(self):
+        return self.session
+
+    @session_factory('session_maker')
+    def some_other_method(self):
+        return self.session
+
+
+class TestSessionFactory(unittest.TestCase):
+
+    @pytest.fixture(autouse=True)
+    def init(self, session_maker):
+        self.session_maker = session_maker
+
+    def setUp(self):
+        self.test_object = TestObject(self.session_maker)
+
+    def test_no_session_factory_found(self):
+        self.assertRaises(Exception, )
+        with self.assertRaises(Exception) as cm:
+            self.test_object.some_method()
+        the_exception = cm.exception
+        self.assertEqual(the_exception.message, 'session_maker test not found')
+
+    def test_session_creation(self):
+        res = self.test_object.some_other_method()
+        self.assertIsNotNone(res)
+        self.assertIsInstance(res, Session)
