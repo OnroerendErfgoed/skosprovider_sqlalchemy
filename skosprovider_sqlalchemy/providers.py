@@ -73,9 +73,14 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             self.uri_generator = DefaultUrnGenerator(self.metadata.get('id'))
         self.session = session
-        self.conceptscheme_id = int(metadata.get(
-            'conceptscheme_id', metadata.get('id')
-        ))
+        try:
+            self.conceptscheme_id = int(metadata.get(
+                'conceptscheme_id', metadata.get('id')
+            ))
+        except ValueError:
+            raise ValueError(
+                'Please provide a valid integer for the conceptscheme_id.'
+            )
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
@@ -90,23 +95,24 @@ class SQLAlchemyProvider(VocabularyProvider):
 
     def _get_concept_scheme(self):
         '''
-        Find a :class:`skosprovider.skos.ConceptScheme` for a certain id.
+        Find a :class:`skosprovider.skos.ConceptScheme` for this provider.
 
         :rtype: :class:`skosprovider.skos.ConceptScheme`
         '''
         csm = self.session\
                   .query(ConceptSchemeModel)\
                   .get(self.conceptscheme_id)
-        if csm:
-            return ConceptScheme(
-                uri=csm.uri
-            )
-        else:
-            return ConceptScheme(
-                uri=DefaultConceptSchemeUrnGenerator().generate(
-                    id=self.conceptscheme_id
-                )
-            )
+        return ConceptScheme(
+            uri=csm.uri,
+            labels=[
+                Label(l.label, l.labeltype_id, l.language_id)
+                for l in csm.labels
+            ],
+            notes=[
+                Note(n.note, n.notetype_id, n.language_id)
+                for n in csm.notes
+            ]
+        )
 
     def _from_thing(self, thing):
         '''

@@ -29,16 +29,15 @@ class TestSQLAlchemyProvider:
                 expand_strategy='invalid'
             )
 
-    def test_provider_without_cs_id_has_cs(self, session):
+    def test_provider_without_cs_id(self, session):
         from skosprovider.skos import (
             ConceptScheme
         )
-        provider = SQLAlchemyProvider(
-            {'id': 'SOORTEN'},
-            session
-        )
-        cs = provider.concept_scheme
-        assert isinstance(cs, ConceptScheme)
+        with pytest.raises(ValueError):
+            SQLAlchemyProvider(
+                {'id': 'SOORTEN'},
+                session
+            )
 
     def test_get_vocabulary_id(self, provider):
         assert 'SOORTEN' == provider.get_vocabulary_id()
