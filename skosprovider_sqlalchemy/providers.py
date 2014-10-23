@@ -73,9 +73,9 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             self.uri_generator = DefaultUrnGenerator(self.metadata.get('id'))
         self.session = session
-        self.conceptscheme_id = metadata.get(
+        self.conceptscheme_id = int(metadata.get(
             'conceptscheme_id', metadata.get('id')
-        )
+        ))
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
