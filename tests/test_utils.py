@@ -514,7 +514,7 @@ class TestSessionFactory(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             self.test_object.some_method()
         the_exception = cm.exception
-        self.assertEqual(the_exception.message, 'session_maker test not found')
+        self.assertEqual(str(the_exception), 'session_maker test not found')
 
     def test_session_creation(self):
         res = self.test_object.some_other_method()
