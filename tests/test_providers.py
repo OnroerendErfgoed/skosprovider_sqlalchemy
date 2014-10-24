@@ -31,7 +31,6 @@ class TestSQLAlchemyProvider(unittest.TestCase):
         self.session.rollback()
         self.session.close()
 
-
     def test_default_recurse_strategy(self):
         assert 'recurse' == self.provider.expand_strategy
 
@@ -50,6 +49,13 @@ class TestSQLAlchemyProvider(unittest.TestCase):
                 {'id': 'SOORTEN', 'conceptscheme_id': 1},
                 self.session_maker,
                 expand_strategy='invalid'
+            )
+
+    def test_provider_without_cs_id(self):
+        with pytest.raises(ValueError):
+            SQLAlchemyProvider(
+                {'id': 'SOORTEN'},
+                self.session_maker
             )
 
     def test_get_vocabulary_id(self):
