@@ -98,6 +98,14 @@ class TestSQLAlchemyProvider(unittest.TestCase):
         assert [4] == con.narrower
         assert [2] == con.subordinate_arrays
 
+    def test_concept_has_concept_scheme(self):
+        from skosprovider.skos import (
+            ConceptScheme
+        )
+        con = self.provider.get_by_id(1)
+        assert isinstance(con.concept_scheme, ConceptScheme)
+        assert 'urn:x-skosprovider:test' == con.concept_scheme.uri
+
     def test_get_concept_by_id_string(self):
         from skosprovider.skos import Concept
 
