@@ -3,7 +3,11 @@
 
 * **Major BC break**: A provider is no longer passed a database session, but a
   database session maker. This change was needed to get the provider to function
-  properly in threaded web applications.
+  properly in threaded web applications. This will mean changing the
+  code where you're creating your provider. In the past, you probably called
+  a session maker first and then passed the result of this call to the provider.
+  Now you should just pass the session maker itself and let the provider create
+  the sessions for you.
 * Different way of fetching the :class:`~skosprovider.skos.ConceptScheme` 
   for a provider. No longer fetches a conceptscheme at provider instantiation, 
   but when needed. Otherwise we end up with a possibly very long cached version 
