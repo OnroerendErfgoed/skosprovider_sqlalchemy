@@ -4,7 +4,8 @@ import unittest
 
 import pytest
 
-from skosprovider_sqlalchemy.models import Initialiser
+from skosprovider_sqlalchemy.models import Initialiser, Base
+from tests import DBTestCase
 
 
 class ModelTestCase(unittest.TestCase):
@@ -177,19 +178,17 @@ class CollectionTests(ModelTestCase):
         self.assertEqual(1, len(c.member_of))
 
 
-class TestLabel(unittest.TestCase):
-
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestLabel(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Label
@@ -220,19 +219,17 @@ class TestLabel(unittest.TestCase):
         assert 'prefLabel' == l.labeltype.name
 
 
-class TestNote(unittest.TestCase):
-
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestNote(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Note

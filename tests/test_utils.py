@@ -7,11 +7,13 @@ import unittest
 
 import pytest
 from sqlalchemy.orm import Session
+from skosprovider_sqlalchemy.models import Base, Initialiser
 
 from skosprovider_sqlalchemy.utils import (
     import_provider,
     VisitationCalculator,
     session_factory)
+from tests import DBTestCase
 
 
 def _get_menu():
@@ -229,17 +231,17 @@ def _get_event_types():
     return heritage_types
 
 
-class TestImportProviderTests(unittest.TestCase):
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestImportProviderTests(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
+        Initialiser(self.session).init_all()
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
         from skosprovider_sqlalchemy.models import (
@@ -375,17 +377,17 @@ class TestImportProviderTests(unittest.TestCase):
         assert 3 == len(archeologische_opgravingen.narrower_collections)
 
 
-class TestVisitationCalculator(unittest.TestCase):
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestVisitationCalculator(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
+        Initialiser(self.session).init_all()
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
         from skosprovider_sqlalchemy.models import (

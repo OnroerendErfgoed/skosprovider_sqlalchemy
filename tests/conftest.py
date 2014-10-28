@@ -2,10 +2,6 @@ import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-from skosprovider_sqlalchemy.models import (
-    Base
-)
-
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -22,12 +18,7 @@ def engine(request):
         request.config.getoption('--sqlalchemy_url'),
         echo=True
     )
-    Base.metadata.create_all(engine)
 
-    def finalize():
-        Base.metadata.drop_all(engine)
-
-    request.addfinalizer(finalize)
     return engine
 
 

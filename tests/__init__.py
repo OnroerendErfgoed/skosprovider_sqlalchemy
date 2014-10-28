@@ -1,35 +1,18 @@
 # -*- coding: utf-8 -*-
-
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-
-
-def _initTestingDB(engine):
-    from skosprovider_sqlalchemy.models import (
-        Base
-    )
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(
-        bind=engine
-    )
-    DBSession = Session()
-
-    from skosprovider_sqlalchemy.models import (
-        Initialiser
-    )
-
-    init = Initialiser(DBSession)
-    init.init_all()
-    return DBSession
-
-engine = create_engine('sqlite:///:memory:', echo=True)
+import unittest
+import pytest
 
 
 def setUpPackage():
-    session = _initTestingDB(engine)
-    session.commit()
+    pass
 
 
 def tearDownPackage():
     pass
+
+
+class DBTestCase(unittest.TestCase):
+    @pytest.fixture(autouse=True)
+    def init(self, session_maker, engine):
+        self.session_maker = session_maker
+        self.engine = engine

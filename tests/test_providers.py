@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import unittest
 from skosprovider.uri import UriPatternGenerator
 from skosprovider_sqlalchemy.models import Initialiser
 
 from skosprovider_sqlalchemy.providers import (
     SQLAlchemyProvider
 )
+from tests import DBTestCase
 from tests.conftest import create_data, create_visitation
+from skosprovider_sqlalchemy.models import (
+    Base
+)
 
 
-class TestSQLAlchemyProvider(unittest.TestCase):
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestSQLAlchemyProvider(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
         create_data(self.session)
@@ -27,9 +28,9 @@ class TestSQLAlchemyProvider(unittest.TestCase):
         )
 
     def tearDown(self):
-
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def test_default_recurse_strategy(self):
         assert 'recurse' == self.provider.expand_strategy
@@ -355,13 +356,10 @@ class TestSQLAlchemyProvider(unittest.TestCase):
         assert not ids
 
 
-class TestSQLAlchemyProviderExpandVisit(unittest.TestCase):
-
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestSQLAlchemyProviderExpandVisit(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
         create_data(self.session)
@@ -374,7 +372,8 @@ class TestSQLAlchemyProviderExpandVisit(unittest.TestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def test_expand_concept_visit(self):
         ids = self.visitationprovider.expand_concept(1)
@@ -393,13 +392,10 @@ class TestSQLAlchemyProviderExpandVisit(unittest.TestCase):
         assert not ids
 
 
-class TestSQLAlchemyProviderExpandVisitNoVisitation(unittest.TestCase):
-
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
+class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
 
     def setUp(self):
+        Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
         self.visitationprovider=SQLAlchemyProvider(
@@ -410,7 +406,8 @@ class TestSQLAlchemyProviderExpandVisitNoVisitation(unittest.TestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def test_expand_concept(self):
         ids = self.visitationprovider.expand_concept(1)
