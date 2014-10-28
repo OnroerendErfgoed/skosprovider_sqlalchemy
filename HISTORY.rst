@@ -1,6 +1,9 @@
-next version
-------------
+0.4.0 (2014-10-28)
+------------------
 
+* **Major BC break**: A provider is no longer passed a database session, but a
+  database session maker. This change was needed to get the provider to function
+  properly in threaded web applications.
 * Different way of fetching the :class:`~skosprovider.skos.ConceptScheme` 
   for a provider. No longer fetches a conceptscheme at provider instantiation, 
   but when needed. Otherwise we end up with a possibly very long cached version 
