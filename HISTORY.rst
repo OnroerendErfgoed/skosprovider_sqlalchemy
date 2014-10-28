@@ -1,3 +1,9 @@
+0.4.1 (2014-??-??)
+------------------
+
+* Fix a bug with the deletion of a Concept not being possible without having
+  it's matches deleted first. [BartSaelen]
+
 0.4.0 (2014-10-28)
 ------------------
 
