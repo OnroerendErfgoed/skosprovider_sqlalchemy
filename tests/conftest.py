@@ -1,15 +1,7 @@
 import pytest
-
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from skosprovider_sqlalchemy.models import (
-    Base,
-    Initialiser
-)
 
-from skosprovider_sqlalchemy.providers import (
-    SQLAlchemyProvider
-)
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -19,52 +11,27 @@ def pytest_addoption(parser):
         help='SQLAlchemy connection url to database under test.'
     )
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture()
 def engine(request):
     engine = create_engine(
         request.config.getoption('--sqlalchemy_url'),
         echo=True
     )
-    Base.metadata.create_all(engine)
 
-    def finalize():
-        Base.metadata.drop_all(engine)
-
-    request.addfinalizer(finalize)
     return engine
 
-@pytest.fixture()
-def session(request, engine):
-    connection = engine.connect()
-    transaction = connection.begin()
 
-    Session = sessionmaker(
+@pytest.fixture()
+def session_maker(request, engine):
+    _session_maker = sessionmaker(
         bind=engine
     )
-    DBSession = Session()
 
-    init = Initialiser(DBSession)
-    init.init_all()
+    return _session_maker
 
-    def finalize():
-        DBSession.close()
-        transaction.rollback()
 
-    request.addfinalizer(finalize)
-    return DBSession
-
-@pytest.fixture()
-def provider(request, test_data, session):
-    from skosprovider.uri import UriPatternGenerator
-    provider = SQLAlchemyProvider(
-        {'id': 'SOORTEN', 'conceptscheme_id': 1},
-        session,
-        uri_generator=UriPatternGenerator('urn:x-skosprovider-sa:test:%s')
-    )
-    return provider
-
-@pytest.fixture()
-def test_data(request, session):
+def create_data(session):
     from skosprovider_sqlalchemy.models import (
         Concept,
         ConceptScheme,
@@ -146,18 +113,10 @@ def test_data(request, session):
         uri = 'http://vocab.getty.edu/aat/300007501'
     )
     cath.matches.append(match)
+    session.commit()
 
-@pytest.fixture()
-def visitationprovider(request, test_data, session):
-    provider = SQLAlchemyProvider(
-        {'id': 'SOORTEN', 'conceptscheme_id': 1},
-        session,
-        expand_strategy='visit'
-    )
-    return provider
 
-@pytest.fixture()
-def create_visitation(session, test_data):
+def create_visitation(session):
     from skosprovider_sqlalchemy.utils import (
         VisitationCalculator
     )
@@ -167,7 +126,7 @@ def create_visitation(session, test_data):
     )
     vc = VisitationCalculator(session)
     conceptschemes = session.query(ConceptScheme).all()
-    for cs in conceptschemes:                     
+    for cs in conceptschemes:
         visit = vc.visit(cs)
         for v in visit:
             vrow = Visitation(
@@ -178,3 +137,4 @@ def create_visitation(session, test_data):
                 depth=v['depth']
             )
             session.add(vrow)
+    session.commit()

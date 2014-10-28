@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import unittest
+
+import pytest
+
+from skosprovider_sqlalchemy.models import Initialiser, Base
+from tests import DBTestCase
 
 
 class ModelTestCase(unittest.TestCase):
     pass
+
 
 class ConceptTests(ModelTestCase):
 
@@ -173,7 +178,17 @@ class CollectionTests(ModelTestCase):
         self.assertEqual(1, len(c.member_of))
 
 
-class TestLabel:
+class TestLabel(DBTestCase):
+
+    def setUp(self):
+        Base.metadata.create_all(self.engine)
+        self.session = self.session_maker()
+        Initialiser(self.session).init_all()
+
+    def tearDown(self):
+        self.session.rollback()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Label
@@ -185,25 +200,36 @@ class TestLabel:
         assert 'prefLabel' == l.labeltype_id
         assert 'Kerken' == l.__str__()
 
-    def test_load_objects(self, session):
+    def test_load_objects(self):
         l = self._get_target_class()('Kerken', 'prefLabel', 'nl')
-        session.add(l)
-        session.flush()
+        self.session.add(l)
+        self.session.flush()
+
         assert 'Dutch' == l.language.name
         assert 'prefLabel' ==l.labeltype.name
 
-    def test_no_language(self, session):
+    def test_no_language(self):
         l = self._get_target_class()('Kerken', 'prefLabel')
         assert None == l.language_id
         assert 'prefLabel' == l.labeltype_id
         assert 'Kerken' == l.__str__()
-        session.add(l)
-        session.flush()
+        self.session.add(l)
+        self.session.flush()
         assert None == l.language_id
         assert 'prefLabel' == l.labeltype.name
 
 
-class TestNote:
+class TestNote(DBTestCase):
+
+    def setUp(self):
+        Base.metadata.create_all(self.engine)
+        self.session = self.session_maker()
+        Initialiser(self.session).init_all()
+
+    def tearDown(self):
+        self.session.rollback()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Note
@@ -219,18 +245,18 @@ class TestNote:
         assert 'definition' == n.notetype_id
         assert 'Een kerk is een religieus gebouw.' == n.__str__()
 
-    def test_load_objects(self, session):
+    def test_load_objects(self):
         n = self._get_target_class()(
             'Een kerk is een religieus gebouw.',
             'definition',
             'nl'
         )
-        session.add(n)
-        session.flush()
+        self.session.add(n)
+        self.session.flush()
         assert 'Dutch' == n.language.name
         assert 'definition' == n.notetype.name
 
-    def test_no_language(self, session):
+    def test_no_language(self):
         n = self._get_target_class()(
             'Een kerk is een religieus gebouw.',
             'definition',
@@ -239,8 +265,8 @@ class TestNote:
         assert None == n.language_id
         assert 'definition' == n.notetype_id
         assert 'Een kerk is een religieus gebouw.' == n.__str__()
-        session.add(n)
-        session.flush()
+        self.session.add(n)
+        self.session.flush()
         assert None == n.language
         assert 'definition' == n.notetype.name
 
