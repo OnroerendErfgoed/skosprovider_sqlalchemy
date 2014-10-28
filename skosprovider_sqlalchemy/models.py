@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import logging
+
 log = logging.getLogger(__name__)
 
 from language_tags import tags
@@ -228,6 +229,7 @@ def related_concepts_append_listener(target, value, initiator):
     if (target) not in getattr(value, '__related_to__', set()):
         value.related_concepts.add(target)
 
+
 event.listen(
     Concept.related_concepts,
     'append',
@@ -249,7 +251,8 @@ def related_concepts_remove_listener(target, value, initiator):
     target.__removed_from__.add(value)
 
     if target in value.related_concepts and target not in getattr(value, '__removed_from__', set()):
-            value.related_concepts.remove(target)
+        value.related_concepts.remove(target)
+
 
 event.listen(Concept.related_concepts, 'remove', related_concepts_remove_listener)
 
@@ -443,7 +446,9 @@ class Match(Base):
     '''
     __tablename__ = 'match'
 
-    concept = relationship('Concept', backref='matches')
+    concept = relationship('Concept', backref=backref('matches',
+                                                      cascade='save-update, merge, '
+                                                              'delete, delete-orphan'))
     concept_id = Column(
         Integer,
         ForeignKey('concept.id'),
@@ -464,6 +469,7 @@ class Match(Base):
 
     def __str__(self):
         return self.uri
+
 
 class Visitation(Base):
     '''
@@ -545,7 +551,8 @@ def label(labels=[], language='any'):
                 pref = l
             if labeltype == 'altLabel' and (alt is None or alt.language_id != language):
                 alt = l
-        if broader_language_tag and tags.tag(l.language_id).language and tags.tag(l.language_id).language.format == broader_language_tag.format:
+        if broader_language_tag and tags.tag(l.language_id).language and tags.tag(
+                l.language_id).language.format == broader_language_tag.format:
             if labeltype == 'prefLabel' and pref is None:
                 pref = l
             if labeltype == 'altLabel' and alt is None:
@@ -615,8 +622,10 @@ class Initialiser(object):
         Initialise the matchtypes.
         '''
         matchtypes = [
-            ('closeMatch', 'Indicates that two concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.'),
-            ('exactMatch', 'Indicates that there is a high degree of confidence that two concepts can be used interchangeably across a wide range of information retrieval applications.'),
+            ('closeMatch',
+             'Indicates that two concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.'),
+            ('exactMatch',
+             'Indicates that there is a high degree of confidence that two concepts can be used interchangeably across a wide range of information retrieval applications.'),
             ('broadMatch', 'Indicates that one concept has a broader match with another one.'),
             ('narrowMatch', 'Indicates that one concept has a narrower match with another one.'),
             ('relatedMatch', 'Indicates that there is an associative mapping between two concepts.')
