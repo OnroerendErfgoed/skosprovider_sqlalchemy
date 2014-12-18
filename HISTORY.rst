@@ -1,4 +1,4 @@
-0.4.1 (2014-??-??)
+0.4.1 (2014-12-18)
 ------------------
 
 * Fix a bug with the deletion of a Concept not being possible without having
