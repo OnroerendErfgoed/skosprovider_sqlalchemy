@@ -644,7 +644,7 @@ class Initialiser(object):
         languages = [
             ('la', 'Latin'),
             ('nl', 'Dutch'),
-            ('vls', 'Flemish'),
+            ('vls', '(West) Flemish'),
             ('en', 'English'),
             ('fr', 'French'),
             ('de', 'German')
