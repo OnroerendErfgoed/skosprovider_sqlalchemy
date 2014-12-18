@@ -21,8 +21,7 @@ setup(
     name='skosprovider_sqlalchemy',
     version='0.4.1',
     description='A sqlAlchemy implementation of skosprovider.',
-    long_description=open('README.rst').read() + '\n\n' +
-                     open('HISTORY.rst').read(),
+    long_description=open('README.rst').read(),
     author='Koen Van Daele',
     author_email='koen_van_daele@telenet.be',
     url='http://github.com/koenedaele/skosprovider_sqlalchemy',
