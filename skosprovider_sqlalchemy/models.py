@@ -353,7 +353,7 @@ class Label(Base):
         index=True
     )
     language_id = Column(
-        String(10),
+        String(64),
         ForeignKey('language.id'),
         nullable=True,
         index=True
@@ -407,7 +407,7 @@ class Note(Base):
 
     language = relationship('Language', uselist=False)
     language_id = Column(
-        String(10),
+        String(64),
         ForeignKey('language.id'),
         nullable=True,
         index=True
