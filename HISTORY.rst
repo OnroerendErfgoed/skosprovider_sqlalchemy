@@ -2,6 +2,10 @@
 ------------------
 
 * Make README work better on pypi.
+* Fix a further problem with the length of language identifiers. Previous fix
+  in 0.3.0 only fixed the length of the identifiers in the languages table,
+  but not in the links from the labels and the notes to the language table. 
+  [BartSaelen]
 
 0.4.1 (2014-12-18)
 ------------------
