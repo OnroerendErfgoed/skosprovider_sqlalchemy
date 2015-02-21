@@ -3,14 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Skosprovider_sqlalchemy's documentation!
-===================================================
+SkosProvider_SQLAlchemy
+=======================
 
 This library offers an implementation of the 
 :class:`skosprovider.providers.VocabularyProvider`
 interface that uses a SQLALchemy_ backend. While a 
 :class:`VocabularyProvider <skosprovider.providers.VocabularyProvider>` is
-a read-only interface, the underlying SQLAlchemy_ domain model is fully 
+a read-only interface, the underlying SQLAlchemy_ 
+:mod:`domain model <skosprovider_sqlalchemy.models>` is fully 
 writeable.
 
 This library is fully integrated into Atramhasis_, an online open source
@@ -19,6 +20,7 @@ editor for :term:`SKOS` vocabularies.
 .. toctree::
    :maxdepth: 2
 
+   setup
    api
    changes
 
