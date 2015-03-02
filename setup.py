@@ -19,7 +19,7 @@ requires = [
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='0.4.2-dev',
+    version='0.4.2',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read(),
     author='Koen Van Daele',
