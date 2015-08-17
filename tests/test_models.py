@@ -239,11 +239,13 @@ class TestNote(DBTestCase):
         n = self._get_target_class()(
             'Een kerk is een religieus gebouw.',
             'definition',
-            'nl'
+            'nl',
+            'HTML'
         )
         assert 'nl' == n.language_id
         assert 'definition' == n.notetype_id
         assert 'Een kerk is een religieus gebouw.' == n.__str__()
+        assert 'HTML' == n.markup
 
     def test_load_objects(self):
         n = self._get_target_class()(
@@ -255,6 +257,7 @@ class TestNote(DBTestCase):
         self.session.flush()
         assert 'Dutch' == n.language.name
         assert 'definition' == n.notetype.name
+        assert None == n.markup
 
     def test_no_language(self):
         n = self._get_target_class()(
@@ -269,6 +272,7 @@ class TestNote(DBTestCase):
         self.session.flush()
         assert None == n.language
         assert 'definition' == n.notetype.name
+        assert None == n.markup
 
 
 class LanguageTests(ModelTestCase):

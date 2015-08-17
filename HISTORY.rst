@@ -1,3 +1,13 @@
+0.5.0 (2015-??-??)
+------------------
+
+* Update to skosprovider 0.6.0
+* Due to the update to skosprovider 0.6.0, a new field `markup`, was added to a 
+  :class:`skosprovider_sqlalchemy.models.Note`. When upgrading from a previous
+  version of `skosprovider_sqlalchemy`, any databases created in that previous
+  verions will need to be updated as well. Please add a field called `markup` 
+  to the `note` table.
+
 0.4.2 (2015-03-02)
 ------------------
 
