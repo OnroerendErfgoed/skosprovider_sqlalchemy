@@ -412,11 +412,13 @@ class Note(Base):
         nullable=True,
         index=True
     )
+    markup = Column(String(20), nullable=True)
 
-    def __init__(self, note, notetype_id, language_id):
+    def __init__(self, note, notetype_id, language_id, markup=None):
         self.notetype_id = notetype_id
         self.language_id = language_id
         self.note = note
+        self.markup = markup
 
     def __str__(self):
         return self.note

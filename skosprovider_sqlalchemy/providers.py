@@ -114,7 +114,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 for l in csm.labels
             ],
             notes=[
-                Note(n.note, n.notetype_id, n.language_id)
+                Note(n.note, n.notetype_id, n.language_id, n.markup)
                 for n in csm.notes
             ]
         )
@@ -136,7 +136,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     for l in thing.labels
                 ],
                 notes=[
-                    Note(n.note, n.notetype_id, n.language_id)
+                    Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
                 ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
@@ -159,7 +159,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     for l in thing.labels
                 ],
                 notes=[
-                    Note(n.note, n.notetype_id, n.language_id)
+                    Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
                 ],
                 broader=[c.concept_id for c in thing.broader_concepts],
