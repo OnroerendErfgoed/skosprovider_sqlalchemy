@@ -121,14 +121,18 @@ class ConceptSchemeTests(ModelTestCase):
         return ConceptScheme
 
     def test_simple(self):
-        from skosprovider_sqlalchemy.models import Label
+        from skosprovider_sqlalchemy.models import Label, Language
         l = Label('Heritage types', 'prefLabel', 'en')
+        en = Language('en', 'English')
         c = self._get_target_class()(
             id=1,
-            labels=[l]
+            labels=[l],
+            languages=[en]
         )
         self.assertEqual(1, c.id)
         self.assertEqual(l, c.label())
+        self.assertEqual(1, len(c.languages))
+        self.assertIn(en, c.languages)
 
 
 class CollectionTests(ModelTestCase):

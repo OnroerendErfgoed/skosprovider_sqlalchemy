@@ -66,6 +66,23 @@ conceptscheme_note = Table(
     Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
+conceptscheme_language = Table(
+    'conceptscheme_language',
+    Base.metadata,
+    Column(
+        'conceptscheme_id',
+        Integer,
+        ForeignKey('conceptscheme.id'),
+        primary_key=True
+    ),
+    Column(
+        'language_id',
+        String(64),
+        ForeignKey('language.id'),
+        primary_key=True
+    )
+)
+
 collection_concept = Table(
     'collection_concept',
     Base.metadata,
@@ -294,7 +311,10 @@ class ConceptScheme(Base):
         secondary=conceptscheme_note,
         backref=backref('conceptscheme', uselist=False)
     )
-
+    languages = relationship(
+        'Language',
+        secondary=conceptscheme_language
+    )
     def label(self, language='any'):
         return label(self.labels, language)
 

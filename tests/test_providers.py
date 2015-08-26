@@ -89,6 +89,16 @@ class TestSQLAlchemyProvider(DBTestCase):
         c2 = provider.get_by_id(1)
         assert c2.uri == 'http://id.example.com/trees/1'
 
+    def test_concept_scheme(self):
+        from skosprovider.skos import (
+            ConceptScheme
+        )
+        cs = self.provider.concept_scheme
+        assert isinstance(cs, ConceptScheme)
+        assert 'urn:x-skosprovider:test' == cs.uri
+        assert 2 == len(cs.languages)
+        assert 'en' in cs.languages
+
     def test_get_concept_by_id(self):
         from skosprovider.skos import Concept
 

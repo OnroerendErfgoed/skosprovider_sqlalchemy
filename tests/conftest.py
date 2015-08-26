@@ -38,11 +38,15 @@ def create_data(session):
         Collection,
         Label,
         Note,
-        Match
+        Match,
+        Language
     )
+    en = session.query(Language).get('en')
+    nl = session.query(Language).get('nl')
     cs = ConceptScheme(
         id=1,
-        uri='urn:x-skosprovider:test'
+        uri='urn:x-skosprovider:test',
+        languages=[en, nl]
     )
     session.add(cs)
     con = Concept(

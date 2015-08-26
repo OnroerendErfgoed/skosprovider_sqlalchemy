@@ -116,6 +116,9 @@ class SQLAlchemyProvider(VocabularyProvider):
             notes=[
                 Note(n.note, n.notetype_id, n.language_id, n.markup)
                 for n in csm.notes
+            ],
+            languages=[
+                l.id for l in csm.languages
             ]
         )
 

@@ -7,6 +7,12 @@
   version of `skosprovider_sqlalchemy`, any databases created in that previous
   verions will need to be updated as well. Please add a field called `markup` 
   to the `note` table.
+* Inline with the skosprovider 0.6.0 update, a `languages` attribute was added
+  to :class:`skosprovider_sqlalchemy.models.ConceptScheme`. When upgrading from 
+  a previous version of `skosprovider_sqlalchemy`, any databases created with 
+  that previous verions will need to be updated as well. Please add a table 
+  called `conceptscheme_language` with fields `conceptscheme_id` and
+  `language_id`. (#18)
 
 0.4.2 (2015-03-02)
 ------------------
