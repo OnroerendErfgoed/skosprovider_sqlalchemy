@@ -1,0 +1,6 @@
+[run]
+source = skosprovider_sqlalchemy
+omit = skosprovider_sqlalchemy/scripts/*
+
+[report]
+show_missing = True
