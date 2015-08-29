@@ -209,11 +209,19 @@ def _get_heritage_types():
     )['typologie']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
+    from skosprovider.skos import ConceptScheme
 
     heritage_types = DictionaryProvider(
         {'id': 'HERITAGE_TYPES'},
         typology_data,
-        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s')
+        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s'),
+        concept_scheme=ConceptScheme(
+            uri='https://id.erfgoed.net/thesauri/erfgoedtypes',
+            labels=[
+                {'label': 'Erfgoedtypes', 'type': 'prefLabel', 'language': 'nl-BE'},
+                {'label': 'Heritagetypes', 'type': 'prefLabel', 'language': 'en'}
+            ]
+        )
     )
     return heritage_types
 
@@ -364,6 +372,8 @@ class TestImportProviderTests(DBTestCase):
             .filter(ConceptModel.concept_id == 72) \
             .one()
         assert 2 == len(bomen.narrower_collections)
+        assert 2 == len(cs.labels)
+        assert 'Erfgoedtypes' == cs.label('nl').label
 
     def test_event_types(self):
         from skosprovider_sqlalchemy.models import (

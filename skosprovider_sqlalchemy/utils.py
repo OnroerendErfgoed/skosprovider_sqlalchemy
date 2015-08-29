@@ -37,6 +37,26 @@ def import_provider(provider, conceptscheme, session):
 
     '''
 
+    # Copy information about the scheme
+    cs = provider.concept_scheme
+    for l in cs.labels:
+        _check_language(l.language, session)
+        conceptscheme.labels.append(LabelModel(
+            label=l.label,
+            labeltype_id=l.type,
+            language_id=l.language
+        ))
+    for n in cs.notes:
+        _check_language(n.language, session)
+        conceptscheme.notes.append(NoteModel(
+            note=n.note,
+            notetype_id=n.type,
+            language_id=n.language
+        ))
+    for l in cs.languages:
+        _check_language(l, session)
+        conceptscheme.languages.append(language)
+
     # First pass: load all concepts and collections
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
@@ -124,6 +144,7 @@ def _check_language(language_tag, session):
 
     :param string language_tag: IANA language tag
     :param session: Database session to use
+    :rtype: :class:`skosprovider_sqlalchemy.models.Language`
     '''
     if not language_tag:
         language_tag = 'und'
@@ -132,8 +153,9 @@ def _check_language(language_tag, session):
         if not tags.check(language_tag):
             raise ValueError('Unable to import provider. Invalid language tag: %s' % language_tag)
         descriptions = ', '.join(tags.description(language_tag))
-        language_item = LanguageModel(id=language_tag, name=descriptions)
-        session.add(language_item)
+        l = LanguageModel(id=language_tag, name=descriptions)
+        session.add(l)
+    return l
 
 
 class VisitationCalculator(object):
