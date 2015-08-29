@@ -92,6 +92,10 @@ def _get_geo():
                         'type': 'prefLabel',
                         'language': 'en',
                         'label': 'Flanders'
+                    }, {
+                        'type': 'prefLabel',
+                        'language': 'nl-BE',
+                        'label': 'Vlaanderen'
                     }
                 ],
                 'broader': [4]
@@ -408,6 +412,26 @@ class TestVisitationCalculator(DBTestCase):
         vc = VisitationCalculator(self.session)
         v = vc.visit(cs)
         assert 0 == len(v)
+
+    def test_provider_invalid_language(self):
+        from skosprovider.providers import DictionaryProvider
+
+        p = DictionaryProvider({'id': 'EMPTY'}, [
+            {
+                'id': '1',
+                'labels': [
+                    {
+                        'type': 'prefLabel',
+                        'language': 'nederlands',
+                        'label': 'Versterkingen'
+                    }
+                ]
+            }
+        ])
+        cs = self._get_cs()
+        self.session.add(cs)
+        with self.assertRaises(ValueError):
+            import_provider(p, cs, self.session)
 
     def test_menu(self):
         csvprovider = _get_menu()

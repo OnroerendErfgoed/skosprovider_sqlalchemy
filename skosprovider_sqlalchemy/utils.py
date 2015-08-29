@@ -9,13 +9,16 @@ from skosprovider.skos import (
     Collection
 )
 
+from language_tags import tags
+
 from skosprovider_sqlalchemy.models import (
     Thing as ThingModel,
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
     Note as NoteModel,
-    Match as MatchModel
+    Match as MatchModel,
+    Language as LanguageModel
 )
 
 
@@ -50,12 +53,14 @@ def import_provider(provider, conceptscheme, session):
                 conceptscheme=conceptscheme
             )
         for l in c.labels:
+            _check_language(l.language, session)
             cm.labels.append(LabelModel(
                 label=l.label,
                 labeltype_id=l.type,
                 language_id=l.language
             ))
         for n in c.notes:
+            _check_language(n.language, session)
             cm.notes.append(NoteModel(
                 note=n.note,
                 notetype_id=n.type,
@@ -111,6 +116,24 @@ def import_provider(provider, conceptscheme, session):
                     .filter(ConceptModel.concept_id == int(mc)) \
                     .one()
                 cm.members.add(mc)
+
+
+def _check_language(language_tag, session):
+    '''
+    Checks if a certain language is already present, if not import.
+
+    :param string language_tag: IANA language tag
+    :param session: Database session to use
+    '''
+    if not language_tag:
+        language_tag = 'und'
+    l = session.query(LanguageModel).get(language_tag)
+    if not l:
+        if not tags.check(language_tag):
+            raise ValueError('Unable to import provider. Invalid language tag: %s' % language_tag)
+        descriptions = ', '.join(tags.description(language_tag))
+        language_item = LanguageModel(id=language_tag, name=descriptions)
+        session.add(language_item)
 
 
 class VisitationCalculator(object):
