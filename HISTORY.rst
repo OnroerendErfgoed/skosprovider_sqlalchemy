@@ -13,6 +13,10 @@
   that previous verions will need to be updated as well. Please add a table 
   called `conceptscheme_language` with fields `conceptscheme_id` and
   `language_id`. (#18)
+* When importing a provider, check if the languages that are being used in the
+  provider are already in our database. If not, validate them and add them to
+  the database. In the pastthe entire import would fail if not all languages had
+  previously been added to the database. (#14)
 * When importing a provider, try to import as much information as possible about
   the concept_scheme that's attached to the provider. (#19)
 
