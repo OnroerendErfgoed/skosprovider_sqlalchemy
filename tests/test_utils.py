@@ -220,7 +220,19 @@ def _get_heritage_types():
             labels=[
                 {'label': 'Erfgoedtypes', 'type': 'prefLabel', 'language': 'nl-BE'},
                 {'label': 'Heritagetypes', 'type': 'prefLabel', 'language': 'en'}
-            ]
+            ],
+            notes=[
+                {
+                    'note': 'Different types of heritage.',
+                    'type': 'definition',
+                    'language': 'en'
+                }, {
+                    'note': 'Verschillende types van erfgoed.',
+                    'type': 'definition',
+                    'language': 'nl'
+                }
+            ],
+            languages=['nl', 'en']
         )
     )
     return heritage_types
@@ -374,6 +386,8 @@ class TestImportProviderTests(DBTestCase):
         assert 2 == len(bomen.narrower_collections)
         assert 2 == len(cs.labels)
         assert 'Erfgoedtypes' == cs.label('nl').label
+        assert 2 == len(cs.notes)
+        assert 2 == len(cs.languages)
 
     def test_event_types(self):
         from skosprovider_sqlalchemy.models import (

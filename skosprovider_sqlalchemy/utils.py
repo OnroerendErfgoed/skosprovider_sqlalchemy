@@ -54,7 +54,7 @@ def import_provider(provider, conceptscheme, session):
             language_id=n.language
         ))
     for l in cs.languages:
-        _check_language(l, session)
+        language = _check_language(l, session)
         conceptscheme.languages.append(language)
 
     # First pass: load all concepts and collections

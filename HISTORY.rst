@@ -13,6 +13,8 @@
   that previous verions will need to be updated as well. Please add a table 
   called `conceptscheme_language` with fields `conceptscheme_id` and
   `language_id`. (#18)
+* When importing a provider, try to import as much information as possible about
+  the concept_scheme that's attached to the provider. (#19)
 
 0.4.2 (2015-03-02)
 ------------------
