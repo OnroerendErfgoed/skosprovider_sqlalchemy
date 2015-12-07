@@ -189,7 +189,8 @@ def _get_buildings():
             }, {
                 'id': 4,
                 'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Huts'}
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Huts'},
+                    {'type': 'prefLabel', 'language': None, 'label': 'Hutten'}
                 ],
                 'broader': [3],
                 'matches': {
