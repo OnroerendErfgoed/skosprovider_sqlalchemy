@@ -54,6 +54,13 @@ concept_note = Table(
     Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
 )
 
+concept_source = Table(
+    'concept_source',
+    Base.metadata,
+    Column('concept_id', Integer, ForeignKey('concept.id'), primary_key=True),
+    Column('source_id', Integer, ForeignKey('source.id'), primary_key=True)
+)
+
 conceptscheme_note = Table(
     'conceptscheme_note',
     Base.metadata,
@@ -64,6 +71,23 @@ conceptscheme_note = Table(
         primary_key=True
     ),
     Column('note_id', Integer, ForeignKey('note.id'), primary_key=True)
+)
+
+conceptscheme_source = Table(
+    'conceptscheme_source',
+    Base.metadata,
+    Column(
+        'conceptscheme_id',
+        Integer,
+        ForeignKey('conceptscheme.id'),
+        primary_key=True
+    ),
+    Column(
+        'source_id',
+        Integer,
+        ForeignKey('source.id'),
+        primary_key=True
+    )
 )
 
 conceptscheme_language = Table(
@@ -173,6 +197,13 @@ class Thing(Base):
     notes = relationship(
         'Note',
         secondary=concept_note,
+        backref=backref('concept', uselist=False),
+        cascade='all, delete-orphan',
+        single_parent=True
+    )
+    sources = relationship(
+        'Source',
+        secondary=concept_source,
         backref=backref('concept', uselist=False),
         cascade='all, delete-orphan',
         single_parent=True
@@ -315,6 +346,13 @@ class ConceptScheme(Base):
         'Language',
         secondary=conceptscheme_language
     )
+    sources = relationship(
+        'Source',
+        secondary=conceptscheme_source,
+        backref=backref('conceptscheme', uselist=False),
+        cascade='all, delete-orphan',
+        single_parent=True
+    )
     def label(self, language='any'):
         return label(self.labels, language)
 
@@ -444,6 +482,24 @@ class Note(Base):
         return self.note
 
 
+class Source(Base):
+    '''
+    The source where a certain piece of information came from.
+    '''
+    __tablename__ = 'source'
+    id = Column(Integer, primary_key=True)
+    citation = Column(
+        Text,
+        nullable=False
+    )
+
+    def __init__(self, citation):
+        self.citation = citation
+
+    def __str__(self):
+        return self.citation
+
+
 class MatchType(Base):
     '''
     A matchType according to :term:`skosprovider:SKOS`.
@@ -463,7 +519,7 @@ class MatchType(Base):
 
 class Match(Base):
     '''
-    A match between a :class:`Concept` in one ConceptScheme and those in 
+    A match between a :class:`Concept` in one ConceptScheme and those in
     another one.
     '''
     __tablename__ = 'match'
@@ -540,8 +596,8 @@ def label(labels=[], language='any'):
     if no exact match is present, an inexact match will be attempted. This might
     be because a label in language `nl-BE` is being requested, but only `nl` or
     even `nl-NL` is present. Similarly, when requesting `nl`, a label with
-    language `nl-NL` or even `nl-Latn-NL` will also be considered, 
-    providing no label is present that has an exact match with the 
+    language `nl-NL` or even `nl-Latn-NL` will also be considered,
+    providing no label is present that has an exact match with the
     requested language.
 
     If language 'any' was specified, all labels will be considered,
@@ -555,7 +611,7 @@ def label(labels=[], language='any'):
     Finally, if no label could be found, None is returned.
 
     :param list labels: A list of :class:`labels <Label>`.
-    :param str language: The language for which a label should preferentially 
+    :param str language: The language for which a label should preferentially
         be returned. This should be a valid IANA language tag.
     :rtype: A :class:`Label` or `None` if no label could be found.
     '''

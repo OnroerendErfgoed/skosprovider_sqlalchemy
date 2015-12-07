@@ -2,17 +2,25 @@
 ------------------
 
 * Update to skosprovider 0.6.0
-* Due to the update to skosprovider 0.6.0, a new field `markup`, was added to a 
+* Due to the update to skosprovider 0.6.0, a new field `markup`, was added to a
   :class:`skosprovider_sqlalchemy.models.Note`. When upgrading from a previous
   version of `skosprovider_sqlalchemy`, any databases created in that previous
-  verions will need to be updated as well. Please add a field called `markup` 
+  verions will need to be updated as well. Please add a field called `markup`
   to the `note` table.
 * Inline with the skosprovider 0.6.0 update, a `languages` attribute was added
-  to :class:`skosprovider_sqlalchemy.models.ConceptScheme`. When upgrading from 
-  a previous version of `skosprovider_sqlalchemy`, any databases created with 
-  that previous verions will need to be updated as well. Please add a table 
+  to :class:`skosprovider_sqlalchemy.models.ConceptScheme`. When upgrading from
+  a previous version of `skosprovider_sqlalchemy`, any databases created with
+  that previous verions will need to be updated as well. Please add a table
   called `conceptscheme_language` with fields `conceptscheme_id` and
   `language_id`. (#18)
+* To comply with the skosprovider 0.6.0 update, the `sources` attribute was
+  added to :class:`skosprovider_sqlalchemy.models.Conceptscheme`,
+  :class:`skosprovider_sqlalchemy.models.Concept` and :class:`skosprovider_sqlalchemy.models.Collection`.
+  When upgrading from a previous version of `skosprovider_sqlalchemy`, any
+  databases created with that previous verions will need to be updated as well.
+  Please add a table `source` with fields `id` and `citation`, a table
+  `concept_source` with fields `concept_id` and `source_id` and a table
+  `conceptscheme_source` with fields `conceptscheme_id` and `source_id`.
 * When importing a provider, check if the languages that are being used in the
   provider are already in our database. If not, validate them and add them to
   the database. In the pastthe entire import would fail if not all languages had
@@ -26,7 +34,7 @@
 * Make README work better on pypi.
 * Fix a further problem with the length of language identifiers. Previous fix
   in 0.3.0 only fixed the length of the identifiers in the languages table,
-  but not in the links from the labels and the notes to the language table. 
+  but not in the links from the labels and the notes to the language table.
   [BartSaelen]
 * Added some documentation about setting up a database.
 
@@ -46,9 +54,9 @@
   a session maker first and then passed the result of this call to the provider.
   Now you should just pass the session maker itself and let the provider create
   the sessions for you.
-* Different way of fetching the :class:`~skosprovider.skos.ConceptScheme` 
-  for a provider. No longer fetches a conceptscheme at provider instantiation, 
-  but when needed. Otherwise we end up with a possibly very long cached version 
+* Different way of fetching the :class:`~skosprovider.skos.ConceptScheme`
+  for a provider. No longer fetches a conceptscheme at provider instantiation,
+  but when needed. Otherwise we end up with a possibly very long cached version
   of a conceptscheme.
 
 0.3.0 (2014-10-17)
@@ -56,13 +64,13 @@
 
 * Update to skosprovider 0.4.0.
 * Add :class:`~skosprovider.skos.ConceptScheme` information to a provider so it
-  can be attached to :class:`~skosprovider.skos.Concept` objects that are 
+  can be attached to :class:`~skosprovider.skos.Concept` objects that are
   handled by the provider.
 * Let provider handle superordinates and subordinate arrays.
 * Let provider add notes to collections.
 * Added a :class:`~skosprovider_sqlalchemy.models.Match` model to handle
   matches. Expand the provider to actually provide information on these matches.
-* Expand the field length for language identifiers. IANA suggests that 
+* Expand the field length for language identifiers. IANA suggests that
   identifiers up to 35 characters should be permitted. Updated our field length
   to 64 to have a bit of an extra buffer.
 
@@ -74,9 +82,9 @@
 * Add ability to configure the SQLAlchemy URL used for testing. Allows testing
   on multiple RDBMS systems.
 * Run `Travis <https://travis-ci.org>`_ tests for both SQLite and Postgresql.
-* Fix a bug in :meth:`skosprovider_sqlalchemy.utils.import_provider` when 
+* Fix a bug in :meth:`skosprovider_sqlalchemy.utils.import_provider` when
   dealing with narrower collections (#8). [cahytinne]
-* Make the provider actually generate a :term:`URI` if there's none in the 
+* Make the provider actually generate a :term:`URI` if there's none in the
   database.
 
 0.2.0 (2014-05-14)
@@ -95,7 +103,7 @@
 ------------------
 
 * Pinned dependency on skosprovider < 0.3.0
-* Pass data to :class:`skosprovider.skos.Concept` using keywords in stead of 
+* Pass data to :class:`skosprovider.skos.Concept` using keywords in stead of
   positions.
 
 0.1.1 (2013-11-28)
@@ -109,7 +117,7 @@
 
 * Initial version
 * Implementation of a SKOS domain model in SQLAlchemy.
-* Implementation of a :class:`skosprovider.providers.VocabularyProvider` that 
+* Implementation of a :class:`skosprovider.providers.VocabularyProvider` that
   uses this model.
 * Can query a hierarchy recursively or using nested sets.
 * Utility function to import a :class:`skosprovider.providers.VocabularyProvider`

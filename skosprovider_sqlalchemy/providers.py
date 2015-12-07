@@ -14,7 +14,8 @@ from skosprovider.skos import (
     Concept,
     Collection,
     Label,
-    Note
+    Note,
+    Source
 )
 
 from skosprovider_sqlalchemy.models import (
@@ -119,6 +120,9 @@ class SQLAlchemyProvider(VocabularyProvider):
             ],
             languages=[
                 l.id for l in csm.languages
+            ],
+            sources=[
+                Source(s.citation) for s in csm.sources
             ]
         )
 
@@ -142,6 +146,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
                 ],
+                sources=[
+                    Source(s.citation) for s in thing.sources
+                ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
                 superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
@@ -164,6 +171,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                 notes=[
                     Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
+                ],
+                sources=[
+                    Source(s.citation) for s in thing.sources
                 ],
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],

@@ -19,15 +19,18 @@ class ConceptTests(ModelTestCase):
         return Concept
 
     def test_simple(self):
-        from skosprovider_sqlalchemy.models import Label
+        from skosprovider_sqlalchemy.models import Label, Source
         l = Label('Churches', 'prefLabel', 'en')
+        s = Source('Carlisle, P. 2014.')
         c = self._get_target_class()(
             id=1,
             concept_id=1,
-            labels=[l]
+            labels=[l],
+            sources=[s]
         )
-        self.assertEqual(1, c.id)
-        self.assertEqual(l, c.label())
+        assert 1 == c.id
+        assert l == c.label()
+        assert s in c.sources
 
     def test_related(self):
         c1 = self._get_target_class()(
@@ -121,18 +124,21 @@ class ConceptSchemeTests(ModelTestCase):
         return ConceptScheme
 
     def test_simple(self):
-        from skosprovider_sqlalchemy.models import Label, Language
+        from skosprovider_sqlalchemy.models import Label, Language, Source
         l = Label('Heritage types', 'prefLabel', 'en')
         en = Language('en', 'English')
+        s = Source('Carlisle, P. 2014.')
         c = self._get_target_class()(
             id=1,
             labels=[l],
-            languages=[en]
+            languages=[en],
+            sources=[s]
         )
-        self.assertEqual(1, c.id)
-        self.assertEqual(l, c.label())
-        self.assertEqual(1, len(c.languages))
-        self.assertIn(en, c.languages)
+        assert 1 == c.id
+        assert l == c.label()
+        assert 1 == len(c.languages)
+        assert en in c.languages
+        assert s in c.sources
 
 
 class CollectionTests(ModelTestCase):
@@ -316,6 +322,30 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.name)
         self.assertEqual('A definition.', n.description)
         self.assertEqual('definition', n.__str__())
+
+
+class TestiSource(DBTestCase):
+
+    def setUp(self):
+        Base.metadata.create_all(self.engine)
+        self.session = self.session_maker()
+        Initialiser(self.session).init_all()
+
+    def tearDown(self):
+        self.session.rollback()
+        self.session.close_all()
+        Base.metadata.drop_all(self.engine)
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import Source
+        return Source
+
+    def test_simple(self):
+        s = self._get_target_class()(
+            'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.'
+        )
+        assert 'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.' == s.citation
+        assert str(s) == s.citation
 
 
 class TestMatchType:
