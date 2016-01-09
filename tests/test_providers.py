@@ -350,7 +350,7 @@ class TestSQLAlchemyProvider(DBTestCase):
                } in all
 
     def test_expand_concept(self):
-        ids = self.provider.expand_concept(1)
+        ids = self.provider.expand(1)
         assert [1, 4] == ids
 
     def test_expand_collection(self):
@@ -386,7 +386,7 @@ class TestSQLAlchemyProviderExpandVisit(DBTestCase):
         Base.metadata.drop_all(self.engine)
 
     def test_expand_concept_visit(self):
-        ids = self.visitationprovider.expand_concept(1)
+        ids = self.visitationprovider.expand(1)
         assert ids == [1, 4]
 
     def test_expand_collection_visit(self):
@@ -420,7 +420,7 @@ class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
         Base.metadata.drop_all(self.engine)
 
     def test_expand_concept(self):
-        ids = self.visitationprovider.expand_concept(1)
+        ids = self.visitationprovider.expand(1)
         assert not ids
 
     def test_expand_collection_visit(self):

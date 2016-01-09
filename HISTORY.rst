@@ -21,6 +21,9 @@
   Please add a table `source` with fields `id` and `citation`, a table
   `concept_source` with fields `concept_id` and `source_id` and a table
   `conceptscheme_source` with fields `conceptscheme_id` and `source_id`.
+* To comply with the skosprovider 0.6.0 update, the deprecated
+  :meth:`skosprovider_sqlalchemy.providers.SQLAlchemyProvider.expand_concept`
+  was removed.
 * When importing a provider, check if the languages that are being used in the
   provider are already in our database. If not, validate them and add them to
   the database. In the pastthe entire import would fail if not all languages had

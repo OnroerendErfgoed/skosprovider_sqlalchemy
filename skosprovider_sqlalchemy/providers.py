@@ -283,9 +283,6 @@ class SQLAlchemyProvider(VocabularyProvider):
         lan = self._get_language(**kwargs)
         return [self._get_id_and_label(c, lan) for c in top]
 
-    def expand_concept(self, id):
-        return self.expand(id)
-
     @session_factory('session_maker')
     def expand(self, id):
         try:
