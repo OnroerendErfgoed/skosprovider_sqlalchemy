@@ -221,6 +221,23 @@ class Thing(Base):
     def label(self, language='any'):
         return label(self.labels, language)
 
+    def _sortkey(self, key='id', language='any'):
+        '''
+        Provide a single sortkey.
+
+        :param string key: Either `id`, `uri`, `label` or `sortlabel`.
+        :param string language: The preferred language to receive the label in
+            if key is `label` or `sortlabel`. This should be a valid IANA language tag.
+        :rtype: :class:`str`
+        '''
+        if key == 'id':
+            return str(self.id)
+        elif key == 'uri':
+            return self.uri if self.uri else ''
+        else:
+            l = label(self.labels, language, key == 'sortlabel')
+            return l.label.lower() if l else ''
+
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': 'thing'
@@ -581,7 +598,7 @@ class Visitation(Base):
     )
 
 
-def label(labels=[], language='any'):
+def label(labels=[], language='any', sortLabel=False):
     '''
     Provide a label for a list of labels.
 
@@ -613,6 +630,10 @@ def label(labels=[], language='any'):
     :param list labels: A list of :class:`labels <Label>`.
     :param str language: The language for which a label should preferentially
         be returned. This should be a valid IANA language tag.
+    :param boolean sortLabel: Should sortLabels be considered or not? If True,
+        sortLabels will be preferred over prefLabels. Bear in mind that these 
+        are still language dependent. So, it's possible to have a different
+        sortLabel per language.
     :rtype: A :class:`Label` or `None` if no label could be found.
     '''
     # Normalise the tag
@@ -622,6 +643,7 @@ def label(labels=[], language='any'):
         broader_language_tag = tags.tag(language).language
     pref = None
     alt = None
+    sort = None
     for l in labels:
         labeltype = l.labeltype_id or l.labeltype.name
         if language == 'any' or l.language_id == language:
@@ -629,17 +651,23 @@ def label(labels=[], language='any'):
                 pref = l
             if labeltype == 'altLabel' and (alt is None or alt.language_id != language):
                 alt = l
+            if labeltype == 'sortLabel' and (sort is None or sort.language_id != language):
+                sort = l
         if broader_language_tag and tags.tag(l.language_id).language and tags.tag(
                 l.language_id).language.format == broader_language_tag.format:
             if labeltype == 'prefLabel' and pref is None:
                 pref = l
             if labeltype == 'altLabel' and alt is None:
                 alt = l
+            if labeltype == 'sortLabel' and sort is None:
+                sort = l
+    if sortLabel and sort is not None:
+        return sort
     if pref is not None:
         return pref
     elif alt is not None:
         return alt
-    return label(labels, 'any') if language != 'any' else None
+    return label(labels, 'any', sortLabel) if language != 'any' else None
 
 
 class Initialiser(object):

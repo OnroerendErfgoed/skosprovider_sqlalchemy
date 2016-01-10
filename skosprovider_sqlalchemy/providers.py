@@ -259,7 +259,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                 Thing.member_of.any(Thing.concept_id == coll.id)
             )
         all = q.all()
-        return [self._get_id_and_label(c, lan) for c in all]
+        sort = self._get_sort(**kwargs)
+        sort_order = self._get_sort_order(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in self._sort(all, sort, lan, sort_order=='desc')]
 
     @session_factory('session_maker')
     def get_all(self, **kwargs):
@@ -269,7 +271,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                   .filter(Thing.conceptscheme_id == self.conceptscheme_id)\
                   .all()
         lan = self._get_language(**kwargs)
-        return [self._get_id_and_label(c, lan) for c in all]
+        sort = self._get_sort(**kwargs)
+        sort_order = self._get_sort_order(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in self._sort(all, sort, lan, sort_order=='desc')]
 
     @session_factory('session_maker')
     def get_top_concepts(self, **kwargs):
@@ -281,7 +285,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                     ConceptModel.broader_concepts == None
                   ).all()
         lan = self._get_language(**kwargs)
-        return [self._get_id_and_label(c, lan) for c in top]
+        sort = self._get_sort(**kwargs)
+        sort_order = self._get_sort_order(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in self._sort(top, sort, lan, sort_order=='desc')]
 
     @session_factory('session_maker')
     def expand(self, id):
@@ -371,7 +377,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                   ).all()
         res = tco + tcl
         lan = self._get_language(**kwargs)
-        return [self._get_id_and_label(c, lan) for c in res]
+        sort = self._get_sort(**kwargs)
+        sort_order = self._get_sort_order(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in self._sort(res, sort, lan, sort_order=='desc')]
 
     @session_factory('session_maker')
     def get_children_display(self, id, **kwargs):
@@ -395,16 +403,15 @@ class SQLAlchemyProvider(VocabularyProvider):
                         ).one()
         except NoResultFound:
             return False
-        ret = []
         lan = self._get_language(**kwargs)
-        display_children = []
+        res = []
         if thing.type == 'concept':
             if len(thing.narrower_collections) > 0:
-                display_children += thing.narrower_collections
+                res += thing.narrower_collections
             elif len(thing.narrower_concepts)>0:
-                display_children += thing.narrower_concepts
+                res += thing.narrower_concepts
         if thing.type == 'collection' and hasattr(thing, 'members'):
-            display_children += thing.members
-        for c in display_children:
-            ret.append(self._get_id_and_label(c, lan))
-        return ret
+            res += thing.members
+        sort = self._get_sort(**kwargs)
+        sort_order = self._get_sort_order(**kwargs)
+        return [self._get_id_and_label(c, lan) for c in self._sort(res, sort, lan, sort_order=='desc')]

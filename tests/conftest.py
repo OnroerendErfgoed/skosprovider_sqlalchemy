@@ -75,6 +75,8 @@ def create_data(session):
     col.notes.append(n)
     l = Label('Churches by function', 'prefLabel', 'en')
     col.labels.append(l)
+    l = Label('111sortmefirst', 'sortLabel', 'en')
+    col.labels.append(l)
     session.add(col)
     chap = Concept(
         id=30,

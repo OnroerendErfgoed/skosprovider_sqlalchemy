@@ -472,3 +472,17 @@ class LabelFunctionTest(ModelTestCase):
         assert khnlbe == label(labels, 'nl-BE')
         assert khnl == label(labels, 'nl')
         assert label(labels, 'en-US') in [khen, khengb]
+
+    def test_sort_precedes_pref(self):
+        label = self._get_fut()
+        from skosprovider_sqlalchemy.models import Label
+        khnl = Label('Knokke-Heist', "prefLabel", 'nl')
+        chnl = Label('Cnock-Heyst', "altLabel", 'nl')
+        khen = Label('Knocke-Heyst', "prefLabel", 'en')
+        khensort = Label('123MeFirst', "sortLabel", 'en')
+        khnlbe = self._get_knokke_heist_nl()
+        chnlbe = self._get_cnocke_heyst_nl()
+        khengb = self._get_knokke_heist_en()
+        labels = [chnl, khen, khnlbe, khnl, chnlbe, khengb, khensort]
+        assert khensort == label(labels, 'en-GB', True)
+        assert khensort == label(labels, 'en', True)

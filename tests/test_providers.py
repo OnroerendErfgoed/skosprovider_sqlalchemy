@@ -214,6 +214,31 @@ class TestSQLAlchemyProvider(DBTestCase):
                    'label': 'Boomkapellen'
                } in all
 
+    def test_get_all_sorted_id_desc(self):
+        all = self.provider.get_all(sort='id', sort_order='desc')
+        assert len(all) == 5
+        assert [5, 4, 3, 2, 1] == [c['id'] for c in all]
+
+    def test_get_all_sorted_label(self):
+        all = self.provider.get_all(sort='label')
+        assert len(all) == 5
+        assert [
+            'Boomkapellen', 'Cathedrals',
+            'Chapels', 'Churches',
+            'Churches by function'
+        ] == [c['label'] for c in all]
+
+    def test_get_all_sorted_sortlabel_desc(self):
+        all = self.provider.get_all(sort='sortlabel', sort_order='desc')
+        assert len(all) == 5
+        assert [
+            'Churches',
+            'Chapels',
+            'Cathedrals',
+            'Boomkapellen',
+            'Churches by function',
+        ] == [c['label'] for c in all]
+
     def test_get_top_concepts(self):
         all = self.provider.get_top_concepts()
         assert len(all) == 2
@@ -232,6 +257,15 @@ class TestSQLAlchemyProvider(DBTestCase):
                    'label': 'Chapels'
                } in all
 
+    def test_get_top_concepts_sort_uri_desc(self):
+        all = self.provider.get_top_concepts(sort='uri', sort_order='desc')
+        assert len(all) == 2
+
+        assert [
+            'urn:x-skosprovider:test:3',
+            'urn:x-skosprovider:test:1',
+        ] == [c['uri'] for c in all]
+
     def test_get_top_display(self):
         all = self.provider.get_top_display()
         assert len(all) == 2
@@ -249,12 +283,31 @@ class TestSQLAlchemyProvider(DBTestCase):
                    'label': 'Churches'
                } in all
 
+    def test_get_top_display_british_sort_label_desc(self):
+        all = self.provider.get_top_display(language='en-GB', sort='label', sort_order='desc')
+        assert len(all) == 2
+
+        assert [
+            'Churches',
+            'Chapels'
+        ] == [c['label'] for c in all]
+
     def test_get_children_display_unexisting(self):
         children = self.provider.get_children_display(700)
         assert not children
 
     def test_get_children_display_collection(self):
         children = self.provider.get_children_display(2)
+        assert len(children) == 1
+        assert {
+                   'id': 4,
+                   'uri': 'urn:x-skosprovider:test:4',
+                   'type': 'concept',
+                   'label': 'Cathedrals'
+               } in children
+
+    def test_get_children_display_collection_sort_id(self):
+        children = self.provider.get_children_display(2, sort='id')
         assert len(children) == 1
         assert {
                    'id': 4,
@@ -304,6 +357,16 @@ class TestSQLAlchemyProvider(DBTestCase):
                    'type': 'collection',
                    'label': 'Churches by function'
                } not in all
+
+    def test_find_type_concept_sorted_uri_desc(self):
+        all = self.provider.find({'type': 'concept'}, sort='uri', sort_order='desc')
+        assert len(all) == 4
+        assert [
+            'urn:x-skosprovider:test:5', 
+            'urn:x-skosprovider:test:4', 
+            'urn:x-skosprovider:test:3', 
+            'urn:x-skosprovider:test:1', 
+            ] == [c['uri'] for c in all]
 
     def test_find_type_collection(self):
         all = self.provider.find({'type': 'collection'})
