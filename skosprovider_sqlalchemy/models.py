@@ -689,7 +689,8 @@ class Initialiser(object):
         labeltypes = [
             ('hiddenLabel', 'A hidden label.'),
             ('altLabel', 'An alternative label.'),
-            ('prefLabel', 'A preferred label.')
+            ('prefLabel', 'A preferred label.'),
+            ('sortLabel', 'A label exclusively used for sorting.')
         ]
         for l in labeltypes:
             lt = LabelType(l[0], l[1])
