@@ -21,6 +21,11 @@
   Please add a table `source` with fields `id` and `citation`, a table
   `concept_source` with fields `concept_id` and `source_id` and a table
   `conceptscheme_source` with fields `conceptscheme_id` and `source_id`.
+* All methodes that return a list have been modified in line with skosprovider
+  0.6.0 to support sorting. Sorting is possible on `id`, `uri`, `label` and
+  `sortlabel`. The last two are language dependent. The `sortlabel` allows
+  custom sorting of concepts. This can be used to eg. sort concepts representing
+  chronological periods in chronological in stead of alphabetical order. (#20)
 * To comply with the skosprovider 0.6.0 update, the deprecated
   :meth:`skosprovider_sqlalchemy.providers.SQLAlchemyProvider.expand_concept`
   was removed.
