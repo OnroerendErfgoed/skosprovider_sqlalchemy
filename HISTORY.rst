@@ -35,6 +35,8 @@
   previously been added to the database. (#14)
 * When importing a provider, try to import as much information as possible about
   the concept_scheme that's attached to the provider. (#19)
+* When querying for indvidual an conceptscheme or concept, use `joinedload` to
+  reduce the number of queries needed to collect everything. (#15)
 
 0.4.2 (2015-03-02)
 ------------------

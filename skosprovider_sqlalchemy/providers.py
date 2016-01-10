@@ -107,6 +107,10 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         csm = self.session\
                   .query(ConceptSchemeModel)\
+                  .options(joinedload('labels'))\
+                  .options(joinedload('notes'))\
+                  .options(joinedload('languages'))\
+                  .options(joinedload('sources'))\
                   .get(self.conceptscheme_id)
         return ConceptScheme(
             uri=csm.uri,
@@ -188,6 +192,9 @@ class SQLAlchemyProvider(VocabularyProvider):
         try:
             thing = self.session\
                         .query(Thing)\
+                        .options(joinedload('labels'))\
+                        .options(joinedload('notes'))\
+                        .options(joinedload('sources'))\
                         .filter(
                             Thing.concept_id == int(id),
                             Thing.conceptscheme_id == self.conceptscheme_id
@@ -213,6 +220,9 @@ class SQLAlchemyProvider(VocabularyProvider):
         try:
             thing = self.session\
                         .query(Thing)\
+                        .options(joinedload('labels'))\
+                        .options(joinedload('notes'))\
+                        .options(joinedload('sources'))\
                         .filter(
                             Thing.uri == uri,
                             Thing.conceptscheme_id == self.conceptscheme_id
