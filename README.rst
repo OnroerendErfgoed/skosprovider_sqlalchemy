@@ -7,6 +7,11 @@ A SQLAlchemy implementation of the skosprovider_ interface.
         :target: https://travis-ci.org/koenedaele/skosprovider_sqlalchemy
 .. image:: https://coveralls.io/repos/koenedaele/skosprovider_sqlalchemy/badge.png?branch=master
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
+.. image:: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/badges/quality-score.png?b=master
+        :target: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/?branch=master
+
+.. image:: https://readthedocs.org/projects/skosprovider_sqlalchemy/badge/?version=latest
+        :target: https://readthedocs.org/projects/skosprovider_sqlalchemy/?badge=latest
 .. image:: https://badge.fury.io/py/skosprovider_sqlalchemy.png
         :target: http://badge.fury.io/py/skosprovider_sqlalchemy
 
