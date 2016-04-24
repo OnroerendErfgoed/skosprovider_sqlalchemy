@@ -441,21 +441,21 @@ class TestVisitationCalculator(DBTestCase):
     def test_provider_invalid_language(self):
         from skosprovider.providers import DictionaryProvider
 
-        p = DictionaryProvider({'id': 'EMPTY'}, [
-            {
-                'id': '1',
-                'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'nederlands',
-                        'label': 'Versterkingen'
-                    }
-                ]
-            }
-        ])
-        cs = self._get_cs()
-        self.session.add(cs)
         with self.assertRaises(ValueError):
+            p = DictionaryProvider({'id': 'EMPTY'}, [
+                {
+                    'id': '1',
+                    'labels': [
+                        {
+                            'type': 'prefLabel',
+                            'language': 'nederlands',
+                            'label': 'Versterkingen'
+                        }
+                    ]
+                }
+            ])
+            cs = self._get_cs()
+            self.session.add(cs)
             import_provider(p, cs, self.session)
 
     def test_menu(self):

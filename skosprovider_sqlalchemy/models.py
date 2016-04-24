@@ -7,6 +7,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from language_tags import tags
+from skosprovider.skos import label as skoslabel
 
 from sqlalchemy import (
     Column,
@@ -20,6 +21,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy.orm import (
     relationship,
@@ -387,7 +389,7 @@ class Language(Base):
         self.name = name
 
     def __str__(self):
-        return self.name
+        return self.id
 
 
 class LabelType(Base):
@@ -419,7 +421,7 @@ class Label(Base):
     )
 
     labeltype = relationship('LabelType', uselist=False)
-    language = relationship('Language', uselist=False)
+    _language = relationship('Language', uselist=False)
 
     labeltype_id = Column(
         String(20),
@@ -438,6 +440,14 @@ class Label(Base):
         self.labeltype_id = labeltype_id
         self.language_id = language_id
         self.label = label
+
+    @hybrid_property
+    def type(self):
+        return self.labeltype_id
+
+    @hybrid_property
+    def language(self):
+        return self._language or self.language_id
 
     def __str__(self):
         return self.label
@@ -636,38 +646,7 @@ def label(labels=[], language='any', sortLabel=False):
         sortLabel per language.
     :rtype: A :class:`Label` or `None` if no label could be found.
     '''
-    # Normalise the tag
-    broader_language_tag = None
-    if language != 'any':
-        language = tags.tag(language).format
-        broader_language_tag = tags.tag(language).language
-    pref = None
-    alt = None
-    sort = None
-    for l in labels:
-        labeltype = l.labeltype_id or l.labeltype.name
-        if language == 'any' or l.language_id == language:
-            if labeltype == 'prefLabel' and (pref is None or pref.language_id != language):
-                pref = l
-            if labeltype == 'altLabel' and (alt is None or alt.language_id != language):
-                alt = l
-            if labeltype == 'sortLabel' and (sort is None or sort.language_id != language):
-                sort = l
-        if broader_language_tag and tags.tag(l.language_id).language and tags.tag(
-                l.language_id).language.format == broader_language_tag.format:
-            if labeltype == 'prefLabel' and pref is None:
-                pref = l
-            if labeltype == 'altLabel' and alt is None:
-                alt = l
-            if labeltype == 'sortLabel' and sort is None:
-                sort = l
-    if sortLabel and sort is not None:
-        return sort
-    if pref is not None:
-        return pref
-    elif alt is not None:
-        return alt
-    return label(labels, 'any', sortLabel) if language != 'any' else None
+    return skoslabel(labels, language, sortLabel)
 
 
 class Initialiser(object):

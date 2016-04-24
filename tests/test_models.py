@@ -209,6 +209,7 @@ class TestLabel(DBTestCase):
         assert 'nl' == l.language_id
         assert 'prefLabel' == l.labeltype_id
         assert 'Kerken' == l.__str__()
+        assert 'nl' == l.language
 
     def test_load_objects(self):
         l = self._get_target_class()('Kerken', 'prefLabel', 'nl')
@@ -295,7 +296,7 @@ class LanguageTests(ModelTestCase):
         l = self._get_target_class()('nl', 'Dutch')
         self.assertEqual('nl', l.id)
         self.assertEqual('Dutch', l.name)
-        self.assertEqual('Dutch', l.__str__())
+        self.assertEqual('nl', l.__str__())
 
 
 class LabelTypeTests(ModelTestCase):
@@ -484,5 +485,5 @@ class LabelFunctionTest(ModelTestCase):
         chnlbe = self._get_cnocke_heyst_nl()
         khengb = self._get_knokke_heist_en()
         labels = [chnl, khen, khnlbe, khnl, chnlbe, khengb, khensort]
-        assert khensort == label(labels, 'en-GB', True)
         assert khensort == label(labels, 'en', True)
+        assert khensort == label(labels, 'en-GB', True)
