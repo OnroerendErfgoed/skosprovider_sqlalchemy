@@ -2,6 +2,9 @@
 ------------------
 
 * Update to skosprovider 0.6.0
+* **Minor BC break**: A :class:`skosprovider_sqlalchemy.models.Language` that gets
+  cast to a string, now returns the language's ID (the IANA language
+  code),as opposed to the language's description it would previously return.
 * Due to the update to skosprovider 0.6.0, a new field `markup`, was added to a
   :class:`skosprovider_sqlalchemy.models.Note`. When upgrading from a previous
   version of `skosprovider_sqlalchemy`, any databases created in that previous
@@ -31,12 +34,17 @@
   was removed.
 * When importing a provider, check if the languages that are being used in the
   provider are already in our database. If not, validate them and add them to
-  the database. In the pastthe entire import would fail if not all languages had
+  the database. In the past the entire import would fail if not all languages had
   previously been added to the database. (#14)
 * When importing a provider, try to import as much information as possible about
   the concept_scheme that's attached to the provider. (#19)
 * When querying for indvidual an conceptscheme or concept, use `joinedload` to
   reduce the number of queries needed to collect everything. (#15)
+* Deprecated the :func:`skosprovider_sqlalchemy.models.label` function. Please
+  use :func:`skosprovider.skos.label` from now once, since this function can now
+  operate on both :class:`skosprovider.skos.Label` and
+  :class:`skosprovider_sqlalchemy.models.Label` instances. This was the reason
+  for the BC break in this release.
 
 0.4.2 (2015-03-02)
 ------------------

@@ -221,7 +221,7 @@ class Thing(Base):
 
 
     def label(self, language='any'):
-        return label(self.labels, language)
+        return skoslabel(self.labels, language)
 
     def _sortkey(self, key='id', language='any'):
         '''
@@ -237,7 +237,7 @@ class Thing(Base):
         elif key == 'uri':
             return self.uri if self.uri else ''
         else:
-            l = label(self.labels, language, key == 'sortlabel')
+            l = skoslabel(self.labels, language, key == 'sortlabel')
             return l.label.lower() if l else ''
 
     __mapper_args__ = {
@@ -373,7 +373,7 @@ class ConceptScheme(Base):
         single_parent=True
     )
     def label(self, language='any'):
-        return label(self.labels, language)
+        return skoslabel(self.labels, language)
 
 
 class Language(Base):
@@ -612,30 +612,10 @@ def label(labels=[], language='any', sortLabel=False):
     '''
     Provide a label for a list of labels.
 
-    The items in the list of labels are assumed to be instances of
-    :class:`Label`.
-
-    This method tries to find a label by looking if there's
-    a pref label for the specified language. If there's no pref label,
-    it looks for an alt label. It disregards hidden labels.
-
-    While matching languages, preference will be given to exact matches. But,
-    if no exact match is present, an inexact match will be attempted. This might
-    be because a label in language `nl-BE` is being requested, but only `nl` or
-    even `nl-NL` is present. Similarly, when requesting `nl`, a label with
-    language `nl-NL` or even `nl-Latn-NL` will also be considered,
-    providing no label is present that has an exact match with the
-    requested language.
-
-    If language 'any' was specified, all labels will be considered,
-    regardless of language.
-
-    To find a label without a specified language, pass `None` as language.
-
-    If a language or None was specified, and no label could be found, this
-    method will automatically try to find a label in some other language.
-
-    Finally, if no label could be found, None is returned.
+    .. deprecated:: 0.5.0
+       Please use :func:`skosprovider.skos.label`. Starting with 
+       `skosprovider 0.6.0`, the function can function on 
+       :class:`skosprovider_sqlalchemy.models.Label` instances as well.
 
     :param list labels: A list of :class:`labels <Label>`.
     :param str language: The language for which a label should preferentially
