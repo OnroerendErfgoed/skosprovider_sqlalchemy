@@ -3,17 +3,18 @@ skosprovider_sqlalchemy
 
 A SQLAlchemy implementation of the skosprovider_ interface.
 
+.. image:: https://img.shields.io/pypi/v/skosprovider_sqlalchemy.svg
+        :target: https://pypi.python.org/pypi/skosprovider_sqlalchemy
+.. image:: https://readthedocs.org/projects/skosprovider_sqlalchemy/badge/?version=latest
+        :target: https://readthedocs.org/projects/skosprovider_sqlalchemy/?badge=latest
+
 .. image:: https://travis-ci.org/koenedaele/skosprovider_sqlalchemy.png?branch=master
         :target: https://travis-ci.org/koenedaele/skosprovider_sqlalchemy
-.. image:: https://coveralls.io/repos/koenedaele/skosprovider_sqlalchemy/badge.png?branch=master
+.. image:: https://img.shields.io/coveralls/koenedaele/skosprovider_sqlalchemy.svg
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
 .. image:: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/badges/quality-score.png?b=master
         :target: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/?branch=master
 
-.. image:: https://readthedocs.org/projects/skosprovider_sqlalchemy/badge/?version=latest
-        :target: https://readthedocs.org/projects/skosprovider_sqlalchemy/?badge=latest
-.. image:: https://badge.fury.io/py/skosprovider_sqlalchemy.png
-        :target: http://badge.fury.io/py/skosprovider_sqlalchemy
 
 Building the docs
 -----------------
