@@ -18,7 +18,8 @@ from skosprovider_sqlalchemy.models import (
     Label as LabelModel,
     Note as NoteModel,
     Match as MatchModel,
-    Language as LanguageModel
+    Language as LanguageModel,
+    Source as SourceModel
 )
 
 
@@ -39,20 +40,9 @@ def import_provider(provider, conceptscheme, session):
 
     # Copy information about the scheme
     cs = provider.concept_scheme
-    for l in cs.labels:
-        _check_language(l.language, session)
-        conceptscheme.labels.append(LabelModel(
-            label=l.label,
-            labeltype_id=l.type,
-            language_id=l.language
-        ))
-    for n in cs.notes:
-        _check_language(n.language, session)
-        conceptscheme.notes.append(NoteModel(
-            note=n.note,
-            notetype_id=n.type,
-            language_id=n.language
-        ))
+    _add_labels(conceptscheme, cs.labels, session)
+    _add_notes(conceptscheme, cs.notes, session)
+    _add_sources(conceptscheme, cs.sources, session)
     for l in cs.languages:
         language = _check_language(l, session)
         conceptscheme.languages.append(language)
@@ -72,20 +62,9 @@ def import_provider(provider, conceptscheme, session):
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
-        for l in c.labels:
-            _check_language(l.language, session)
-            cm.labels.append(LabelModel(
-                label=l.label,
-                labeltype_id=l.type,
-                language_id=l.language
-            ))
-        for n in c.notes:
-            _check_language(n.language, session)
-            cm.notes.append(NoteModel(
-                note=n.note,
-                notetype_id=n.type,
-                language_id=n.language
-            ))
+        _add_labels(cm, c.labels, session)
+        _add_notes(cm, c.notes, session)
+        _add_sources(cm, c.sources, session)
         if hasattr(c, 'matches'):
             for mt in c.matches:
                 matchtype = mt + 'Match'
@@ -157,6 +136,55 @@ def _check_language(language_tag, session):
         session.add(l)
     return l
 
+def _add_labels(target, labels, session):
+    '''
+    Adds the labels to the target
+
+    :param target: Target to add the labels to
+    :param labels: A list of :class:`skosprovider.skos.Label` instances.
+    :param session:  A :class:`sqlalchemy.orm.session.Session`.
+    '''
+    for l in labels:
+        _check_language(l.language, session)
+        target.labels.append(LabelModel(
+            label=l.label,
+            labeltype_id=l.type,
+            language_id=l.language
+        ))
+    return target
+
+def _add_notes(target, notes, session):
+    '''
+    Adds the notes to the target
+
+    :param target: Target to add the notes to
+    :param notes: A list of :class:`skosprovider.skos.Note` instances.
+    :param session:  A :class:`sqlalchemy.orm.session.Session`.
+    '''
+    for n in notes:
+        _check_language(n.language, session)
+        target.notes.append(NoteModel(
+            note=n.note,
+            notetype_id=n.type,
+            language_id=n.language,
+            markup=n.markup
+        ))
+    return target
+
+def _add_sources(target, sources, session):
+    '''
+    Adds the sources to the target
+
+    :param target: Target to add the sources to
+    :param sources: A list of :class:`skosprovider.skos.Source` instances.
+    :param session:  A :class:`sqlalchemy.orm.session.Session`.
+    '''
+    for s in sources:
+        target.sources.append(SourceModel(
+            citation=s.citation,
+            markup=s.markup
+        ))
+    return target
 
 class VisitationCalculator(object):
     '''
