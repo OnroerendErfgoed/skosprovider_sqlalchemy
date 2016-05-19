@@ -325,7 +325,7 @@ class NoteTypeTests(ModelTestCase):
         self.assertEqual('definition', n.__str__())
 
 
-class TestiSource(DBTestCase):
+class TestSource(DBTestCase):
 
     def setUp(self):
         Base.metadata.create_all(self.engine)
@@ -347,6 +347,14 @@ class TestiSource(DBTestCase):
         )
         assert 'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.' == s.citation
         assert str(s) == s.citation
+        assert s.markup is None
+
+    def test_markup(self):
+        s = self._get_target_class()(
+            'Van Daele, K; Meganck M. & Mortier S 2014. <em>Data Driven Systems and System Driven Data.</em>',
+            'HTML'
+        )
+        assert s.markup == 'HTML'
 
 
 class TestMatchType:

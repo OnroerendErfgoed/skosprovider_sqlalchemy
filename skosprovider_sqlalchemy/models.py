@@ -519,9 +519,11 @@ class Source(Base):
         Text,
         nullable=False
     )
+    markup = Column(String(20), nullable=True)
 
-    def __init__(self, citation):
+    def __init__(self, citation, markup=None):
         self.citation = citation
+        self.markup = markup
 
     def __str__(self):
         return self.citation

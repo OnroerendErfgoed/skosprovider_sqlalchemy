@@ -126,7 +126,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 l.id for l in csm.languages
             ],
             sources=[
-                Source(s.citation) for s in csm.sources
+                Source(s.citation, s.markup) for s in csm.sources
             ]
         )
 
@@ -151,7 +151,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     for n in thing.notes
                 ],
                 sources=[
-                    Source(s.citation) for s in thing.sources
+                    Source(s.citation, s.markup ) for s in thing.sources
                 ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
@@ -177,7 +177,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     for n in thing.notes
                 ],
                 sources=[
-                    Source(s.citation) for s in thing.sources
+                    Source(s.citation, s.markup) for s in thing.sources
                 ],
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],

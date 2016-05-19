@@ -21,9 +21,9 @@
   :class:`skosprovider_sqlalchemy.models.Concept` and :class:`skosprovider_sqlalchemy.models.Collection`.
   When upgrading from a previous version of `skosprovider_sqlalchemy`, any
   databases created with that previous verions will need to be updated as well.
-  Please add a table `source` with fields `id` and `citation`, a table
-  `concept_source` with fields `concept_id` and `source_id` and a table
-  `conceptscheme_source` with fields `conceptscheme_id` and `source_id`.
+  Please add a table `source` with fields `id`, `citation` and `markup`,
+  a table `concept_source` with fields `concept_id` and `source_id` and a
+  table `conceptscheme_source` with fields `conceptscheme_id` and `source_id`.
 * All methodes that return a list have been modified in line with skosprovider
   0.6.0 to support sorting. Sorting is possible on `id`, `uri`, `label` and
   `sortlabel`. The last two are language dependent. The `sortlabel` allows
