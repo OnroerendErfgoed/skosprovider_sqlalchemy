@@ -1,2 +1,2 @@
-SQLAlchemy==1.0.12
+SQLAlchemy==1.0.13
 -e git+https://github.com/koenedaele/skosprovider.git#egg=skosprovider
