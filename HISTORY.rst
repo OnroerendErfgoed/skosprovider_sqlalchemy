@@ -5,6 +5,9 @@
 * **Minor BC break**: A :class:`skosprovider_sqlalchemy.models.Language` that gets
   cast to a string, now returns the language's ID (the IANA language
   code),as opposed to the language's description it would previously return.
+* **Minor BC break**: The URI attribute has been made required for a 
+  :class:`skosprovider_sqlalchemy.models.ConceptScheme`. Before it was optional,
+  but it probably would have caused problems with skosprovider anyway.
 * Due to the update to skosprovider 0.6.0, a new field `markup`, was added to a
   :class:`skosprovider_sqlalchemy.models.Note`. When upgrading from a previous
   version of `skosprovider_sqlalchemy`, any databases created in that previous

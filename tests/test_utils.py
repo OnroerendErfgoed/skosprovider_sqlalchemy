@@ -274,7 +274,8 @@ class TestImportProviderTests(DBTestCase):
         )
 
         return ConceptSchemeModel(
-            id=68
+            id=68,
+            uri='urn:x-skosprovider:cs:68'
         )
 
     def test_empty_provider(self):
@@ -424,7 +425,8 @@ class TestVisitationCalculator(DBTestCase):
         )
 
         return ConceptSchemeModel(
-            id=1
+            id=1,
+            uri='urn:x-skosprovider:cs:1'
         )
 
     def test_empty_provider(self):

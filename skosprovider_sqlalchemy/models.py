@@ -349,7 +349,7 @@ class ConceptScheme(Base):
     '''
     __tablename__ = 'conceptscheme'
     id = Column(Integer, primary_key=True)
-    uri = Column(String(512))
+    uri = Column(String(512), nullable=False)
 
     labels = relationship(
         'Label',

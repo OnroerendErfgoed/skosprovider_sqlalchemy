@@ -81,7 +81,7 @@ class TestSQLAlchemyProvider(DBTestCase):
             self.session_maker,
             uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
         )
-        c1 = Concept(concept_id=1, conceptscheme=ConceptScheme(id=99))
+        c1 = Concept(concept_id=1, conceptscheme=ConceptScheme(id=99, uri='http://id.example.com/trees'))
         session = self.session_maker()
         session.add(c1)
         session.commit()
