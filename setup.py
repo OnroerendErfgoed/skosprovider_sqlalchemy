@@ -13,13 +13,13 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=0.4.2',
+    'skosprovider>=0.6.0',
     'sqlalchemy',
 ]
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='0.5.0.dev0',
+    version='0.5.0',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read(),
     author='Koen Van Daele',
