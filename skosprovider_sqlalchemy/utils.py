@@ -22,6 +22,8 @@ from skosprovider_sqlalchemy.models import (
     Source as SourceModel
 )
 
+from sqlalchemy.orm.exc import NoResultFound
+
 
 def import_provider(provider, conceptscheme, session):
     '''
@@ -85,36 +87,56 @@ def import_provider(provider, conceptscheme, session):
                 .one()
             if len(c.narrower) > 0:
                 for nc in c.narrower:
-                    nc = session.query(ConceptModel) \
-                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                        .filter(ConceptModel.concept_id == int(nc)) \
-                        .one()
-                    cm.narrower_concepts.add(nc)
+                    try:
+                        nc = session.query(ConceptModel) \
+                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                            .filter(ConceptModel.concept_id == int(nc)) \
+                            .one()
+                        cm.narrower_concepts.add(nc)
+                    except NoResultFound:
+                        log.warning(
+                            'Tried to add a relation %s narrower %s, but target \
+                            does not exist. Relation will be lost.' % (c.id, nc))
             if len(c.subordinate_arrays) > 0:
                 for sa in c.subordinate_arrays:
-                    sa = session.query(CollectionModel) \
-                        .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
-                        .filter(CollectionModel.concept_id == int(sa)) \
-                        .one()
-                    cm.narrower_collections.add(sa)
+                    try:
+                        sa = session.query(CollectionModel) \
+                            .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
+                            .filter(CollectionModel.concept_id == int(sa)) \
+                            .one()
+                        cm.narrower_collections.add(sa)
+                    except NoResultFound:
+                        log.warning(
+                            'Tried to add a relation %s subordinate array %s, but target \
+                            does not exist. Relation will be lost.' % (c.id, sa))
             if len(c.related) > 0:
                 for rc in c.related:
-                    rc = session.query(ConceptModel) \
-                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                        .filter(ConceptModel.concept_id == int(rc)) \
-                        .one()
-                    cm.related_concepts.add(rc)
+                    try:
+                        rc = session.query(ConceptModel) \
+                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                            .filter(ConceptModel.concept_id == int(rc)) \
+                            .one()
+                        cm.related_concepts.add(rc)
+                    except NoResultFound:
+                        log.warning(
+                            'Tried to add a relation %s related %s, but target \
+                            does not exist. Relation will be lost.' % (c.id, rc))
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.query(CollectionModel) \
                 .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
                 .filter(ConceptModel.concept_id == int(c.id)) \
                 .one()
             for mc in c.members:
-                mc = session.query(ThingModel) \
-                    .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                    .filter(ConceptModel.concept_id == int(mc)) \
-                    .one()
-                cm.members.add(mc)
+                try:
+                    mc = session.query(ThingModel) \
+                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
+                        .filter(ConceptModel.concept_id == int(mc)) \
+                        .one()
+                    cm.members.add(mc)
+                except NoResultFound:
+                    log.warning(
+                        'Tried to add a relation %s member %s, but target \
+                        does not exist. Relation will be lost.' % (c.id, mc))
 
 
 def _check_language(language_tag, session):

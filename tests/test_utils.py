@@ -202,6 +202,41 @@ def _get_buildings():
     return buildings
 
 
+def _get_materials():
+    from skosprovider.providers import DictionaryProvider
+
+    materials = DictionaryProvider(
+        {'id': 'MATERIALS'},
+        [
+            {
+                'id': '1',
+                'labels': [
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Cardboard'
+                    }
+                ],
+                'narrower': [2],
+                'related': [3],
+                'subordinate_arrays': [56]
+            }, {
+                'id': '789',
+                'type': 'collection',
+                'labels': [
+                    {
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Wood by Tree'
+                    }
+                ],
+                'members': [654]
+            }
+        ]
+    )
+    return materials
+
+
 def _get_heritage_types():
     import json
 
@@ -405,6 +440,20 @@ class TestImportProviderTests(DBTestCase):
             .filter(ConceptModel.concept_id == 38) \
             .one()
         assert 3 == len(archeologische_opgravingen.narrower_collections)
+
+    def test_materials(self):
+        from skosprovider_sqlalchemy.models import (
+            Thing as ThingModel,
+        )
+
+        materialsprovider = _get_materials()
+        cs = self._get_cs()
+        self.session.add(cs)
+        import_provider(materialsprovider, cs, self.session)
+        materials = self.session.query(ThingModel) \
+            .filter(ThingModel.conceptscheme == cs) \
+            .all()
+        assert 2 == len(materials)
 
 
 class TestVisitationCalculator(DBTestCase):
