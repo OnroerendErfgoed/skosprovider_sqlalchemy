@@ -1,3 +1,10 @@
+0.5.1 (2016-??-??)
+------------------
+
+* Catch linking errors when importing a provider and turn them into log warning.
+  By linking errors we mean cases where one concept has a relation to a
+  non-existing other concept. (#25)
+
 0.5.0 (2016-08-11)
 ------------------
 
