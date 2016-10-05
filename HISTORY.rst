@@ -1,4 +1,4 @@
-0.5.1 (2016-??-??)
+0.5.1 (2016-10-05)
 ------------------
 
 * Catch linking errors when importing a provider and turn them into log warning.
