@@ -13,7 +13,7 @@ pytest-cov==2.5.1
 coveralls==1.2.0
 
 # Linting
-flake8==2.5.4
+flake8==3.4.1
 mccabe==0.4.0
 pep8==1.7.0
 pyflakes==1.1.0
