@@ -245,6 +245,9 @@ class Thing(Base):
         'polymorphic_identity': 'thing'
     }
 
+    def __str__(self):
+        return self.__class__.__name__ + '-' + str(self.id)
+
 
 class Concept(Thing):
     '''
@@ -374,6 +377,9 @@ class ConceptScheme(Base):
     )
     def label(self, language='any'):
         return skoslabel(self.labels, language)
+
+    def __str__(self):
+        return self.__class__.__name__ + '-' + str(self.id)
 
 
 class Language(Base):
@@ -608,6 +614,9 @@ class Visitation(Base):
         nullable=False,
         index=True
     )
+
+    def __str__(self):
+        return self.__class__.__name__ + '-' + str(self.id)
 
 
 def label(labels=[], language='any', sortLabel=False):
