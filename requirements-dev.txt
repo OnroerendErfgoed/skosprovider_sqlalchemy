@@ -5,15 +5,15 @@
 psycopg2==2.7.5
 
 # Documentation
-Sphinx==1.7.8
+Sphinx==1.8.1
 
 # Testing
-pytest==3.7.4
-pytest-cov==2.5.1
-coveralls==1.5.0
+pytest==3.9.3
+pytest-cov==2.6.0
+coveralls==1.5.1
 
 # Linting
-flake8==3.5.0
+flake8==3.6.0
 mccabe==0.6.1
 pep8==1.7.1
 pyflakes==2.0.0
