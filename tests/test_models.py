@@ -31,6 +31,7 @@ class ConceptTests(ModelTestCase):
         assert 1 == c.id
         assert l == c.label()
         assert s in c.sources
+        assert 'Concept-1' == str(c)
 
     def test_related(self):
         c1 = self._get_target_class()(
@@ -139,6 +140,7 @@ class ConceptSchemeTests(ModelTestCase):
         assert 1 == len(c.languages)
         assert en in c.languages
         assert s in c.sources
+        assert 'ConceptScheme-1' == str(c)
 
 
 class CollectionTests(ModelTestCase):
@@ -355,6 +357,24 @@ class TestSource(DBTestCase):
             'HTML'
         )
         assert s.markup == 'HTML'
+
+
+class VisitationTests(ModelTestCase):
+
+    def _get_target_class(self):
+        from skosprovider_sqlalchemy.models import Visitation
+        return Visitation
+
+    def test_simple(self):
+        v = self._get_target_class()(id=0, lft=1, rght=2, depth=3,
+                                     conceptscheme_id=4, concept_id=5)
+        assert 0 == v.id
+        assert 1 == v.lft
+        assert 2 == v.rght
+        assert 3 == v.depth
+        assert 4 == v.conceptscheme_id
+        assert 5 == v.concept_id
+        assert 'Visitation-0' == str(v)
 
 
 class TestMatchType:
