@@ -8,7 +8,7 @@ psycopg2==2.8.2
 Sphinx==2.0.1
 
 # Testing
-pytest==3.9.3
+pytest==4.4.1
 pytest-cov==2.6.0
 coveralls==1.5.1
 
