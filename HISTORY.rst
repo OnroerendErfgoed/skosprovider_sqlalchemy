@@ -1,3 +1,9 @@
+0.5.2 (2018-11-13)
+------------------
+
+* Update a lot of dependencies.
+* Add __str__ implementations to the model classes. (#43)
+
 0.5.1 (2016-10-05)
 ------------------
 
