@@ -254,6 +254,9 @@ class VisitationCalculator(object):
         if concept.type == 'concept':
             for nc in concept.narrower_concepts:
                 self._visit_concept(nc)
+            #for ncol in concept.narrower_collections:
+            #    if ncol.infer_concept_relations:
+            #        self._visit_concept(ncol)
         self.count += 1
         v['rght'] = self.count
         self.visitation.append(v)

@@ -163,10 +163,12 @@ class CollectionTests(ModelTestCase):
         c = self._get_target_class()(
             id=1,
             concept_id=253,
-            labels=[l]
+            labels=[l],
+            infer_concept_relations=True
         )
         self.assertEqual(1, c.id)
         self.assertEqual(l, c.label())
+        self.assertTrue(c.infer_concept_relations)
 
     def test_members(self):
         col = self._get_target_class()(

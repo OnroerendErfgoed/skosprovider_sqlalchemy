@@ -54,9 +54,9 @@ class SQLAlchemyProvider(VocabularyProvider):
     * `recurse`: Determine all narrower concepts by recursivly querying the
       database. Can take a long time for concepts that are at the top of a
       large hierarchy.
-    * `visit`: Query the database's 
-      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table. 
-      This table contains a nested set representation of each conceptscheme. 
+    * `visit`: Query the database's
+      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table.
+      This table contains a nested set representation of each conceptscheme.
       Actually creating the data in this table needs to be scheduled.
     '''
 
@@ -208,7 +208,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''Get all information on a concept or collection, based on a
         :term:`URI`.
 
-        This method will only find concepts or collections whose :term:`URI` is 
+        This method will only find concepts or collections whose :term:`URI` is
         actually stored in the database. It will not find anything that has
         no :term:`URI` in the database, but does have a matching :term:`URI`
         after generation.
@@ -325,6 +325,9 @@ class SQLAlchemyProvider(VocabularyProvider):
             ret.append(thing.concept_id)
             for n in thing.narrower_concepts:
                 ret += self._expand_recurse(n)
+            for n in thing.narrower_collections:
+                if n.infer_concept_relations:
+                    ret += self._expand_recurse(n)
         return list(set(ret))
 
     @session_factory('session_maker')
@@ -362,11 +365,11 @@ class SQLAlchemyProvider(VocabularyProvider):
         hierarchy.
 
         As opposed to the :meth:`get_top_concepts`, this method can possibly
-        return both concepts and collections. 
+        return both concepts and collections.
 
         :rtype: Returns a list of concepts and collections. For each an
-            id is present and a label. The label is determined by looking at 
-            the `**kwargs` parameter, the default language of the provider 
+            id is present and a label. The label is determined by looking at
+            the `**kwargs` parameter, the default language of the provider
             and falls back to `en` if nothing is present.
         '''
         tco = self.session\
@@ -400,8 +403,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param id: A concept or collection id.
         :rtype: A list of concepts and collections. For each an
             id is present and a label. The label is determined by looking at
-            the `**kwargs` parameter, the default language of the provider 
-            and falls back to `en` if nothing is present. If the id does not 
+            the `**kwargs` parameter, the default language of the provider
+            and falls back to `en` if nothing is present. If the id does not
             exist, return `False`.
         '''
         try:

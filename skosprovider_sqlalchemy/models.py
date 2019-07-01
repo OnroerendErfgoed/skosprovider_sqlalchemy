@@ -14,6 +14,7 @@ from sqlalchemy import (
     Integer,
     Text,
     String,
+    Boolean,
     ForeignKey,
     UniqueConstraint,
     Table,
@@ -332,9 +333,7 @@ class Collection(Thing):
     A collection as know by :term:`skosprovider:SKOS`.
     '''
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'collection'
-    }
+    infer_concept_relations = Column(Boolean, nullable=False, default=True)
 
     members = relationship(
         'Thing',
@@ -344,6 +343,10 @@ class Collection(Thing):
         secondaryjoin='Thing.id==collection_concept.c.concept_id',
         collection_class=set
     )
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'collection'
+    }
 
 
 class ConceptScheme(Base):
@@ -624,15 +627,15 @@ def label(labels=[], language='any', sortLabel=False):
     Provide a label for a list of labels.
 
     .. deprecated:: 0.5.0
-       Please use :func:`skosprovider.skos.label`. Starting with 
-       `skosprovider 0.6.0`, the function can function on 
+       Please use :func:`skosprovider.skos.label`. Starting with
+       `skosprovider 0.6.0`, the function can function on
        :class:`skosprovider_sqlalchemy.models.Label` instances as well.
 
     :param list labels: A list of :class:`labels <Label>`.
     :param str language: The language for which a label should preferentially
         be returned. This should be a valid IANA language tag.
     :param boolean sortLabel: Should sortLabels be considered or not? If True,
-        sortLabels will be preferred over prefLabels. Bear in mind that these 
+        sortLabels will be preferred over prefLabels. Bear in mind that these
         are still language dependent. So, it's possible to have a different
         sortLabel per language.
     :rtype: A :class:`Label` or `None` if no label could be found.
