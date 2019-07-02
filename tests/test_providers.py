@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+
+from sqlalchemy.orm import session
+
 from skosprovider.uri import UriPatternGenerator
 from skosprovider_sqlalchemy.models import Initialiser
 
@@ -29,7 +32,7 @@ class TestSQLAlchemyProvider(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def test_default_recurse_strategy(self):
@@ -362,10 +365,10 @@ class TestSQLAlchemyProvider(DBTestCase):
         all = self.provider.find({'type': 'concept'}, sort='uri', sort_order='desc')
         assert len(all) == 4
         assert [
-            'urn:x-skosprovider:test:5', 
-            'urn:x-skosprovider:test:4', 
-            'urn:x-skosprovider:test:3', 
-            'urn:x-skosprovider:test:1', 
+            'urn:x-skosprovider:test:5',
+            'urn:x-skosprovider:test:4',
+            'urn:x-skosprovider:test:3',
+            'urn:x-skosprovider:test:1',
             ] == [c['uri'] for c in all]
 
     def test_find_type_collection(self):
@@ -445,7 +448,7 @@ class TestSQLAlchemyProviderExpandVisit(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def test_expand_concept_visit(self):
@@ -479,7 +482,7 @@ class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def test_expand_concept(self):

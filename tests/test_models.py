@@ -4,6 +4,7 @@ import unittest
 
 import pytest
 
+from sqlalchemy.orm import session
 from skosprovider_sqlalchemy.models import Initialiser, Base
 from tests import DBTestCase
 
@@ -201,7 +202,7 @@ class TestLabel(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
@@ -243,7 +244,7 @@ class TestNote(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
@@ -338,7 +339,7 @@ class TestSource(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
