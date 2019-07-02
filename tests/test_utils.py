@@ -6,7 +6,7 @@ import csv
 import unittest
 
 import pytest
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, session
 from skosprovider_sqlalchemy.models import Base, Initialiser
 
 from skosprovider_sqlalchemy.utils import (
@@ -300,7 +300,7 @@ class TestImportProviderTests(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
@@ -465,7 +465,7 @@ class TestVisitationCalculator(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
