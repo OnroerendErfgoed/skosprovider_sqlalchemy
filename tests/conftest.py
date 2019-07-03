@@ -111,14 +111,33 @@ def create_data(session):
         'en'
     )
     cath.notes.append(n)
-    session.add(cath)
-    cath.broader_concepts.add(con)
-    cath.member_of.add(col)
     match = Match(
         matchtype_id = 'closeMatch',
         uri = 'http://vocab.getty.edu/aat/300007501'
     )
     cath.matches.append(match)
+    session.add(cath)
+    cath.member_of.add(col)
+    pchurch = Concept(
+        id=60,
+        uri='urn:x-skosprovider:test:6',
+        concept_id=6,
+        conceptscheme=cs
+    )
+    l = Label('Parochiekerken', 'prefLabel', 'nl')
+    pchurch.labels.append(l)
+    session.add(pchurch)
+    pchurch.member_of.add(col)
+    hkerk = Concept(
+        id=70,
+        uri='urn:x-skosprovider:test:7',
+        concept_id=7,
+        conceptscheme=cs
+    )
+    l = Label('Hulpkerken', 'prefLabel', 'nl')
+    hkerk.labels.append(l)
+    session.add(hkerk)
+    hkerk.broader_concepts.add(pchurch)
     session.commit()
 
 

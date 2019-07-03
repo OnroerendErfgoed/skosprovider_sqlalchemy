@@ -287,6 +287,7 @@ class SQLAlchemyProvider(VocabularyProvider):
 
     @session_factory('session_maker')
     def get_top_concepts(self, **kwargs):
+        # get the concepts that have no direct broader concept
         top = self.session\
                   .query(ConceptModel)\
                   .options(joinedload('labels'))\
@@ -294,6 +295,13 @@ class SQLAlchemyProvider(VocabularyProvider):
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None
                   ).all()
+        # check if they have an indirect broader concept
+        def _has_higher_concept(c):
+            for coll in c.member_of:
+                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                    return True
+            return False
+        top = [c for c in top if not _has_higher_concept(c)]
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)
