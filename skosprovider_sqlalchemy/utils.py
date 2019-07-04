@@ -232,7 +232,7 @@ class VisitationCalculator(object):
         self.count = 0
         self.depth = 0
         self.visitation = []
-        # get all possible top concept
+        # get all possible top concepts
         topc = self.session \
             .query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == conceptscheme) \

@@ -493,7 +493,7 @@ class TestSQLAlchemyProviderExpandVisit(DBTestCase):
 
     def test_expand_collection_visit(self):
         ids = self.visitationprovider.expand(2)
-        assert ids == [4]
+        assert ids == [4, 6, 7]
 
     def test_expand_concept_without_narrower_visit(self):
         ids = self.visitationprovider.expand(4)
