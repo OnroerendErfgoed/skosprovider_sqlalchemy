@@ -344,10 +344,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         if thing.type == 'collection':
             ret = []
             for m in thing.members:
-                try:
-                    ret += self._expand_visit(m)
-                except TypeError:
-                    ret += self._expand_recurse(m)
+                ret += self._expand_visit(m)
         else:
             try:
                 cov = self.session\
