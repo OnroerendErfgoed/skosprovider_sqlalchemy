@@ -478,6 +478,10 @@ class TestSQLAlchemyProvider(DBTestCase):
         ids = self.provider.expand(2)
         assert [4, 6, 7] == ids
 
+    def test_expand_collection_without_inference(self):
+        ids = self.provider.expand(8)
+        assert [9] == ids
+
     def test_expand_concept_without_narrower(self):
         ids = self.provider.expand(5)
         assert [5] == ids
