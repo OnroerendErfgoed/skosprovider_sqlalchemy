@@ -155,7 +155,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                 ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
-                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
+                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts],
+                infer_concept_relations=thing.infer_concept_relations
             )
         else:
             matches = {}
@@ -346,7 +347,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 try:
                     ret += self._expand_visit(m)
                 except TypeError:
-                    return False
+                    ret += self._expand_recurse(m)
         else:
             try:
                 cov = self.session\
@@ -355,7 +356,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                           .filter(Visitation.concept_id == thing.id)\
                           .one()
             except NoResultFound:
-                return False
+                return self._expand_recurse(thing)
 
             ids = self.session\
                       .query(Thing.concept_id)\

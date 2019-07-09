@@ -138,6 +138,27 @@ def create_data(session):
     hkerk.labels.append(l)
     session.add(hkerk)
     hkerk.broader_concepts.add(pchurch)
+    chparts = Collection(
+        id=80,
+        uri='urn:x-skosprovider:test:8',
+        concept_id=8,
+        conceptscheme=cs,
+        infer_concept_relations=False
+    )
+    l = Label('Parts of churches', 'prefLabel', 'en')
+    chparts.labels.append(l)
+    session.add(chparts)
+    chparts.broader_concepts.add(con)
+    chtow = Concept(
+        id=90,
+        uri='urn:x-skosprovider:test:9',
+        concept_id=9,
+        conceptscheme=cs,
+    )
+    l = Label('Churchtowers', 'prefLabel', 'en')
+    chtow.labels.append(l)
+    session.add(chtow)
+    chtow.member_of.add(chparts)
     session.commit()
 
 
