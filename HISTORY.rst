@@ -2,7 +2,7 @@
 ------------------
 
 * Update to the latest skosprovider version and implement the
-  `infer_concept_relations` attribute.
+  `infer_concept_relations` attribute. (#53)
 
 0.5.2 (2018-11-13)
 ------------------
