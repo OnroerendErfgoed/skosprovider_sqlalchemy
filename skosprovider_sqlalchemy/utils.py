@@ -147,7 +147,7 @@ def _check_language(language_tag, session):
     :param session: Database session to use
     :rtype: :class:`skosprovider_sqlalchemy.models.Language`
     '''
-    if not language_tag:
+    if not language_tag: # pragma: no cover
         language_tag = 'und'
     l = session.query(LanguageModel).get(language_tag)
     if not l:
@@ -232,32 +232,47 @@ class VisitationCalculator(object):
         self.count = 0
         self.depth = 0
         self.visitation = []
+        # get all possible top concepts
         topc = self.session \
             .query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == conceptscheme) \
             .filter(ConceptModel.broader_concepts == None) \
             .all()
+        # check if they have an indirect broader concept
+        def _has_higher_concept(c):
+            for coll in c.member_of:
+                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                    return True
+            return False
+        topc = [c for c in topc if not _has_higher_concept(c)]
         for tc in topc:
             self._visit_concept(tc)
         self.visitation.sort(key=lambda v: v['lft'])
         return self.visitation
 
     def _visit_concept(self, concept):
-        log.debug('Visiting concept %s.' % concept.id)
-        self.depth += 1
-        self.count += 1
-        v = {
-            'id': concept.id,
-            'lft': self.count,
-            'depth': self.depth
-        }
         if concept.type == 'concept':
+            log.debug('Visiting concept %s.' % concept.id)
+            self.depth += 1
+            self.count += 1
+            v = {
+                'id': concept.id,
+                'lft': self.count,
+                'depth': self.depth
+            }
             for nc in concept.narrower_concepts:
                 self._visit_concept(nc)
-        self.count += 1
-        v['rght'] = self.count
-        self.visitation.append(v)
-        self.depth -= 1
+            for ncol in concept.narrower_collections:
+                if ncol.infer_concept_relations:
+                    self._visit_concept(ncol)
+            self.count += 1
+            v['rght'] = self.count
+            self.visitation.append(v)
+            self.depth -= 1
+        elif concept.type == 'collection':
+            log.debug('Visiting collection %s.' % concept.id)
+            for m in concept.members:
+                self._visit_concept(m)
 
 
 def session_factory(session_maker_name):

@@ -54,9 +54,9 @@ class SQLAlchemyProvider(VocabularyProvider):
     * `recurse`: Determine all narrower concepts by recursivly querying the
       database. Can take a long time for concepts that are at the top of a
       large hierarchy.
-    * `visit`: Query the database's 
-      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table. 
-      This table contains a nested set representation of each conceptscheme. 
+    * `visit`: Query the database's
+      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table.
+      This table contains a nested set representation of each conceptscheme.
       Actually creating the data in this table needs to be scheduled.
     '''
 
@@ -155,7 +155,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                 ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
-                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
+                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts],
+                infer_concept_relations=thing.infer_concept_relations
             )
         else:
             matches = {}
@@ -208,7 +209,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''Get all information on a concept or collection, based on a
         :term:`URI`.
 
-        This method will only find concepts or collections whose :term:`URI` is 
+        This method will only find concepts or collections whose :term:`URI` is
         actually stored in the database. It will not find anything that has
         no :term:`URI` in the database, but does have a matching :term:`URI`
         after generation.
@@ -287,6 +288,7 @@ class SQLAlchemyProvider(VocabularyProvider):
 
     @session_factory('session_maker')
     def get_top_concepts(self, **kwargs):
+        # get the concepts that have no direct broader concept
         top = self.session\
                   .query(ConceptModel)\
                   .options(joinedload('labels'))\
@@ -294,6 +296,13 @@ class SQLAlchemyProvider(VocabularyProvider):
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None
                   ).all()
+        # check if they have an indirect broader concept
+        def _has_higher_concept(c):
+            for coll in c.member_of:
+                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                    return True
+            return False
+        top = [c for c in top if not _has_higher_concept(c)]
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)
@@ -325,6 +334,9 @@ class SQLAlchemyProvider(VocabularyProvider):
             ret.append(thing.concept_id)
             for n in thing.narrower_concepts:
                 ret += self._expand_recurse(n)
+            for n in thing.narrower_collections:
+                if n.infer_concept_relations:
+                    ret += self._expand_recurse(n)
         return list(set(ret))
 
     @session_factory('session_maker')
@@ -332,10 +344,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         if thing.type == 'collection':
             ret = []
             for m in thing.members:
-                try:
-                    ret += self._expand_visit(m)
-                except TypeError:
-                    return False
+                ret += self._expand_visit(m)
         else:
             try:
                 cov = self.session\
@@ -344,7 +353,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                           .filter(Visitation.concept_id == thing.id)\
                           .one()
             except NoResultFound:
-                return False
+                return self._expand_recurse(thing)
 
             ids = self.session\
                       .query(Thing.concept_id)\
@@ -362,11 +371,11 @@ class SQLAlchemyProvider(VocabularyProvider):
         hierarchy.
 
         As opposed to the :meth:`get_top_concepts`, this method can possibly
-        return both concepts and collections. 
+        return both concepts and collections.
 
         :rtype: Returns a list of concepts and collections. For each an
-            id is present and a label. The label is determined by looking at 
-            the `**kwargs` parameter, the default language of the provider 
+            id is present and a label. The label is determined by looking at
+            the `**kwargs` parameter, the default language of the provider
             and falls back to `en` if nothing is present.
         '''
         tco = self.session\
@@ -400,8 +409,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param id: A concept or collection id.
         :rtype: A list of concepts and collections. For each an
             id is present and a label. The label is determined by looking at
-            the `**kwargs` parameter, the default language of the provider 
-            and falls back to `en` if nothing is present. If the id does not 
+            the `**kwargs` parameter, the default language of the provider
+            and falls back to `en` if nothing is present. If the id does not
             exist, return `False`.
         '''
         try:
