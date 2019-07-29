@@ -147,7 +147,7 @@ def _check_language(language_tag, session):
     :param session: Database session to use
     :rtype: :class:`skosprovider_sqlalchemy.models.Language`
     '''
-    if not language_tag:
+    if not language_tag: # pragma: no cover
         language_tag = 'und'
     l = session.query(LanguageModel).get(language_tag)
     if not l:
