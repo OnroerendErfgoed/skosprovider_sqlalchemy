@@ -10,7 +10,7 @@ Sphinx==2.1.2
 # Testing
 pytest==5.0.1
 pytest-cov==2.7.1
-coveralls==1.7.0
+coveralls==1.8.2
 
 # Linting
 flake8==3.7.7
