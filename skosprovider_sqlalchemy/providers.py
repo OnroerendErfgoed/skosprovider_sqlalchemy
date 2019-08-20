@@ -24,6 +24,7 @@ from skosprovider_sqlalchemy.models import (
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
+    Match as MatchModel,
     Visitation
 )
 
@@ -248,15 +249,41 @@ class SQLAlchemyProvider(VocabularyProvider):
     @session_factory('session_maker')
     def find(self, query, **kwargs):
         lan = self._get_language(**kwargs)
-        q = self.session\
-                .query(Thing)\
-                .options(joinedload('labels'))\
-                .filter(Thing.conceptscheme_id == self.conceptscheme_id)
-        if 'type' in query and query['type'] in ['concept', 'collection']:
-            q = q.filter(Thing.type == query['type'])
+        model = Thing
+        if 'matches' in query:
+            match_uri = query['matches'].get('uri', None)
+            if not match_uri:
+                raise ValueError(
+                    'Please provide a URI to match with.'
+                )
+            model = ConceptModel
+            q = self.session\
+                    .query(model)\
+                    .options(joinedload('labels'))\
+                    .join(MatchModel)\
+                    .filter(model.conceptscheme_id == self.conceptscheme_id)
+            mtype = query['matches'].get('type')
+            if mtype and mtype in Concept.matchtypes:
+                mtype += 'Match'
+                mtypes = [mtype]
+                if mtype == 'closeMatch':
+                    mtypes.append('exactMatch')
+                q = q.filter(
+                    MatchModel.uri == match_uri,
+                    MatchModel.matchtype_id.in_(mtypes)
+                )
+            else:
+                q = q.filter(MatchModel.uri == match_uri)
+        else:
+            q = self.session\
+                    .query(model)\
+                    .options(joinedload('labels'))\
+                    .filter(model.conceptscheme_id == self.conceptscheme_id)
+            if 'type' in query and query['type'] in ['concept', 'collection']:
+                q = q.filter(model.type == query['type'])
         if 'label' in query:
             q = q.filter(
-                Thing.labels.any(
+                model.labels.any(
                     LabelModel.label.ilike('%' + query['label'].lower() + '%')
                 )
             )
@@ -267,8 +294,9 @@ class SQLAlchemyProvider(VocabularyProvider):
                     'You are searching for items in an unexisting collection.'
                 )
             q = q.filter(
-                Thing.member_of.any(Thing.concept_id == coll.id)
+                model.member_of.any(Thing.concept_id == coll.id)
             )
+
         all = q.all()
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)

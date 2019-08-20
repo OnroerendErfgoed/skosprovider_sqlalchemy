@@ -157,9 +157,15 @@ def create_data(session):
     )
     l = Label('Churchtowers', 'prefLabel', 'en')
     chtow.labels.append(l)
+    match = Match(
+        matchtype_id = 'exactMatch',
+        uri = 'http://vocab.getty.edu/aat/300003625'
+    )
+    chtow.matches.append(match)
     session.add(chtow)
     chtow.member_of.add(chparts)
     session.commit()
+
 
 
 def create_visitation(session):
