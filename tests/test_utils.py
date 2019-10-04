@@ -11,8 +11,9 @@ from skosprovider_sqlalchemy.models import Base, Initialiser
 
 from skosprovider_sqlalchemy.utils import (
     import_provider,
-    VisitationCalculator,
-    session_factory)
+    VisitationCalculator
+)
+
 from tests import DBTestCase
 
 
@@ -587,38 +588,3 @@ class TestVisitationCalculator(DBTestCase):
             if v['id'] == 2:
                 assert v['lft'] + 1 == v['rght']
                 assert 2 == v['depth']
-
-
-class TestObject(object):
-    def __init__(self, session_maker):
-        self.session_maker = session_maker
-
-    @session_factory('test')
-    def some_method(self):
-        return self.session
-
-    @session_factory('session_maker')
-    def some_other_method(self):
-        return self.session
-
-
-class TestSessionFactory(unittest.TestCase):
-
-    @pytest.fixture(autouse=True)
-    def init(self, session_maker):
-        self.session_maker = session_maker
-
-    def setUp(self):
-        self.test_object = TestObject(self.session_maker)
-
-    def test_no_session_factory_found(self):
-        self.assertRaises(Exception, )
-        with self.assertRaises(Exception) as cm:
-            self.test_object.some_method()
-        the_exception = cm.exception
-        self.assertEqual(str(the_exception), 'session_maker test not found')
-
-    def test_session_creation(self):
-        res = self.test_object.some_other_method()
-        self.assertIsNotNone(res)
-        self.assertIsInstance(res, Session)

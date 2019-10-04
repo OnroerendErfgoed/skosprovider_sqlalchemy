@@ -273,35 +273,3 @@ class VisitationCalculator(object):
             log.debug('Visiting collection %s.' % concept.id)
             for m in concept.members:
                 self._visit_concept(m)
-
-
-def session_factory(session_maker_name):
-    def with_session(fn):
-        def go(parent_object, *args, **kw):
-            if hasattr(parent_object, session_maker_name):
-                root_call = True
-                session_maker = getattr(parent_object, session_maker_name)
-                if not hasattr(parent_object, 'session'):
-                    parent_object.session = None
-                if parent_object.session is None:
-                    session = session_maker()
-                    parent_object.session = session
-                else:
-                    root_call = False
-                try:
-                    parent_object.session.begin(subtransactions=True)
-                    ret = fn(parent_object, *args, **kw)
-                    parent_object.session.commit()
-                    return ret
-                except:
-                    parent_object.session.rollback()
-                    raise
-                finally:
-                    if root_call:
-                        parent_object.session.close()
-                        parent_object.session = None
-            else:
-                raise Exception('session_maker %s not found' % session_maker_name)
-
-        return go
-    return with_session

@@ -26,7 +26,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         create_data(self.session)
         self.provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session_maker,
+            self.session,
             uri_generator=UriPatternGenerator('urn:x-skosprovider-sa:test:%s')
         )
 
@@ -34,6 +34,14 @@ class TestSQLAlchemyProvider(DBTestCase):
         self.session.rollback()
         session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
+
+    def test_session_maker(self):
+        self.provider = SQLAlchemyProvider(
+            {'id': 'SOORTEN', 'conceptscheme_id': 1},
+            self.session_maker
+        )
+        cs = self.provider.concept_scheme
+        assert 'urn:x-skosprovider:test' == cs.uri
 
     def test_default_recurse_strategy(self):
         assert 'recurse' == self.provider.expand_strategy
@@ -51,7 +59,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         with pytest.raises(ValueError):
             SQLAlchemyProvider(
                 {'id': 'SOORTEN', 'conceptscheme_id': 1},
-                self.session_maker,
+                self.session,
                 expand_strategy='invalid'
             )
 
@@ -59,7 +67,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         with pytest.raises(ValueError):
             SQLAlchemyProvider(
                 {'id': 'SOORTEN'},
-                self.session_maker
+                self.session
             )
 
     def test_get_vocabulary_id(self):
@@ -70,7 +78,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         # Set up provider
         provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session_maker,
+            self.session,
             uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
         )
         assert 'http://id.example.com/trees/1' == provider.uri_generator.generate(id=1)
@@ -81,7 +89,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         # Set up provider
         provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 99},
-            self.session_maker,
+            self.session,
             uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
         )
         c1 = Concept(concept_id=1, conceptscheme=ConceptScheme(id=99, uri='http://id.example.com/trees'))
@@ -549,7 +557,7 @@ class TestSQLAlchemyProviderExpandVisit(DBTestCase):
         create_visitation(self.session)
         self.visitationprovider=SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session_maker,
+            self.session,
             expand_strategy='visit'
         )
 
@@ -587,7 +595,7 @@ class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
         Initialiser(self.session).init_all()
         self.visitationprovider=SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session_maker,
+            self.session,
             expand_strategy='visit'
         )
 
