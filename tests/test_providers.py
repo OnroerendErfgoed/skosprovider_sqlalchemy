@@ -470,6 +470,54 @@ class TestSQLAlchemyProvider(DBTestCase):
                    'label': 'Parochiekerken'
                } in all
 
+    def test_find_matches_no_uri(self):
+        with pytest.raises(ValueError):
+            all = self.provider.find({'matches': {}})
+
+    def test_find_matches_none(self):
+        all = self.provider.find({'matches': {
+            'uri': 'http://vocab.getty.edu/aat/notpresent'
+        }})
+        assert len(all) == 0
+
+    def test_find_matches_one(self):
+        all = self.provider.find({'matches': {
+            'uri': 'http://vocab.getty.edu/aat/300007501'
+        }})
+        assert len(all) == 1
+        assert {
+                   'id': 4,
+                   'uri': 'urn:x-skosprovider:test:4',
+                   'type': 'concept',
+                   'label': 'Cathedrals'
+               } in all
+
+    def test_find_matches_one_close(self):
+        all = self.provider.find({'matches': {
+            'type': 'close',
+            'uri': 'http://vocab.getty.edu/aat/300007501'
+        }})
+        assert len(all) == 1
+        assert {
+                   'id': 4,
+                   'uri': 'urn:x-skosprovider:test:4',
+                   'type': 'concept',
+                   'label': 'Cathedrals'
+               } in all
+
+    def test_find_matches_one_close_inherits_exact(self):
+        all = self.provider.find({'matches': {
+            'type': 'close',
+            'uri': 'http://vocab.getty.edu/aat/300003625'
+        }})
+        assert len(all) == 1
+        assert {
+                   'id': 9,
+                   'uri': 'urn:x-skosprovider:test:9',
+                   'type': 'concept',
+                   'label': 'Churchtowers'
+               } in all
+
     def test_expand_concept(self):
         ids = self.provider.expand(1)
         assert [1, 4, 6, 7] == ids

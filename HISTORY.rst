@@ -3,6 +3,8 @@
 
 * Update to the latest skosprovider version and implement the
   `infer_concept_relations` attribute. (#53)
+* Add the ability to query on matches in line with latest 
+  skosprovider version. (#57)
 
 0.5.2 (2018-11-13)
 ------------------
