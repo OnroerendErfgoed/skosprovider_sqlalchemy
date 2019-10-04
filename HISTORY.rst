@@ -5,6 +5,8 @@
   `infer_concept_relations` attribute. (#53)
 * Add the ability to query on matches in line with latest 
   skosprovider version. (#57)
+* Drop support for Python 3.4. Add support for Python 3.7. This
+  is also the last version to support Python 2. (#62)
 
 0.5.2 (2018-11-13)
 ------------------
