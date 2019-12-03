@@ -92,6 +92,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'Unknown expand strategy.'
                 )
+        self.allowed_instance_scopes = ['single', 'threaded_thread']
 
     @property
     def concept_scheme(self):

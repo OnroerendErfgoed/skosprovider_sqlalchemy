@@ -46,6 +46,10 @@ class TestSQLAlchemyProvider(DBTestCase):
     def test_default_recurse_strategy(self):
         assert 'recurse' == self.provider.expand_strategy
 
+    def test_instance_scopes(self):
+        assert 'single' in self.provider.allowed_instance_scopes
+        assert 'threaded_thread' in self.provider.allowed_instance_scopes
+
     def test_override_expand_strategy(self):
         # Set up provider
         provider = SQLAlchemyProvider(
