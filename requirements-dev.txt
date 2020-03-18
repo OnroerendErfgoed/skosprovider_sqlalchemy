@@ -2,18 +2,20 @@
 --requirement requirements.txt
 
 # Postgresql database access
-psycopg2==2.8.3
+psycopg2==2.8.4
 
 # Documentation
-Sphinx==1.8.5
+Sphinx==1.8.5 ; python_version < '3.5'
+Sphinx==2.4.2 ; python_version >= '3.5'
 
 # Testing
-pytest==4.6.5
-pytest-cov==2.7.1
-coveralls==1.8.2
+pytest==4.6.9 ; python_version < '3.0'
+pytest==5.3.5 ; python_version >= '3.0'
+pytest-cov==2.8.1
+coveralls==1.11.2
 
 # Linting
-flake8==3.7.8
+flake8==3.7.9
 mccabe==0.6.1
 pep8==1.7.1
 pyflakes==2.1.1
