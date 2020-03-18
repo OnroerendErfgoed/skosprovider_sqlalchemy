@@ -1,4 +1,4 @@
-0.6.0 (2019-??-??)
+0.6.0 (2020-03-18)
 ------------------
 
 * Update to the latest skosprovider version and implement the

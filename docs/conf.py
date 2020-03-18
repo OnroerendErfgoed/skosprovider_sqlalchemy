@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Skosprovider_sqlalchemy'
-copyright = u'2013-2017, Koen Van Daele'
+copyright = u'2013-2020, Koen Van Daele'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
