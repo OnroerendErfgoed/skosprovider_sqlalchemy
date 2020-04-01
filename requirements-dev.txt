@@ -5,7 +5,7 @@
 psycopg2==2.8.4
 
 # Documentation
-Sphinx==1.8.5
+Sphinx==2.4.4
 
 # Testing
 pytest==4.4.1
