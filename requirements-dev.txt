@@ -2,7 +2,7 @@
 --requirement requirements.txt
 
 # Postgresql database access
-psycopg2==2.8.2
+psycopg2==2.8.5
 
 # Documentation
 Sphinx==1.8.5
