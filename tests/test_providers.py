@@ -42,6 +42,8 @@ class TestSQLAlchemyProvider(DBTestCase):
         )
         cs = self.provider.concept_scheme
         assert 'urn:x-skosprovider:test' == cs.uri
+        assert 'en' in cs.languages
+        assert 'nl' in cs.languages
 
     def test_default_recurse_strategy(self):
         assert 'recurse' == self.provider.expand_strategy
