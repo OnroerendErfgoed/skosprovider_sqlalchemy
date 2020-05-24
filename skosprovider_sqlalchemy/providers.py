@@ -64,7 +64,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param dict metadata: Metadata about the provider. Apart from the usual
         id, a conceptscheme_id can also be passed.
         :param :class:`sqlachemy.orm.session.Session` session: The database
-        session. This can also be a callable to returns a Session.
+        session. This can also be a callable that returns a Session.
         '''
         if not 'subject' in metadata:
             metadata['subject'] = []
