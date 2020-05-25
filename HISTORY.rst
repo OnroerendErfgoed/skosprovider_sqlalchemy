@@ -1,4 +1,4 @@
-0.6.0 (2020-03-18)
+0.6.0 (2020-??-??)
 ------------------
 
 * Update to the latest skosprovider version and implement the
@@ -9,6 +9,7 @@
   issue we wanted it to fix and it added a lot of overhead. A provider should 
   now be passed a :class:`sqlachemy.orm.session.Session` at startup, or a 
   callable that returns such a session. (#64)
+* Improved performance of getting the concept_scheme by caching it. (#71)
 * Drop support for Python 3.4. Add support for Python 3.7. This
   is also the last version to support Python 2. (#62)
 

@@ -44,6 +44,12 @@ class SQLAlchemyProvider(VocabularyProvider):
     as backend.
     '''
 
+    _conceptscheme = None
+    '''
+    The concept scheme, once it has been loaded. Should never be accessed
+    directly.
+    '''
+
     expand_strategy = 'recurse'
     '''
     Determines how the expand method will operate. Options are:
@@ -96,7 +102,9 @@ class SQLAlchemyProvider(VocabularyProvider):
 
     @property
     def concept_scheme(self):
-        return self._get_concept_scheme()
+        if self._conceptscheme is None:
+            self._conceptscheme = self._get_concept_scheme()
+        return self._conceptscheme
 
     def _get_concept_scheme(self):
         '''

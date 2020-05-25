@@ -116,6 +116,14 @@ class TestSQLAlchemyProvider(DBTestCase):
         assert 2 == len(cs.languages)
         assert 'en' in cs.languages
 
+    def test_concept_scheme_is_cached(self):
+        from skosprovider.skos import (
+            ConceptScheme
+        )
+        assert self.provider._conceptscheme is None
+        cs = self.provider.concept_scheme
+        assert self.provider._conceptscheme == cs
+
     def test_get_concept_by_id(self):
         from skosprovider.skos import Concept
 
