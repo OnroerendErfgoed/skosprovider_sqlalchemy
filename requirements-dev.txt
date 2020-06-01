@@ -9,7 +9,7 @@ Sphinx==3.0.4
 
 # Testing
 pytest==5.4.2
-pytest-cov==2.6.1
+pytest-cov==2.9.0
 coveralls==1.7.0
 
 # Linting
