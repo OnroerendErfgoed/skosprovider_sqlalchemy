@@ -297,10 +297,11 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'You are searching for items in an unexisting collection.'
                 )
-            q = q.filter(
-                model.member_of.any(Thing.concept_id == coll.id)
-            )
-
+            if 'depth' in query['collection'] and query['collection']['depth'] == 'all':
+                members = self.expand(coll.id)
+            else:
+                members = coll.members
+            q = q.filter(model.concept_id.in_(members))
         all = q.all()
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)

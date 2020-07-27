@@ -10,6 +10,8 @@
   now be passed a :class:`sqlachemy.orm.session.Session` at startup, or a 
   callable that returns such a session. (#64)
 * Improved performance of getting the concept_scheme by caching it. (#71)
+* Make querying a collection with depth=all possible. Before the provider would
+  only provide the direct members of a collection. (#76)
 * Drop support for Python 3.4. Add support for Python 3.7. This
   is also the last version to support Python 2. (#62)
 
