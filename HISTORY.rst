@@ -1,4 +1,4 @@
-0.6.0 (2020-??-??)
+0.6.0 (2020-07-29)
 ------------------
 
 * Update to the latest skosprovider version and implement the
@@ -12,7 +12,7 @@
 * Improved performance of getting the concept_scheme by caching it. (#71)
 * Make querying a collection with depth=all possible. Before the provider would
   only provide the direct members of a collection. (#76)
-* Drop support for Python 3.4. Add support for Python 3.7. This
+* Drop support for Python 3.4 and 3.5. Add support for Python 3.7 and 3.8. This
   is also the last version to support Python 2. (#62)
 
 0.5.2 (2018-11-13)
