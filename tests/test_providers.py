@@ -476,8 +476,50 @@ class TestSQLAlchemyProvider(DBTestCase):
         with pytest.raises(ValueError):
             self.provider.find({'collection': {'id': 404}})
 
-    def test_find_collection_2_no_depth(self):
-        all = self.provider.find({'collection': {'id': 2}})
+    def test_find_collection_2_depth_default_members(self):
+        nodepth = self.provider.find({'collection': {'id': 2}})
+        depth = self.provider.find({
+            'collection': {
+                'id': 2,
+                'depth': 'members'
+            }
+        })
+        assert len(depth) == len(nodepth)
+
+    def test_find_collection_2_depth_all(self):
+        all = self.provider.find({
+            'collection': {
+                'id': 2,
+                'depth': 'all'
+            }
+        })
+        assert len(all) == 3
+        assert {
+                   'id': 4,
+                   'uri': 'urn:x-skosprovider:test:4',
+                   'type': 'concept',
+                   'label': 'Cathedrals'
+               } in all
+        assert {
+                   'id': 6,
+                   'uri': 'urn:x-skosprovider:test:6',
+                   'type': 'concept',
+                   'label': 'Parochiekerken'
+               } in all
+        assert {
+                   'id': 7,
+                   'uri': 'urn:x-skosprovider:test:7',
+                   'type': 'concept',
+                   'label': 'Hulpkerken'
+               } in all
+
+    def test_find_collection_2_depth_members(self):
+        all = self.provider.find({
+            'collection': {
+                'id': 2,
+                'depth': 'members'
+            }
+        })
         assert len(all) == 2
         assert {
                    'id': 4,
