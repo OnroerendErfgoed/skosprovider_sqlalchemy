@@ -1,3 +1,20 @@
+0.6.0 (2020-07-29)
+------------------
+
+* Update to the latest skosprovider version and implement the
+  `infer_concept_relations` attribute. (#53)
+* Add the ability to query on matches in line with the latest 
+  skosprovider version. (#57)
+* Drop the session decorator that was added in 0.4.0 since it did not fix the 
+  issue we wanted it to fix and it added a lot of overhead. A provider should 
+  now be passed a :class:`sqlachemy.orm.session.Session` at startup, or a 
+  callable that returns such a session. (#64)
+* Improved performance of getting the concept_scheme by caching it. (#71)
+* Make querying a collection with depth=all possible. Before the provider would
+  only provide the direct members of a collection. (#76)
+* Drop support for Python 3.4 and 3.5. Add support for Python 3.7 and 3.8. This
+  is also the last version to support Python 2. (#62)
+
 0.5.2 (2018-11-13)
 ------------------
 

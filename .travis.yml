@@ -1,20 +1,20 @@
 language: python
 sudo: false
 python:
- - 2.7
- - 3.4
- - 3.5
- - 3.6
+ - "2.7"
+ - "3.6"
+ - "3.7"
+ - "3.8"
+services:
+ - postgresql
 env:
  - DB="sqlite" SAURL="sqlite:///:memory:"
  - DB="postgres" SAURL="postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy"
- # - DB="mysql" SAURL="mysql://travis:@localhost/skosprovider_sqlalchemy"
 install:
  - pip install -r requirements-dev.txt
  - python setup.py -q develop
 before_script:
  - "if [[ $DB = 'postgres' ]]; then psql -U postgres -c 'create database skosprovider_sqlalchemy'; fi"
- - "if [[ $DB = 'mysql' ]]; then mysql -e 'create database skosprovider_sqlalchemy'; fi"
 script: 
  - py.test --sqlalchemy_url $SAURL -v --cov skosprovider_sqlalchemy
 after_success: coveralls

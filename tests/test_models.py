@@ -4,6 +4,7 @@ import unittest
 
 import pytest
 
+from sqlalchemy.orm import session
 from skosprovider_sqlalchemy.models import Initialiser, Base
 from tests import DBTestCase
 
@@ -163,10 +164,12 @@ class CollectionTests(ModelTestCase):
         c = self._get_target_class()(
             id=1,
             concept_id=253,
-            labels=[l]
+            labels=[l],
+            infer_concept_relations=True
         )
         self.assertEqual(1, c.id)
         self.assertEqual(l, c.label())
+        self.assertTrue(c.infer_concept_relations)
 
     def test_members(self):
         col = self._get_target_class()(
@@ -199,7 +202,7 @@ class TestLabel(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
@@ -241,7 +244,7 @@ class TestNote(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):
@@ -336,7 +339,7 @@ class TestSource(DBTestCase):
 
     def tearDown(self):
         self.session.rollback()
-        self.session.close_all()
+        session.close_all_sessions()
         Base.metadata.drop_all(self.engine)
 
     def _get_target_class(self):

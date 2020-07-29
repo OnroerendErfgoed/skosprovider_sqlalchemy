@@ -147,7 +147,7 @@ def _check_language(language_tag, session):
     :param session: Database session to use
     :rtype: :class:`skosprovider_sqlalchemy.models.Language`
     '''
-    if not language_tag:
+    if not language_tag: # pragma: no cover
         language_tag = 'und'
     l = session.query(LanguageModel).get(language_tag)
     if not l:
@@ -232,61 +232,44 @@ class VisitationCalculator(object):
         self.count = 0
         self.depth = 0
         self.visitation = []
+        # get all possible top concepts
         topc = self.session \
             .query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == conceptscheme) \
             .filter(ConceptModel.broader_concepts == None) \
             .all()
+        # check if they have an indirect broader concept
+        def _has_higher_concept(c):
+            for coll in c.member_of:
+                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                    return True
+            return False
+        topc = [c for c in topc if not _has_higher_concept(c)]
         for tc in topc:
             self._visit_concept(tc)
         self.visitation.sort(key=lambda v: v['lft'])
         return self.visitation
 
     def _visit_concept(self, concept):
-        log.debug('Visiting concept %s.' % concept.id)
-        self.depth += 1
-        self.count += 1
-        v = {
-            'id': concept.id,
-            'lft': self.count,
-            'depth': self.depth
-        }
         if concept.type == 'concept':
+            log.debug('Visiting concept %s.' % concept.id)
+            self.depth += 1
+            self.count += 1
+            v = {
+                'id': concept.id,
+                'lft': self.count,
+                'depth': self.depth
+            }
             for nc in concept.narrower_concepts:
                 self._visit_concept(nc)
-        self.count += 1
-        v['rght'] = self.count
-        self.visitation.append(v)
-        self.depth -= 1
-
-
-def session_factory(session_maker_name):
-    def with_session(fn):
-        def go(parent_object, *args, **kw):
-            if hasattr(parent_object, session_maker_name):
-                root_call = True
-                session_maker = getattr(parent_object, session_maker_name)
-                if not hasattr(parent_object, 'session'):
-                    parent_object.session = None
-                if parent_object.session is None:
-                    session = session_maker()
-                    parent_object.session = session
-                else:
-                    root_call = False
-                try:
-                    parent_object.session.begin(subtransactions=True)
-                    ret = fn(parent_object, *args, **kw)
-                    parent_object.session.commit()
-                    return ret
-                except:
-                    parent_object.session.rollback()
-                    raise
-                finally:
-                    if root_call:
-                        parent_object.session.close()
-                        parent_object.session = None
-            else:
-                raise Exception('session_maker %s not found' % session_maker_name)
-
-        return go
-    return with_session
+            for ncol in concept.narrower_collections:
+                if ncol.infer_concept_relations:
+                    self._visit_concept(ncol)
+            self.count += 1
+            v['rght'] = self.count
+            self.visitation.append(v)
+            self.depth -= 1
+        elif concept.type == 'collection':
+            log.debug('Visiting collection %s.' % concept.id)
+            for m in concept.members:
+                self._visit_concept(m)

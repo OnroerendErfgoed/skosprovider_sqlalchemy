@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-from skosprovider_sqlalchemy.utils import session_factory
-
-
 log = logging.getLogger(__name__)
 
 from skosprovider.providers import VocabularyProvider
@@ -24,6 +20,7 @@ from skosprovider_sqlalchemy.models import (
     Concept as ConceptModel,
     Collection as CollectionModel,
     Label as LabelModel,
+    Match as MatchModel,
     Visitation
 )
 
@@ -47,6 +44,12 @@ class SQLAlchemyProvider(VocabularyProvider):
     as backend.
     '''
 
+    _conceptscheme = None
+    '''
+    The concept scheme, once it has been loaded. Should never be accessed
+    directly.
+    '''
+
     expand_strategy = 'recurse'
     '''
     Determines how the expand method will operate. Options are:
@@ -54,20 +57,20 @@ class SQLAlchemyProvider(VocabularyProvider):
     * `recurse`: Determine all narrower concepts by recursivly querying the
       database. Can take a long time for concepts that are at the top of a
       large hierarchy.
-    * `visit`: Query the database's 
-      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table. 
-      This table contains a nested set representation of each conceptscheme. 
+    * `visit`: Query the database's
+      :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table.
+      This table contains a nested set representation of each conceptscheme.
       Actually creating the data in this table needs to be scheduled.
     '''
 
-    def __init__(self, metadata, session_maker, **kwargs):
+    def __init__(self, metadata, session, **kwargs):
         '''
         Create a new provider
 
         :param dict metadata: Metadata about the provider. Apart from the usual
         id, a conceptscheme_id can also be passed.
         :param :class:`sqlachemy.orm.session.Session` session: The database
-        session.
+        session. This can also be a callable that returns a Session.
         '''
         if not 'subject' in metadata:
             metadata['subject'] = []
@@ -76,7 +79,10 @@ class SQLAlchemyProvider(VocabularyProvider):
             self.uri_generator = kwargs.get('uri_generator')
         else:
             self.uri_generator = DefaultUrnGenerator(self.metadata.get('id'))
-        self.session_maker = session_maker
+        try:
+            self.session = session()
+        except TypeError as e:
+            self.session = session
         try:
             self.conceptscheme_id = int(metadata.get(
                 'conceptscheme_id', metadata.get('id')
@@ -92,12 +98,14 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'Unknown expand strategy.'
                 )
+        self.allowed_instance_scopes = ['single', 'threaded_thread']
 
     @property
     def concept_scheme(self):
-        return self._get_concept_scheme()
+        if self._conceptscheme is None:
+            self._conceptscheme = self._get_concept_scheme()
+        return self._conceptscheme
 
-    @session_factory('session_maker')
     def _get_concept_scheme(self):
         '''
         Find a :class:`skosprovider.skos.ConceptScheme` for this provider.
@@ -155,7 +163,8 @@ class SQLAlchemyProvider(VocabularyProvider):
                 ],
                 members=[member.concept_id for member in thing.members] if hasattr(thing, 'members') else [],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
-                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts]
+                superordinates=[broader_concept.concept_id for broader_concept in thing.broader_concepts],
+                infer_concept_relations=thing.infer_concept_relations
             )
         else:
             matches = {}
@@ -187,7 +196,6 @@ class SQLAlchemyProvider(VocabularyProvider):
                 matches=matches
             )
 
-    @session_factory('session_maker')
     def get_by_id(self, id):
         try:
             thing = self.session\
@@ -203,12 +211,11 @@ class SQLAlchemyProvider(VocabularyProvider):
             return False
         return self._from_thing(thing)
 
-    @session_factory('session_maker')
     def get_by_uri(self, uri):
         '''Get all information on a concept or collection, based on a
         :term:`URI`.
 
-        This method will only find concepts or collections whose :term:`URI` is 
+        This method will only find concepts or collections whose :term:`URI` is
         actually stored in the database. It will not find anything that has
         no :term:`URI` in the database, but does have a matching :term:`URI`
         after generation.
@@ -244,18 +251,43 @@ class SQLAlchemyProvider(VocabularyProvider):
             'label': l.label if l is not None else None
         }
 
-    @session_factory('session_maker')
     def find(self, query, **kwargs):
         lan = self._get_language(**kwargs)
-        q = self.session\
-                .query(Thing)\
-                .options(joinedload('labels'))\
-                .filter(Thing.conceptscheme_id == self.conceptscheme_id)
-        if 'type' in query and query['type'] in ['concept', 'collection']:
-            q = q.filter(Thing.type == query['type'])
+        model = Thing
+        if 'matches' in query:
+            match_uri = query['matches'].get('uri', None)
+            if not match_uri:
+                raise ValueError(
+                    'Please provide a URI to match with.'
+                )
+            model = ConceptModel
+            q = self.session\
+                    .query(model)\
+                    .options(joinedload('labels'))\
+                    .join(MatchModel)\
+                    .filter(model.conceptscheme_id == self.conceptscheme_id)
+            mtype = query['matches'].get('type')
+            if mtype and mtype in Concept.matchtypes:
+                mtype += 'Match'
+                mtypes = [mtype]
+                if mtype == 'closeMatch':
+                    mtypes.append('exactMatch')
+                q = q.filter(
+                    MatchModel.uri == match_uri,
+                    MatchModel.matchtype_id.in_(mtypes)
+                )
+            else:
+                q = q.filter(MatchModel.uri == match_uri)
+        else:
+            q = self.session\
+                    .query(model)\
+                    .options(joinedload('labels'))\
+                    .filter(model.conceptscheme_id == self.conceptscheme_id)
+            if 'type' in query and query['type'] in ['concept', 'collection']:
+                q = q.filter(model.type == query['type'])
         if 'label' in query:
             q = q.filter(
-                Thing.labels.any(
+                model.labels.any(
                     LabelModel.label.ilike('%' + query['label'].lower() + '%')
                 )
             )
@@ -265,15 +297,16 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'You are searching for items in an unexisting collection.'
                 )
-            q = q.filter(
-                Thing.member_of.any(Thing.concept_id == coll.id)
-            )
+            if 'depth' in query['collection'] and query['collection']['depth'] == 'all':
+                members = self.expand(coll.id)
+            else:
+                members = coll.members
+            q = q.filter(model.concept_id.in_(members))
         all = q.all()
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)
         return [self._get_id_and_label(c, lan) for c in self._sort(all, sort, lan, sort_order=='desc')]
 
-    @session_factory('session_maker')
     def get_all(self, **kwargs):
         all = self.session\
                   .query(Thing)\
@@ -285,8 +318,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         sort_order = self._get_sort_order(**kwargs)
         return [self._get_id_and_label(c, lan) for c in self._sort(all, sort, lan, sort_order=='desc')]
 
-    @session_factory('session_maker')
     def get_top_concepts(self, **kwargs):
+        # get the concepts that have no direct broader concept
         top = self.session\
                   .query(ConceptModel)\
                   .options(joinedload('labels'))\
@@ -294,12 +327,18 @@ class SQLAlchemyProvider(VocabularyProvider):
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None
                   ).all()
+        # check if they have an indirect broader concept
+        def _has_higher_concept(c):
+            for coll in c.member_of:
+                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                    return True
+            return False
+        top = [c for c in top if not _has_higher_concept(c)]
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)
         return [self._get_id_and_label(c, lan) for c in self._sort(top, sort, lan, sort_order=='desc')]
 
-    @session_factory('session_maker')
     def expand(self, id):
         try:
             thing = self.session\
@@ -325,17 +364,16 @@ class SQLAlchemyProvider(VocabularyProvider):
             ret.append(thing.concept_id)
             for n in thing.narrower_concepts:
                 ret += self._expand_recurse(n)
+            for n in thing.narrower_collections:
+                if n.infer_concept_relations:
+                    ret += self._expand_recurse(n)
         return list(set(ret))
 
-    @session_factory('session_maker')
     def _expand_visit(self, thing):
         if thing.type == 'collection':
             ret = []
             for m in thing.members:
-                try:
-                    ret += self._expand_visit(m)
-                except TypeError:
-                    return False
+                ret += self._expand_visit(m)
         else:
             try:
                 cov = self.session\
@@ -344,7 +382,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                           .filter(Visitation.concept_id == thing.id)\
                           .one()
             except NoResultFound:
-                return False
+                return self._expand_recurse(thing)
 
             ids = self.session\
                       .query(Thing.concept_id)\
@@ -355,18 +393,17 @@ class SQLAlchemyProvider(VocabularyProvider):
             ret = [id[0] for id in ids]
         return list(set(ret))
 
-    @session_factory('session_maker')
     def get_top_display(self, **kwargs):
         '''
         Returns all concepts or collections that form the top-level of a display
         hierarchy.
 
         As opposed to the :meth:`get_top_concepts`, this method can possibly
-        return both concepts and collections. 
+        return both concepts and collections.
 
         :rtype: Returns a list of concepts and collections. For each an
-            id is present and a label. The label is determined by looking at 
-            the `**kwargs` parameter, the default language of the provider 
+            id is present and a label. The label is determined by looking at
+            the `**kwargs` parameter, the default language of the provider
             and falls back to `en` if nothing is present.
         '''
         tco = self.session\
@@ -391,7 +428,6 @@ class SQLAlchemyProvider(VocabularyProvider):
         sort_order = self._get_sort_order(**kwargs)
         return [self._get_id_and_label(c, lan) for c in self._sort(res, sort, lan, sort_order=='desc')]
 
-    @session_factory('session_maker')
     def get_children_display(self, id, **kwargs):
         '''
         Return a list of concepts or collections that should be displayed
@@ -400,8 +436,8 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param id: A concept or collection id.
         :rtype: A list of concepts and collections. For each an
             id is present and a label. The label is determined by looking at
-            the `**kwargs` parameter, the default language of the provider 
-            and falls back to `en` if nothing is present. If the id does not 
+            the `**kwargs` parameter, the default language of the provider
+            and falls back to `en` if nothing is present. If the id does not
             exist, return `False`.
         '''
         try:

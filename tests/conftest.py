@@ -111,15 +111,61 @@ def create_data(session):
         'en'
     )
     cath.notes.append(n)
-    session.add(cath)
-    cath.broader_concepts.add(con)
-    cath.member_of.add(col)
     match = Match(
         matchtype_id = 'closeMatch',
         uri = 'http://vocab.getty.edu/aat/300007501'
     )
     cath.matches.append(match)
+    session.add(cath)
+    cath.member_of.add(col)
+    pchurch = Concept(
+        id=60,
+        uri='urn:x-skosprovider:test:6',
+        concept_id=6,
+        conceptscheme=cs
+    )
+    l = Label('Parochiekerken', 'prefLabel', 'nl')
+    pchurch.labels.append(l)
+    session.add(pchurch)
+    pchurch.member_of.add(col)
+    hkerk = Concept(
+        id=70,
+        uri='urn:x-skosprovider:test:7',
+        concept_id=7,
+        conceptscheme=cs
+    )
+    l = Label('Hulpkerken', 'prefLabel', 'nl')
+    hkerk.labels.append(l)
+    session.add(hkerk)
+    hkerk.broader_concepts.add(pchurch)
+    chparts = Collection(
+        id=80,
+        uri='urn:x-skosprovider:test:8',
+        concept_id=8,
+        conceptscheme=cs,
+        infer_concept_relations=False
+    )
+    l = Label('Parts of churches', 'prefLabel', 'en')
+    chparts.labels.append(l)
+    session.add(chparts)
+    chparts.broader_concepts.add(con)
+    chtow = Concept(
+        id=90,
+        uri='urn:x-skosprovider:test:9',
+        concept_id=9,
+        conceptscheme=cs,
+    )
+    l = Label('Churchtowers', 'prefLabel', 'en')
+    chtow.labels.append(l)
+    match = Match(
+        matchtype_id = 'exactMatch',
+        uri = 'http://vocab.getty.edu/aat/300003625'
+    )
+    chtow.matches.append(match)
+    session.add(chtow)
+    chtow.member_of.add(chparts)
     session.commit()
+
 
 
 def create_visitation(session):

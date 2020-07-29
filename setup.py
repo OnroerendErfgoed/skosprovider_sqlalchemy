@@ -13,15 +13,16 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=0.6.0',
+    'skosprovider>=0.7.0',
     'sqlalchemy',
 ]
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='0.5.2',
+    version='0.6.0',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read(),
+    long_description_content_type='text/x-rst',
     author='Koen Van Daele',
     author_email='koen_van_daele@telenet.be',
     url='http://github.com/koenedaele/skosprovider_sqlalchemy',
@@ -39,9 +40,9 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     test_suite='nose.collector',
     entry_points="""\
