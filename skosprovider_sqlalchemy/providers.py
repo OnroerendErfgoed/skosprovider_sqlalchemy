@@ -1,41 +1,25 @@
-# -*- coding: utf-8 -*-
-
 import logging
-log = logging.getLogger(__name__)
 
 from skosprovider.providers import VocabularyProvider
+from skosprovider.skos import Collection
+from skosprovider.skos import Concept
+from skosprovider.skos import ConceptScheme
+from skosprovider.skos import Label
+from skosprovider.skos import Note
+from skosprovider.skos import Source
+from skosprovider.uri import DefaultUrnGenerator
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 
-from skosprovider.skos import (
-    ConceptScheme,
-    Concept,
-    Collection,
-    Label,
-    Note,
-    Source
-)
+from skosprovider_sqlalchemy.models import Collection as CollectionModel
+from skosprovider_sqlalchemy.models import Concept as ConceptModel
+from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
+from skosprovider_sqlalchemy.models import Label as LabelModel
+from skosprovider_sqlalchemy.models import Match as MatchModel
+from skosprovider_sqlalchemy.models import Thing
+from skosprovider_sqlalchemy.models import Visitation
 
-from skosprovider_sqlalchemy.models import (
-    Thing,
-    ConceptScheme as ConceptSchemeModel,
-    Concept as ConceptModel,
-    Collection as CollectionModel,
-    Label as LabelModel,
-    Match as MatchModel,
-    Visitation
-)
-
-from sqlalchemy.orm import (
-    joinedload,
-)
-
-from sqlalchemy.orm.exc import (
-    NoResultFound
-)
-
-from skosprovider.uri import (
-    DefaultUrnGenerator,
-    DefaultConceptSchemeUrnGenerator
-)
+log = logging.getLogger(__name__)
 
 
 class SQLAlchemyProvider(VocabularyProvider):

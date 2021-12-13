@@ -1,28 +1,20 @@
-# -*- coding: utf-8 -*-
-
 import logging
 
-log = logging.getLogger(__name__)
-
-from skosprovider.skos import (
-    Concept,
-    Collection
-)
-
 from language_tags import tags
-
-from skosprovider_sqlalchemy.models import (
-    Thing as ThingModel,
-    Concept as ConceptModel,
-    Collection as CollectionModel,
-    Label as LabelModel,
-    Note as NoteModel,
-    Match as MatchModel,
-    Language as LanguageModel,
-    Source as SourceModel
-)
-
+from skosprovider.skos import Collection
+from skosprovider.skos import Concept
 from sqlalchemy.orm.exc import NoResultFound
+
+from skosprovider_sqlalchemy.models import Collection as CollectionModel
+from skosprovider_sqlalchemy.models import Concept as ConceptModel
+from skosprovider_sqlalchemy.models import Label as LabelModel
+from skosprovider_sqlalchemy.models import Language as LanguageModel
+from skosprovider_sqlalchemy.models import Match as MatchModel
+from skosprovider_sqlalchemy.models import Note as NoteModel
+from skosprovider_sqlalchemy.models import Source as SourceModel
+from skosprovider_sqlalchemy.models import Thing as ThingModel
+
+log = logging.getLogger(__name__)
 
 
 def import_provider(provider, conceptscheme, session):
@@ -208,7 +200,7 @@ def _add_sources(target, sources, session):
         ))
     return target
 
-class VisitationCalculator(object):
+class VisitationCalculator:
     '''
     Generates a nested set for a conceptscheme.
     '''

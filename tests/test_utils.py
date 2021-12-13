@@ -1,19 +1,12 @@
-# -*- coding: utf-8 -*-
-
-import os
 import csv
+import os
 
-import unittest
+from sqlalchemy.orm import session
 
-import pytest
-from sqlalchemy.orm import Session, session
-from skosprovider_sqlalchemy.models import Base, Initialiser
-
-from skosprovider_sqlalchemy.utils import (
-    import_provider,
-    VisitationCalculator
-)
-
+from skosprovider_sqlalchemy.models import Base
+from skosprovider_sqlalchemy.models import Initialiser
+from skosprovider_sqlalchemy.utils import VisitationCalculator
+from skosprovider_sqlalchemy.utils import import_provider
 from tests import DBTestCase
 
 
@@ -23,9 +16,7 @@ def _get_menu():
     )
 
     ifile = open(
-        os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'),
-        "r"
-    )
+        os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'))
     reader = csv.reader(ifile)
     csvprovider = SimpleCsvProvider(
         {'id': 'MENU'},
