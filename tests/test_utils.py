@@ -15,8 +15,7 @@ def _get_menu():
         SimpleCsvProvider
     )
 
-    ifile = open(
-        os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'))
+    ifile = open(os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'))
     reader = csv.reader(ifile)
     csvprovider = SimpleCsvProvider(
         {'id': 'MENU'},
