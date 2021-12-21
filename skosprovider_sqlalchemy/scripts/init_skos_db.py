@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
-
 import os
 import sys
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..models import (
-    Base,
-    Initialiser
-)
+from ..models import Base
+from ..models import Initialiser
 
 
 def usage(argv):

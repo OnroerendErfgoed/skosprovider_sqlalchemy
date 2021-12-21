@@ -1,19 +1,13 @@
-# -*- coding: utf-8 -*-
-
 import os
 import sys
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..models import (
-    ConceptScheme,
-    Visitation
-)
+from ..models import ConceptScheme
+from ..models import Visitation
+from ..utils import VisitationCalculator
 
-from ..utils import (
-    VisitationCalculator
-)
 
 
 def usage(argv):

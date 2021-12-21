@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Skosprovider_sqlalchemy documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 24 08:21:49 2013.
@@ -10,8 +9,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
-import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -34,14 +31,14 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+# source_encoding = 'utf-8-sig'
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
-project = u'Skosprovider_sqlalchemy'
-copyright = u'2013-2020, Koen Van Daele'
+project = 'Skosprovider_sqlalchemy'
+copyright = '2013-2020, Koen Van Daele'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,8 +180,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Skosprovider_sqlalchemy.tex', u'Skosprovider\\_sqlalchemy Documentation',
-   u'Koen Van Daele', 'manual'),
+    ('index', 'Skosprovider_sqlalchemy.tex', 'Skosprovider\\_sqlalchemy Documentation',
+     'Koen Van Daele', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -213,8 +210,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'skosprovider_sqlalchemy', u'Skosprovider_sqlalchemy Documentation',
-     [u'Koen Van Daele'], 1)
+    ('index', 'skosprovider_sqlalchemy', 'Skosprovider_sqlalchemy Documentation',
+     ['Koen Van Daele'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -227,35 +224,35 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Skosprovider_sqlalchemy', u'Skosprovider_sqlalchemy Documentation',
-   u'Koen Van Daele', 'Skosprovider_sqlalchemy', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'Skosprovider_sqlalchemy', 'Skosprovider_sqlalchemy Documentation',
+     'Koen Van Daele', 'Skosprovider_sqlalchemy', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
 # If false, no module index is generated.
-#texinfo_domain_indices = True
+# texinfo_domain_indices = True
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
-#texinfo_show_urls = 'footnote'
+# texinfo_show_urls = 'footnote'
 
 
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Skosprovider_sqlalchemy'
-epub_author = u'Koen Van Daele'
-epub_publisher = u'Koen Van Daele'
-epub_copyright = u'2013, Koen Van Daele'
+epub_title = 'Skosprovider_sqlalchemy'
+epub_author = 'Koen Van Daele'
+epub_publisher = 'Koen Van Daele'
+epub_copyright = '2013, Koen Van Daele'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
-#epub_language = ''
+# epub_language = ''
 
 # The scheme of the identifier. Typical schemes are ISBN or URL.
-#epub_scheme = ''
+# epub_scheme = ''
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
