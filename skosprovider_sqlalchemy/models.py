@@ -1,34 +1,21 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 import logging
 
-log = logging.getLogger(__name__)
-
-from language_tags import tags
 from skosprovider.skos import label as skoslabel
-
-from sqlalchemy import (
-    Column,
-    Integer,
-    Text,
-    String,
-    Boolean,
-    ForeignKey,
-    UniqueConstraint,
-    Table,
-    event
-)
-
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import Table
+from sqlalchemy import Text
+from sqlalchemy import UniqueConstraint
+from sqlalchemy import event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 
-from sqlalchemy.orm import (
-    relationship,
-    backref
-)
-
+log = logging.getLogger(__name__)
 Base = declarative_base()
 
 concept_label = Table(
@@ -643,7 +630,7 @@ def label(labels=[], language='any', sortLabel=False):
     return skoslabel(labels, language, sortLabel)
 
 
-class Initialiser(object):
+class Initialiser:
     '''
     Initialises a database.
 

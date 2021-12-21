@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 
-import pytest
-
 from sqlalchemy.orm import session
-from skosprovider_sqlalchemy.models import Initialiser, Base
+
+from skosprovider_sqlalchemy.models import Base
+from skosprovider_sqlalchemy.models import Initialiser
 from tests import DBTestCase
 
 
