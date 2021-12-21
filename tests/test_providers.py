@@ -1,20 +1,13 @@
-# -*- coding: utf-8 -*-
-
 import pytest
-
+from skosprovider.uri import UriPatternGenerator
 from sqlalchemy.orm import session
 
-from skosprovider.uri import UriPatternGenerator
+from skosprovider_sqlalchemy.models import Base
 from skosprovider_sqlalchemy.models import Initialiser
-
-from skosprovider_sqlalchemy.providers import (
-    SQLAlchemyProvider
-)
+from skosprovider_sqlalchemy.providers import SQLAlchemyProvider
 from tests import DBTestCase
-from tests.conftest import create_data, create_visitation
-from skosprovider_sqlalchemy.models import (
-    Base
-)
+from tests.conftest import create_data
+from tests.conftest import create_visitation
 
 
 class TestSQLAlchemyProvider(DBTestCase):
@@ -117,9 +110,6 @@ class TestSQLAlchemyProvider(DBTestCase):
         assert 'en' in cs.languages
 
     def test_concept_scheme_is_cached(self):
-        from skosprovider.skos import (
-            ConceptScheme
-        )
         assert self.provider._conceptscheme is None
         cs = self.provider.concept_scheme
         assert self.provider._conceptscheme == cs
