@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: Skosprovider_sqlalchemy
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Koen
+    family-names: Van Daele
+    email: koen.vandaele@vlaanderen.be
+    affiliation: Flanders Heritage Agency
+    orcid: 'https://orcid.org/0000-0002-8153-2978'
+abstract: >-
+    A SQLAlchemy implementation of the Skosprovider interface. It allows
+    storing and querying a SKOS vocabulary in a SQL database.
+keywords:
+  - SKOS
+  - thesaurus
+  - vocabulary
+  - python
+  - sqlalchemy
+license: MIT
+version: 0.6.0
+date-released: "2020-07-29"
