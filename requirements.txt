@@ -1,3 +1,2 @@
-SQLAlchemy==1.3.18
-skosprovider==0.7.1
-#-e git+https://github.com/koenedaele/skosprovider.git@DEV_0.7.0#egg=skosprovider
+SQLAlchemy==1.4.28
+skosprovider==1.1.0
