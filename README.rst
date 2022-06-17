@@ -13,7 +13,7 @@ A SQLAlchemy implementation of the skosprovider_ interface.
 .. image:: https://img.shields.io/coveralls/koenedaele/skosprovider_sqlalchemy.svg
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
 .. image:: https://scrutinizer-ci.com/g/OnroerendErfgoed/skosprovider_sqlalchemy/badges/quality-score.png?b=develop
-        :target: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/?branch=develop
+        :target: https://scrutinizer-ci.com/g/OnroerendErfgoed/skosprovider_sqlalchemy/?branch=develop
 
 
 Building the docs
