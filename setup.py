@@ -19,7 +19,7 @@ requires = [
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='1.0.0',
+    version='2.0.0',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
@@ -34,7 +34,7 @@ setup(
     license='MIT',
     zip_safe=False,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
