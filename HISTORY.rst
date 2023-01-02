@@ -2,6 +2,7 @@
 ------------------
 
 * Drop support for Python 3.6 and 3.7. (#86)
+* Drop pyup support. (#85)
 
 1.0.0 (2021-12-21)
 -------------------
