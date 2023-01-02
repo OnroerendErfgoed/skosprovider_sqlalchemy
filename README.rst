@@ -8,8 +8,8 @@ A SQLAlchemy implementation of the skosprovider_ interface.
 .. image:: https://readthedocs.org/projects/skosprovider_sqlalchemy/badge/?version=latest
         :target: https://readthedocs.org/projects/skosprovider_sqlalchemy/?badge=latest
 
-.. image:: https://travis-ci.org/OnroerendErfgoed/skosprovider_sqlalchemy.png?branch=develop
-        :target: https://travis-ci.org/OnroerendErfgoed/skosprovider_sqlalchemy
+.. image:: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy.svg?branch=develop
+        :target: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy
 .. image:: https://img.shields.io/coveralls/koenedaele/skosprovider_sqlalchemy.svg
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
 .. image:: https://scrutinizer-ci.com/g/OnroerendErfgoed/skosprovider_sqlalchemy/badges/quality-score.png?b=develop
