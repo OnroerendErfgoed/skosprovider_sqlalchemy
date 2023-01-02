@@ -11,6 +11,7 @@ env:
  - DB="sqlite" SAURL="sqlite:///:memory:"
  - DB="postgres" SAURL="postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy"
 install:
+ - pip install --upgrade pip setuptools importlib-metadata
  - pip install -r requirements-dev.txt
  - python setup.py -q develop
 before_script:
