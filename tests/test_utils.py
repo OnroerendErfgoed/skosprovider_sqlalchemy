@@ -328,7 +328,7 @@ class TestImportProviderTests(DBTestCase):
         import_provider(csvprovider, cs, self.session)
         lobster = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 11) \
+            .filter(ConceptModel.concept_id == '11') \
             .one()
         assert 11 == lobster.concept_id
         assert 'urn:x-skosprovider:menu:11' == lobster.uri
@@ -347,7 +347,7 @@ class TestImportProviderTests(DBTestCase):
         import_provider(geoprovider, cs, self.session)
         world = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 1) \
+            .filter(ConceptModel.concept_id == '1') \
             .one()
         assert world.concept_id == 1
         assert 'urn:x-skosprovider:geography:1' == world.uri
@@ -357,7 +357,7 @@ class TestImportProviderTests(DBTestCase):
 
         dutch = self.session.query(CollectionModel) \
             .filter(CollectionModel.conceptscheme == cs) \
-            .filter(CollectionModel.concept_id == 333) \
+            .filter(CollectionModel.concept_id == '333') \
             .one()
         assert 333 == dutch.concept_id
         assert 'urn:x-skosprovider:geography:333' == dutch.uri
@@ -367,7 +367,7 @@ class TestImportProviderTests(DBTestCase):
 
         netherlands = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 10) \
+            .filter(ConceptModel.concept_id == '10') \
             .one()
         assert 10 == netherlands.concept_id
         assert 'concept' == netherlands.type
@@ -386,12 +386,12 @@ class TestImportProviderTests(DBTestCase):
         import_provider(buildingprovider, cs, self.session)
         castle = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 2) \
+            .filter(ConceptModel.concept_id == '2') \
             .one()
         assert 2 == len(castle.broader_concepts)
         hut = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 4) \
+            .filter(ConceptModel.concept_id == '4') \
             .one()
         assert 1 == len(hut.broader_concepts)
         assert 1 == len(hut.matches)
@@ -409,7 +409,7 @@ class TestImportProviderTests(DBTestCase):
         import_provider(heritagetypesprovider, cs, self.session)
         bomen = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 72) \
+            .filter(ConceptModel.concept_id == '72') \
             .one()
         assert 2 == len(bomen.narrower_collections)
         assert 2 == len(cs.labels)
@@ -428,7 +428,7 @@ class TestImportProviderTests(DBTestCase):
         import_provider(eventtypesprovider, cs, self.session)
         archeologische_opgravingen = self.session.query(ConceptModel) \
             .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == 38) \
+            .filter(ConceptModel.concept_id == '38') \
             .one()
         assert 3 == len(archeologische_opgravingen.narrower_collections)
 
