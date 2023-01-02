@@ -1,3 +1,10 @@
+1.0.0. (2021-12-21)
+-------------------
+
+* Drop python 2 support (#80)
+* Upgrade requirements (#78)
+* Add a CITATION.cff file
+
 0.6.0 (2020-07-29)
 ------------------
 
