@@ -75,14 +75,14 @@ def import_provider(provider, conceptscheme, session):
         if isinstance(c, Concept):
             cm = session.query(ConceptModel) \
                 .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                .filter(ConceptModel.concept_id == int(c.id)) \
+                .filter(ConceptModel.concept_id == str(c.id)) \
                 .one()
             if len(c.narrower) > 0:
                 for nc in c.narrower:
                     try:
                         nc = session.query(ConceptModel) \
                             .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(ConceptModel.concept_id == int(nc)) \
+                            .filter(ConceptModel.concept_id == str(nc)) \
                             .one()
                         cm.narrower_concepts.add(nc)
                     except NoResultFound:
@@ -94,7 +94,7 @@ def import_provider(provider, conceptscheme, session):
                     try:
                         sa = session.query(CollectionModel) \
                             .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(CollectionModel.concept_id == int(sa)) \
+                            .filter(CollectionModel.concept_id == str(sa)) \
                             .one()
                         cm.narrower_collections.add(sa)
                     except NoResultFound:
@@ -106,7 +106,7 @@ def import_provider(provider, conceptscheme, session):
                     try:
                         rc = session.query(ConceptModel) \
                             .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(ConceptModel.concept_id == int(rc)) \
+                            .filter(ConceptModel.concept_id == str(rc)) \
                             .one()
                         cm.related_concepts.add(rc)
                     except NoResultFound:
@@ -116,13 +116,13 @@ def import_provider(provider, conceptscheme, session):
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.query(CollectionModel) \
                 .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                .filter(ConceptModel.concept_id == int(c.id)) \
+                .filter(ConceptModel.concept_id == str(c.id)) \
                 .one()
             for mc in c.members:
                 try:
                     mc = session.query(ThingModel) \
                         .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                        .filter(ConceptModel.concept_id == int(mc)) \
+                        .filter(ConceptModel.concept_id == str(mc)) \
                         .one()
                     cm.members.add(mc)
                 except NoResultFound:

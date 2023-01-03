@@ -180,7 +180,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 matches=matches
             )
 
-    def get_by_id(self, id):
+    def get_by_id(self, concept_id):
         try:
             thing = self.session\
                         .query(Thing)\
@@ -188,7 +188,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                         .options(joinedload('notes'))\
                         .options(joinedload('sources'))\
                         .filter(
-                            Thing.concept_id == int(id),
+                            Thing.concept_id == str(concept_id),
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:
@@ -328,7 +328,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             thing = self.session\
                         .query(Thing)\
                         .filter(
-                            Thing.concept_id == id,
+                            Thing.concept_id == str(id),
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:
@@ -428,7 +428,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             thing = self.session\
                         .query(Thing)\
                         .filter(
-                            Thing.concept_id == int(id),
+                            Thing.concept_id == str(id),
                             Thing.conceptscheme_id == self.conceptscheme_id
                         ).one()
         except NoResultFound:

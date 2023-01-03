@@ -172,7 +172,7 @@ class Thing(Base):
     id = Column(Integer, primary_key=True)
     type = Column(String(30))
     concept_id = Column(
-        Integer,
+        String,
         nullable=False,
         index=True
     )
