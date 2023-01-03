@@ -1,6 +1,9 @@
 2.0.0 (2023-01-??)
 ------------------
 
+* **Major BC break**: Change concept.concept_id from Integer to String to allow 
+  storing concepts and collections with a non-numeric id. Existing instance will 
+  need to update their SQL database. (#87)
 * Drop support for Python 3.6 and 3.7. (#86)
 * Drop pyup support. (#85)
 
