@@ -14,6 +14,17 @@ A SQLAlchemy implementation of the skosprovider_ interface.
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
 
 
+Migrating to skosprovider_sqlalchemy 2.0.0
+------------------------------------------
+A change in the models has been made which requires a database upgrade.
+The "concept" table's "concept_id" column has changed from being an int to a string.
+
+Existing databases will therefor require a small change to update table scheme.
+Typically this will look like::
+
+    ALTER TABLE concept ALTER COLUMN concept_id TEXT NOT NULL;
+
+
 Building the docs
 -----------------
 
