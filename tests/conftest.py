@@ -16,7 +16,7 @@ def pytest_addoption(parser):
 def engine(request):
     engine = create_engine(
         request.config.getoption('--sqlalchemy_url'),
-        echo=True
+        echo=True,
     )
 
     return engine
@@ -41,8 +41,8 @@ def create_data(session):
         Match,
         Language
     )
-    en = session.query(Language).get('en')
-    nl = session.query(Language).get('nl')
+    en = session.get(Language, 'en')
+    nl = session.get(Language, 'nl')
     cs = ConceptScheme(
         id=1,
         uri='urn:x-skosprovider:test',

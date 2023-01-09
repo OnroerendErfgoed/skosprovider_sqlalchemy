@@ -231,9 +231,8 @@ def _get_materials():
 def _get_heritage_types():
     import json
 
-    typology_data = json.load(
-        open(os.path.join(os.path.dirname(__file__), 'data', 'typologie.js')),
-    )['typologie']
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'typologie.js')) as f:
+        typology_data = json.load(f)['typologie']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
     from skosprovider.skos import ConceptScheme
@@ -268,9 +267,8 @@ def _get_heritage_types():
 def _get_event_types():
     import json
 
-    event_data = json.load(
-        open(os.path.join(os.path.dirname(__file__), 'data', 'gebeurtenis.js')),
-    )['gebeurtenis']
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'gebeurtenis.js')) as f:
+        event_data = json.load(f)['gebeurtenis']
     from skosprovider.providers import DictionaryProvider
     from skosprovider.uri import UriPatternGenerator
 
@@ -314,7 +312,7 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(p, cs, self.session)
-        scheme = self.session.query(ConceptSchemeModel).get(68)
+        scheme = self.session.get(ConceptSchemeModel, 68)
         assert scheme == cs
 
     def test_menu(self):
@@ -538,7 +536,7 @@ class TestVisitationCalculator(DBTestCase):
         visit = vc.visit(cs)
         assert 10 == len(visit)
         world = visit[0]
-        assert self.session.query(ConceptModel).get(world['id']).concept_id == 1
+        assert self.session.get(ConceptModel, world['id']).concept_id == 1
         assert 1 == world['lft']
         assert 20 == world['rght']
         assert 1 == world['depth']
@@ -563,7 +561,7 @@ class TestVisitationCalculator(DBTestCase):
         visit = vc.visit(cs)
         assert len(visit) == 5
         # Check that castle is present twice
-        ids = [self.session.query(ConceptModel).get(v['id']).concept_id for v in visit]
+        ids = [self.session.get(ConceptModel, v['id']).concept_id for v in visit]
         assert ids.count(2) == 2
         for v in visit:
             # Check that fortification has one child

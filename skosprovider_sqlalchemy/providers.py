@@ -97,13 +97,19 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param id: Id of a conceptscheme.
         :rtype: :class:`skosprovider.skos.ConceptScheme`
         '''
-        csm = self.session\
-                  .query(ConceptSchemeModel)\
-                  .options(joinedload('labels'))\
-                  .options(joinedload('notes'))\
-                  .options(joinedload('languages'))\
-                  .options(joinedload('sources'))\
-                  .get(self.conceptscheme_id)
+        csm = (
+            self.session
+            .get(
+                ConceptSchemeModel,
+                self.conceptscheme_id,
+                options=[
+                    joinedload(ConceptSchemeModel.labels),
+                    joinedload(ConceptSchemeModel.notes),
+                    joinedload(ConceptSchemeModel.languages),
+                    joinedload(ConceptSchemeModel.sources),
+                ]
+            )
+        )
         return ConceptScheme(
             uri=csm.uri,
             labels=[
@@ -184,9 +190,9 @@ class SQLAlchemyProvider(VocabularyProvider):
         try:
             thing = self.session\
                         .query(Thing)\
-                        .options(joinedload('labels'))\
-                        .options(joinedload('notes'))\
-                        .options(joinedload('sources'))\
+                        .options(joinedload(Thing.labels))\
+                        .options(joinedload(Thing.notes))\
+                        .options(joinedload(Thing.sources))\
                         .filter(
                             Thing.concept_id == str(concept_id),
                             Thing.conceptscheme_id == self.conceptscheme_id
@@ -211,9 +217,9 @@ class SQLAlchemyProvider(VocabularyProvider):
         try:
             thing = self.session\
                         .query(Thing)\
-                        .options(joinedload('labels'))\
-                        .options(joinedload('notes'))\
-                        .options(joinedload('sources'))\
+                        .options(joinedload(Thing.labels))\
+                        .options(joinedload(Thing.notes))\
+                        .options(joinedload(Thing.sources))\
                         .filter(
                             Thing.uri == uri,
                             Thing.conceptscheme_id == self.conceptscheme_id
@@ -247,7 +253,7 @@ class SQLAlchemyProvider(VocabularyProvider):
             model = ConceptModel
             q = self.session\
                     .query(model)\
-                    .options(joinedload('labels'))\
+                    .options(joinedload(model.labels))\
                     .join(MatchModel)\
                     .filter(model.conceptscheme_id == self.conceptscheme_id)
             mtype = query['matches'].get('type')
@@ -265,7 +271,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             q = self.session\
                     .query(model)\
-                    .options(joinedload('labels'))\
+                    .options(joinedload(model.labels))\
                     .filter(model.conceptscheme_id == self.conceptscheme_id)
             if 'type' in query and query['type'] in ['concept', 'collection']:
                 q = q.filter(model.type == query['type'])
@@ -294,7 +300,7 @@ class SQLAlchemyProvider(VocabularyProvider):
     def get_all(self, **kwargs):
         all = self.session\
                   .query(Thing)\
-                  .options(joinedload('labels'))\
+                  .options(joinedload(Thing.labels))\
                   .filter(Thing.conceptscheme_id == self.conceptscheme_id)\
                   .all()
         lan = self._get_language(**kwargs)
@@ -306,7 +312,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         # get the concepts that have no direct broader concept
         top = self.session\
                   .query(ConceptModel)\
-                  .options(joinedload('labels'))\
+                  .options(joinedload(ConceptModel.labels))\
                   .filter(
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None
@@ -392,7 +398,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         '''
         tco = self.session\
                   .query(ConceptModel)\
-                  .options(joinedload('labels'))\
+                  .options(joinedload(ConceptModel.labels))\
                   .filter(
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ConceptModel.broader_concepts == None,
@@ -400,7 +406,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                   ).all()
         tcl = self.session\
                   .query(CollectionModel)\
-                  .options(joinedload('labels'))\
+                  .options(joinedload(CollectionModel.labels))\
                   .filter(
                     CollectionModel.conceptscheme_id == self.conceptscheme_id,
                     CollectionModel.broader_concepts == None,

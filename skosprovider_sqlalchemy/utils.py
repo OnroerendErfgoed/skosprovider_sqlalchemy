@@ -56,6 +56,7 @@ def import_provider(provider, conceptscheme, session):
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
+        session.add(cm)
         _add_labels(cm, c.labels, session)
         _add_notes(cm, c.notes, session)
         _add_sources(cm, c.sources, session)
@@ -65,7 +66,6 @@ def import_provider(provider, conceptscheme, session):
                 for m in c.matches[mt]:
                     match = MatchModel(matchtype_id=matchtype, uri=m)
                     cm.matches.append(match)
-        session.add(cm)
 
     session.flush()
 
@@ -139,9 +139,9 @@ def _check_language(language_tag, session):
     :param session: Database session to use
     :rtype: :class:`skosprovider_sqlalchemy.models.Language`
     '''
-    if not language_tag: # pragma: no cover
+    if not language_tag:  # pragma: no cover
         language_tag = 'und'
-    l = session.query(LanguageModel).get(language_tag)
+    l = session.get(LanguageModel, language_tag)
     if not l:
         if not tags.check(language_tag):
             raise ValueError('Unable to import provider. Invalid language tag: %s' % language_tag)
