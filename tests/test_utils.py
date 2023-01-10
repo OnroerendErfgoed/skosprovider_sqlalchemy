@@ -1,6 +1,7 @@
 import csv
 import os
 
+from sqlalchemy import select
 from sqlalchemy.orm import session
 
 from skosprovider_sqlalchemy.models import Base
@@ -324,10 +325,13 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(csvprovider, cs, self.session)
-        lobster = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '11') \
-            .one()
+        lobster = self.session.execute(
+            select(ConceptModel) 
+            .filter(
+                ConceptModel.conceptscheme == cs, 
+                ConceptModel.concept_id == '11'
+            )
+        ).scalar_one()
         assert 11 == lobster.concept_id
         assert 'urn:x-skosprovider:menu:11' == lobster.uri
         assert 'Lobster Thermidor' == str(lobster.label())
@@ -343,30 +347,39 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(geoprovider, cs, self.session)
-        world = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '1') \
-            .one()
+        world = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs,
+                ConceptModel.concept_id == '1'
+            )
+        ).scalar_one()
         assert world.concept_id == 1
         assert 'urn:x-skosprovider:geography:1' == world.uri
         assert 'World' == str(world.label('en'))
         assert 1 == len(world.labels)
         assert 2 == len(world.narrower_concepts)
 
-        dutch = self.session.query(CollectionModel) \
-            .filter(CollectionModel.conceptscheme == cs) \
-            .filter(CollectionModel.concept_id == '333') \
-            .one()
+        dutch = self.session.execute(
+            select(CollectionModel)
+            .filter(
+                CollectionModel.conceptscheme == cs,
+                CollectionModel.concept_id == '333'
+            )
+        ).scalar_one()
         assert 333 == dutch.concept_id
         assert 'urn:x-skosprovider:geography:333' == dutch.uri
         assert 'collection' == dutch.type
         assert 1 == len(dutch.labels)
         assert 4 == len(dutch.members)
 
-        netherlands = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '10') \
-            .one()
+        netherlands = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs, 
+                ConceptModel.concept_id == '10',
+            )
+        ).scalar_one()
         assert 10 == netherlands.concept_id
         assert 'concept' == netherlands.type
         assert 1 == len(netherlands.labels)
@@ -382,15 +395,21 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(buildingprovider, cs, self.session)
-        castle = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '2') \
-            .one()
+        castle = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs,
+                ConceptModel.concept_id == '2'
+            )
+        ).scalar_one()
         assert 2 == len(castle.broader_concepts)
-        hut = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '4') \
-            .one()
+        hut = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs, 
+                ConceptModel.concept_id == '4'
+            )
+        ).scalar_one()
         assert 1 == len(hut.broader_concepts)
         assert 1 == len(hut.matches)
         assert 'exactMatch' == hut.matches[0].matchtype_id
@@ -405,10 +424,13 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(heritagetypesprovider, cs, self.session)
-        bomen = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '72') \
-            .one()
+        bomen = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs, 
+                ConceptModel.concept_id == '72'
+            )
+        ).scalar_one()
         assert 2 == len(bomen.narrower_collections)
         assert 2 == len(cs.labels)
         assert 'Erfgoedtypes' == cs.label('nl').label
@@ -424,10 +446,13 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(eventtypesprovider, cs, self.session)
-        archeologische_opgravingen = self.session.query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == cs) \
-            .filter(ConceptModel.concept_id == '38') \
-            .one()
+        archeologische_opgravingen = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs,
+                ConceptModel.concept_id == '38'
+            )
+        ).scalar_one()
         assert 3 == len(archeologische_opgravingen.narrower_collections)
 
     def test_materials(self):
@@ -439,9 +464,10 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(materialsprovider, cs, self.session)
-        materials = self.session.query(ThingModel) \
-            .filter(ThingModel.conceptscheme == cs) \
-            .all()
+        materials = self.session.execute(
+            select(ThingModel)
+            .filter(ThingModel.conceptscheme == cs)
+        ).scalars().all()
         assert 2 == len(materials)
 
 

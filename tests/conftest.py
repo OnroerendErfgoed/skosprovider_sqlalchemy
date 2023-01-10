@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
@@ -177,7 +178,7 @@ def create_visitation(session):
         ConceptScheme
     )
     vc = VisitationCalculator(session)
-    conceptschemes = session.query(ConceptScheme).all()
+    conceptschemes = session.execute(select(ConceptScheme)).scalars().all()
     for cs in conceptschemes:
         visit = vc.visit(cs)
         for v in visit:

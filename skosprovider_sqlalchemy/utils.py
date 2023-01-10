@@ -3,7 +3,8 @@ import logging
 from language_tags import tags
 from skosprovider.skos import Collection
 from skosprovider.skos import Concept
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 
 from skosprovider_sqlalchemy.models import Collection as CollectionModel
 from skosprovider_sqlalchemy.models import Concept as ConceptModel
@@ -73,17 +74,23 @@ def import_provider(provider, conceptscheme, session):
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
-            cm = session.query(ConceptModel) \
-                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                .filter(ConceptModel.concept_id == str(c.id)) \
-                .one()
+            cm = session.execute(
+                select(ConceptModel)
+                .filter(
+                    ConceptModel.conceptscheme_id == conceptscheme.id,
+                    ConceptModel.concept_id == str(c.id)
+                )
+            ).scalar_one()
             if len(c.narrower) > 0:
                 for nc in c.narrower:
                     try:
-                        nc = session.query(ConceptModel) \
-                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(ConceptModel.concept_id == str(nc)) \
-                            .one()
+                        nc = session.execute(
+                            select(ConceptModel)
+                            .filter(
+                                ConceptModel.conceptscheme_id == conceptscheme.id,
+                                ConceptModel.concept_id == str(nc)
+                            )
+                        ).scalar_one()
                         cm.narrower_concepts.add(nc)
                     except NoResultFound:
                         log.warning(
@@ -92,10 +99,13 @@ def import_provider(provider, conceptscheme, session):
             if len(c.subordinate_arrays) > 0:
                 for sa in c.subordinate_arrays:
                     try:
-                        sa = session.query(CollectionModel) \
-                            .filter(CollectionModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(CollectionModel.concept_id == str(sa)) \
-                            .one()
+                        sa = session.execute(
+                            select(CollectionModel)
+                            .filter(
+                                CollectionModel.conceptscheme_id == conceptscheme.id,
+                                CollectionModel.concept_id == str(sa)
+                            )
+                        ).scalar_one()
                         cm.narrower_collections.add(sa)
                     except NoResultFound:
                         log.warning(
@@ -104,26 +114,35 @@ def import_provider(provider, conceptscheme, session):
             if len(c.related) > 0:
                 for rc in c.related:
                     try:
-                        rc = session.query(ConceptModel) \
-                            .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                            .filter(ConceptModel.concept_id == str(rc)) \
-                            .one()
+                        rc = session.execute(
+                            select(ConceptModel)
+                            .filter(
+                                ConceptModel.conceptscheme_id == conceptscheme.id,
+                                ConceptModel.concept_id == str(rc)
+                            )
+                        ).scalar_one()
                         cm.related_concepts.add(rc)
                     except NoResultFound:
                         log.warning(
                             'Tried to add a relation %s related %s, but target \
                             does not exist. Relation will be lost.' % (c.id, rc))
         elif isinstance(c, Collection) and len(c.members) > 0:
-            cm = session.query(CollectionModel) \
-                .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                .filter(ConceptModel.concept_id == str(c.id)) \
-                .one()
+            cm = session.execute(
+                select(CollectionModel)
+                .filter(
+                    ConceptModel.conceptscheme_id == conceptscheme.id,
+                    ConceptModel.concept_id == str(c.id)
+                )
+            ).scalar_one()
             for mc in c.members:
                 try:
-                    mc = session.query(ThingModel) \
-                        .filter(ConceptModel.conceptscheme_id == conceptscheme.id) \
-                        .filter(ConceptModel.concept_id == str(mc)) \
-                        .one()
+                    mc = session.execute(
+                        select(ThingModel)
+                        .filter(
+                            ConceptModel.conceptscheme_id == conceptscheme.id,
+                            ConceptModel.concept_id == str(mc)
+                        )
+                    ).scalar_one()
                     cm.members.add(mc)
                 except NoResultFound:
                     log.warning(
@@ -200,6 +219,7 @@ def _add_sources(target, sources, session):
         ))
     return target
 
+
 class VisitationCalculator:
     '''
     Generates a nested set for a conceptscheme.
@@ -211,6 +231,9 @@ class VisitationCalculator:
             session.
         '''
         self.session = session
+        self.count = 0
+        self.depth = 0
+        self.visitation = []
 
     def visit(self, conceptscheme):
         '''
@@ -225,15 +248,21 @@ class VisitationCalculator:
         self.depth = 0
         self.visitation = []
         # get all possible top concepts
-        topc = self.session \
-            .query(ConceptModel) \
-            .filter(ConceptModel.conceptscheme == conceptscheme) \
-            .filter(ConceptModel.broader_concepts == None) \
-            .all()
+        topc = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == conceptscheme,
+                ~ConceptModel.broader_concepts.any()
+            )
+        ).scalars().all()
+
         # check if they have an indirect broader concept
         def _has_higher_concept(c):
             for coll in c.member_of:
-                if coll.infer_concept_relations and (coll.broader_concepts or _has_higher_concept(coll)):
+                if (
+                    coll.infer_concept_relations
+                    and coll.broader_concepts or _has_higher_concept(coll)
+                ):
                     return True
             return False
         topc = [c for c in topc if not _has_higher_concept(c)]
