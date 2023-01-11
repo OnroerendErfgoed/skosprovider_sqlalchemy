@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import os
-import sys
-
 try:
     from setuptools import setup
 except ImportError:
@@ -13,7 +10,7 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=1.1.0',
+    'skosprovider>=1.2.0',
     'sqlalchemy',
 ]
 

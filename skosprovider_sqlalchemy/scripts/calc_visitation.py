@@ -27,7 +27,7 @@ def main(argv=sys.argv):
         bind=engine,
     )()
     vc = VisitationCalculator(session)
-    cs = session.query(ConceptScheme).get(scheme_id)
+    cs = session.get(ConceptScheme, scheme_id)
     visit = vc.visit(cs)
     for v in visit:
         vrow = Visitation(

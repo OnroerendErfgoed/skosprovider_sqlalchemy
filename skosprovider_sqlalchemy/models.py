@@ -10,13 +10,13 @@ from sqlalchemy import Table
 from sqlalchemy import Text
 from sqlalchemy import UniqueConstraint
 from sqlalchemy import event
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import orm
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 
 log = logging.getLogger(__name__)
-Base = declarative_base()
+Base = orm.declarative_base()
 
 concept_label = Table(
     'concept_label',
@@ -199,7 +199,9 @@ class Thing(Base):
         single_parent=True
     )
 
-    conceptscheme = relationship('ConceptScheme', backref='concepts')
+    conceptscheme = relationship(
+        'ConceptScheme', backref=orm.backref('concepts', cascade_backrefs=False)
+    )
     conceptscheme_id = Column(
         Integer,
         ForeignKey('conceptscheme.id'),
@@ -253,19 +255,21 @@ class Concept(Thing):
     narrower_concepts = relationship(
         'Concept',
         secondary=concept_hierarchy_concept,
-        backref=backref('broader_concepts', collection_class=set),
+        backref=backref('broader_concepts', collection_class=set, cascade_backrefs=False),
         primaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_broader',
         secondaryjoin='Concept.id==concept_hierarchy_concept.c.concept_id_narrower',
-        collection_class=set
+        collection_class=set,
+        cascade_backrefs=False,
     )
 
     narrower_collections = relationship(
         'Collection',
         secondary=concept_hierarchy_collection,
-        backref=backref('broader_concepts', collection_class=set),
+        backref=backref('broader_concepts', collection_class=set, cascade_backrefs=False),
         primaryjoin='Concept.id==concept_hierarchy_collection.c.concept_id_broader',
         secondaryjoin='Concept.id==concept_hierarchy_collection.c.collection_id_narrower',
-        collection_class=set
+        collection_class=set,
+        cascade_backrefs=False,
     )
 
     __mapper_args__ = {
