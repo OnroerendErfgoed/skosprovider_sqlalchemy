@@ -10,8 +10,10 @@ A SQLAlchemy implementation of the skosprovider_ interface.
 
 .. image:: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy.svg?branch=develop
         :target: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy
-.. image:: https://img.shields.io/coveralls/koenedaele/skosprovider_sqlalchemy.svg
-        :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
+.. image:: https://img.shields.io/coveralls/OnroerendErfgoed/skosprovider_sqlalchemy.svg
+        :target: https://coveralls.io/r/OnroerendErfgoed/skosprovider_sqlalchemy
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.5795912.svg
+        :target: https://doi.org/10.5281/zenodo.5795912
 
 
 Migrating to skosprovider_sqlalchemy 2.0.0
