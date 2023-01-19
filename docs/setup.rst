@@ -54,6 +54,18 @@ Let's have a look at what this script did.
    conceptscheme                 notetype                    
    conceptscheme_label           visitation     
 
+
+Upgrading from skosprovider_sqlalchemy 1.x to 2.x
+=================================================
+
+A change in the models has been made which requires a database upgrade.
+The "concept" table's "concept_id" column has changed from being an int to a string.
+
+Existing databases will therefor require a small change to update table scheme.
+Typically this will look like::
+
+    ALTER TABLE concept ALTER COLUMN concept_id TEXT NOT NULL;
+
 .. _SkosProvider: http://skosprovider.readthedocs.org
 .. _SQLAlchemy: http://docs.sqlalchemy.org/
 .. _SQLite: http://www.sqlite.org
