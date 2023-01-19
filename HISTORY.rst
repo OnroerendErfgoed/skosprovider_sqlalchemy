@@ -1,12 +1,13 @@
-2.0.0 (2023-01-??)
+2.0.0 (2023-01-19)
 ------------------
 
 * **Major BC break**: Change concept.concept_id from Integer to String to allow 
   storing concepts and collections with a non-numeric id. Existing instance will 
-  need to update their SQL database. (#87)
+  need to update their SQL database. Please consult the docs or the README for 
+  some help in doing so. (#87)
 * Skosprovider_sqlalchemy now depends on SQLAlchemy 1.4 or higher and should be compatible with SQLAlchemy 2. Older version of SQLAlchemy are no longer supported. (#90)
 * Refactored the Skosprovider_sqlalchemy constructor to call the super constructor. (#95)
-* Drop support for Python 3.6 and 3.7. (#86)
+* Drop support for Python 3.6 and 3.7. Add support for Python 3.11. (#86)
 * Drop pyup support. (#85)
 
 1.0.0 (2021-12-21)
