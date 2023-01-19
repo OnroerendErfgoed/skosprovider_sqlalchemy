@@ -57,25 +57,26 @@ class SQLAlchemyProvider(VocabularyProvider):
         :param :class:`sqlachemy.orm.session.Session` session: The database
         session. This can also be a callable that returns a Session.
         '''
-        if 'subject' not in metadata:
-            metadata['subject'] = []
-        self.metadata = metadata
-        if 'uri_generator' in kwargs:
-            self.uri_generator = kwargs.get('uri_generator')
-        else:
-            self.uri_generator = DefaultUrnGenerator(self.metadata.get('id'))
+        super().__init__(
+            metadata,
+            allowed_instance_scopes=['single', 'threaded_thread'],
+            concept_scheme=None,
+            **kwargs
+        )
         try:
             self.session = session()
         except TypeError:
             self.session = session
+
         try:
-            self.conceptscheme_id = int(metadata.get(
-                'conceptscheme_id', metadata.get('id')
-            ))
-        except ValueError:
+            self.conceptscheme_id = int(
+                metadata.get('conceptscheme_id', metadata.get('id'))
+            )
+        except (ValueError, TypeError):
             raise ValueError(
                 'Please provide a valid integer for the conceptscheme_id.'
             )
+
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
@@ -83,13 +84,16 @@ class SQLAlchemyProvider(VocabularyProvider):
                 raise ValueError(
                     'Unknown expand strategy.'
                 )
-        self.allowed_instance_scopes = ['single', 'threaded_thread']
 
     @property
     def concept_scheme(self):
         if self._conceptscheme is None:
             self._conceptscheme = self._get_concept_scheme()
         return self._conceptscheme
+
+    @concept_scheme.setter
+    def concept_scheme(self, _):
+        """Ignore the super class setting a concept_scheme."""
 
     def _get_concept_scheme(self):
         '''
