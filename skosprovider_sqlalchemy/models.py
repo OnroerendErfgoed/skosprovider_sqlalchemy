@@ -329,7 +329,7 @@ class Collection(Thing):
     members = relationship(
         'Thing',
         secondary=collection_concept,
-        backref=backref('member_of', collection_class=set),
+        backref=backref('member_of', collection_class=set, cascade_backrefs=False),
         primaryjoin='Thing.id==collection_concept.c.collection_id',
         secondaryjoin='Thing.id==collection_concept.c.concept_id',
         collection_class=set
