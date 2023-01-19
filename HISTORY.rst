@@ -5,6 +5,7 @@
   storing concepts and collections with a non-numeric id. Existing instance will 
   need to update their SQL database. (#87)
 * Skosprovider_sqlalchemy now depends on SQLAlchemy 1.4 or higher and should be compatible with SQLAlchemy 2. Older version of SQLAlchemy are no longer supported. (#90)
+* Refactored the Skosprovider_sqlalchemy constructor to call the super constructor. (#95)
 * Drop support for Python 3.6 and 3.7. (#86)
 * Drop pyup support. (#85)
 
