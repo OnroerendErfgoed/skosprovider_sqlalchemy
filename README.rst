@@ -8,12 +8,21 @@ A SQLAlchemy implementation of the skosprovider_ interface.
 .. image:: https://readthedocs.org/projects/skosprovider_sqlalchemy/badge/?version=latest
         :target: https://readthedocs.org/projects/skosprovider_sqlalchemy/?badge=latest
 
-.. image:: https://travis-ci.org/koenedaele/skosprovider_sqlalchemy.png?branch=master
-        :target: https://travis-ci.org/koenedaele/skosprovider_sqlalchemy
+.. image:: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy.svg?branch=develop
+        :target: https://app.travis-ci.com/OnroerendErfgoed/skosprovider_sqlalchemy
 .. image:: https://img.shields.io/coveralls/koenedaele/skosprovider_sqlalchemy.svg
         :target: https://coveralls.io/r/koenedaele/skosprovider_sqlalchemy
-.. image:: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/badges/quality-score.png?b=master
-        :target: https://scrutinizer-ci.com/g/koenedaele/skosprovider_sqlalchemy/?branch=master
+
+
+Migrating to skosprovider_sqlalchemy 2.0.0
+------------------------------------------
+A change in the models has been made which requires a database upgrade.
+The "concept" table's "concept_id" column has changed from being an int to a string.
+
+Existing databases will therefor require a small change to update table scheme.
+Typically this will look like::
+
+    ALTER TABLE concept ALTER COLUMN concept_id TEXT NOT NULL;
 
 
 Building the docs

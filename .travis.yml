@@ -1,15 +1,18 @@
 language: python
-sudo: false
+os: linux
+dist: bionic
 python:
- - "3.6"
- - "3.7"
  - "3.8"
+ - "3.9"
+ - "3.10"
+ - "3.11"
 services:
  - postgresql
 env:
  - DB="sqlite" SAURL="sqlite:///:memory:"
  - DB="postgres" SAURL="postgresql://postgres:postgres@localhost/skosprovider_sqlalchemy"
 install:
+ - pip install --upgrade pip setuptools importlib-metadata
  - pip install -r requirements-dev.txt
  - python setup.py -q develop
 before_script:

@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
@@ -16,7 +17,7 @@ def pytest_addoption(parser):
 def engine(request):
     engine = create_engine(
         request.config.getoption('--sqlalchemy_url'),
-        echo=True
+        echo=True,
     )
 
     return engine
@@ -41,8 +42,8 @@ def create_data(session):
         Match,
         Language
     )
-    en = session.query(Language).get('en')
-    nl = session.query(Language).get('nl')
+    en = session.get(Language, 'en')
+    nl = session.get(Language, 'nl')
     cs = ConceptScheme(
         id=1,
         uri='urn:x-skosprovider:test',
@@ -177,7 +178,7 @@ def create_visitation(session):
         ConceptScheme
     )
     vc = VisitationCalculator(session)
-    conceptschemes = session.query(ConceptScheme).all()
+    conceptschemes = session.execute(select(ConceptScheme)).scalars().all()
     for cs in conceptschemes:
         visit = vc.visit(cs)
         for v in visit:

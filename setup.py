@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import os
-import sys
-
 try:
     from setuptools import setup
 except ImportError:
@@ -13,13 +10,13 @@ packages = [
 ]
 
 requires = [
-    'skosprovider>=1.1.0',
+    'skosprovider>=1.2.0',
     'sqlalchemy',
 ]
 
 setup(
     name='skosprovider_sqlalchemy',
-    version='1.0.0',
+    version='2.0.0',
     description='A sqlAlchemy implementation of skosprovider.',
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
@@ -34,16 +31,16 @@ setup(
     license='MIT',
     zip_safe=False,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ],
-    test_suite='nose.collector',
     entry_points="""\
     [console_scripts]
     init_skos_db = skosprovider_sqlalchemy.scripts.init_skos_db:main

@@ -10,6 +10,10 @@ authors:
     email: koen.vandaele@vlaanderen.be
     affiliation: Flanders Heritage Agency
     orcid: 'https://orcid.org/0000-0002-8153-2978'
+  - given-names: Bart
+    family-names: Saelen
+  - given-names: Wim
+    family-names: De Clercq
 abstract: >-
     A SQLAlchemy implementation of the Skosprovider interface. It allows
     storing and querying a SKOS vocabulary in a SQL database.
@@ -20,5 +24,5 @@ keywords:
   - python
   - sqlalchemy
 license: MIT
-version: 1.0.0
-date-released: "2021-12-12"
+version: 2.0.0
+date-released: "2023-01-19"
