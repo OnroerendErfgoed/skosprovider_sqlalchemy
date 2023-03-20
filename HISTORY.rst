@@ -1,7 +1,7 @@
 2.0.1 (2023-03-20)
 ------------------
 
-* Fixed and issue with import_provider still assuming ids are numeric. (#97)
+* Fixed an issue with import_provider still assuming ids are numeric. (#97)
 
 2.0.0 (2023-01-19)
 ------------------
