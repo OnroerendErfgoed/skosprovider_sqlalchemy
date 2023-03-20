@@ -47,13 +47,13 @@ def import_provider(provider, conceptscheme, session):
         c = provider.get_by_id(stuff['id'])
         if isinstance(c, Concept):
             cm = ConceptModel(
-                concept_id=int(c.id),
+                concept_id=c.id,
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
         elif isinstance(c, Collection):
             cm = CollectionModel(
-                concept_id=int(c.id),
+                concept_id=c.id,
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )

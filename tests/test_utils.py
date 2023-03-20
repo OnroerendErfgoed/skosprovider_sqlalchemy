@@ -316,6 +316,23 @@ class TestImportProviderTests(DBTestCase):
         scheme = self.session.get(ConceptSchemeModel, 68)
         assert scheme == cs
 
+    def test_string_concept_id_provider(self):
+        from skosprovider_sqlalchemy.models import (
+            ConceptScheme as ConceptSchemeModel
+        )
+        from skosprovider.providers import DictionaryProvider
+
+        p = DictionaryProvider(
+            {'id': 'EMPTY'}, [{'id': 'manual-1', 'uri': 'urn:x-skosprovider:manual/manual-1'}]
+        )
+        cs = self._get_cs()
+        self.session.add(cs)
+        import_provider(p, cs, self.session)
+        scheme = self.session.get(ConceptSchemeModel, 68)
+        assert scheme == cs
+        assert len(scheme.concepts) == 1
+        assert scheme.concepts[0].concept_id == 'manual-1'
+
     def test_menu(self):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel
@@ -332,7 +349,7 @@ class TestImportProviderTests(DBTestCase):
                 ConceptModel.concept_id == '11'
             )
         ).scalar_one()
-        assert 11 == lobster.concept_id
+        assert '11' == lobster.concept_id
         assert 'urn:x-skosprovider:menu:11' == lobster.uri
         assert 'Lobster Thermidor' == str(lobster.label())
         assert 1 == len(lobster.notes)
@@ -347,6 +364,8 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(geoprovider, cs, self.session)
+        self.session.flush()
+        self.session.expire_all()
         world = self.session.execute(
             select(ConceptModel)
             .filter(
@@ -354,7 +373,7 @@ class TestImportProviderTests(DBTestCase):
                 ConceptModel.concept_id == '1'
             )
         ).scalar_one()
-        assert world.concept_id == 1
+        assert world.concept_id == '1'
         assert 'urn:x-skosprovider:geography:1' == world.uri
         assert 'World' == str(world.label('en'))
         assert 1 == len(world.labels)
@@ -367,7 +386,7 @@ class TestImportProviderTests(DBTestCase):
                 CollectionModel.concept_id == '333'
             )
         ).scalar_one()
-        assert 333 == dutch.concept_id
+        assert '333' == dutch.concept_id
         assert 'urn:x-skosprovider:geography:333' == dutch.uri
         assert 'collection' == dutch.type
         assert 1 == len(dutch.labels)
@@ -380,10 +399,10 @@ class TestImportProviderTests(DBTestCase):
                 ConceptModel.concept_id == '10',
             )
         ).scalar_one()
-        assert 10 == netherlands.concept_id
+        assert '10' == netherlands.concept_id
         assert 'concept' == netherlands.type
         assert 1 == len(netherlands.labels)
-        assert 2 == netherlands.broader_concepts.pop().concept_id
+        assert '2' == netherlands.broader_concepts.pop().concept_id
         assert 1 == len(netherlands.related_concepts)
 
     def test_buildings(self):
@@ -562,7 +581,7 @@ class TestVisitationCalculator(DBTestCase):
         visit = vc.visit(cs)
         assert 10 == len(visit)
         world = visit[0]
-        assert self.session.get(ConceptModel, world['id']).concept_id == 1
+        assert self.session.get(ConceptModel, world['id']).concept_id == '1'
         assert 1 == world['lft']
         assert 20 == world['rght']
         assert 1 == world['depth']
