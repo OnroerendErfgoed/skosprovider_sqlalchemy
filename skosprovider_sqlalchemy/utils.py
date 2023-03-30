@@ -3,9 +3,12 @@ import logging
 from language_tags import tags
 from skosprovider.skos import Collection
 from skosprovider.skos import Concept
+from skosprovider.providers import VocabularyProvider
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm.session import Session
 
+from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
 from skosprovider_sqlalchemy.models import Collection as CollectionModel
 from skosprovider_sqlalchemy.models import Concept as ConceptModel
 from skosprovider_sqlalchemy.models import Label as LabelModel
@@ -18,7 +21,7 @@ from skosprovider_sqlalchemy.models import Thing as ThingModel
 log = logging.getLogger(__name__)
 
 
-def import_provider(provider, conceptscheme, session):
+def import_provider(provider: VocabularyProvider, session: Session, conceptscheme: ConceptSchemeModel = None) -> ConceptSchemeModel:
     '''
     Import a provider into a SQLAlchemy database.
 
@@ -28,13 +31,29 @@ def import_provider(provider, conceptscheme, session):
     :param conceptscheme: A
         :class:`skosprovider_sqlalchemy.models.Conceptscheme` to import
         the provider into. This should be an empty scheme so that there are
-        no possible id clashes.
+        no possible id clashes. If no conceptscheme is provided, one will be
+        created.
     :param session:  A :class:`sqlalchemy.orm.session.Session`.
 
+    :return: The conceptscheme that holds the concepts and collections. Either
+        the same conceptscheme that was passed into the provider, or the one that
+        was created by this function.
+    :rtype: skosprovider_sqlalchemy.models.Conceptscheme
     '''
+
 
     # Copy information about the scheme
     cs = provider.concept_scheme
+
+    if not conceptscheme:
+        conceptscheme = ConceptSchemeModel(
+            uri = cs.uri
+        )
+        session.add(conceptscheme)
+    
+    if conceptscheme.uri != cs.uri:
+        log.warning('Conceptscheme model has different URI than conceptscheme attached to provider.')
+
     _add_labels(conceptscheme, cs.labels, session)
     _add_notes(conceptscheme, cs.notes, session)
     _add_sources(conceptscheme, cs.sources, session)
@@ -45,6 +64,7 @@ def import_provider(provider, conceptscheme, session):
     # First pass: load all concepts and collections
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
+        log.warning(c)
         if isinstance(c, Concept):
             cm = ConceptModel(
                 concept_id=c.id,
@@ -73,6 +93,7 @@ def import_provider(provider, conceptscheme, session):
     # Second pass: link
     for stuff in provider.get_all():
         c = provider.get_by_id(stuff['id'])
+        log.warning(c)
         if isinstance(c, Concept):
             cm = session.execute(
                 select(ConceptModel)
@@ -148,6 +169,7 @@ def import_provider(provider, conceptscheme, session):
                     log.warning(
                         'Tried to add a relation %s member %s, but target \
                         does not exist. Relation will be lost.' % (c.id, mc))
+    return conceptscheme
 
 
 def _check_language(language_tag, session):

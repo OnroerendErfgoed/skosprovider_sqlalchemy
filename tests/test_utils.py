@@ -8,6 +8,7 @@ from skosprovider_sqlalchemy.models import Base
 from skosprovider_sqlalchemy.models import Initialiser
 from skosprovider_sqlalchemy.utils import VisitationCalculator
 from skosprovider_sqlalchemy.utils import import_provider
+
 from tests import DBTestCase
 
 
@@ -139,6 +140,8 @@ def _get_geo():
 
 def _get_buildings():
     from skosprovider.providers import DictionaryProvider
+    from skosprovider.uri import UriPatternGenerator
+    from skosprovider.skos import ConceptScheme
 
     buildings = DictionaryProvider(
         {'id': 'BUILDINGS'},
@@ -157,7 +160,7 @@ def _get_buildings():
                     'exact': ['http://vocab.getty.edu/aat/300006888']
                 }
             }, {
-                'id': 2,
+                'id': '2',
                 'labels': [
                     {'type': 'prefLabel', 'language': 'en', 'label': 'Castle'}
                 ],
@@ -166,7 +169,7 @@ def _get_buildings():
                     'broad': ['http://vocab.getty.edu/aat/300006888']
                 }
             }, {
-                'id': 3,
+                'id': '3',
                 'labels': [
                     {
                         'type': 'prefLabel',
@@ -179,7 +182,7 @@ def _get_buildings():
                     'close': ['http://vocab.getty.edu/aat/300005425']
                 }
             }, {
-                'id': 4,
+                'id': '4',
                 'labels': [
                     {'type': 'prefLabel', 'language': 'en', 'label': 'Huts'},
                     {'type': 'prefLabel', 'language': None, 'label': 'Hutten'}
@@ -189,13 +192,19 @@ def _get_buildings():
                     'exact': ['http://vocab.getty.edu/aat/300004824']
                 }
             }
-        ]
+        ],
+        concept_scheme = ConceptScheme(
+            uri = 'https://id.buildings.org'
+        ),
+        uri_generator = UriPatternGenerator('https://id.buildings.org/%s')
     )
     return buildings
 
 
 def _get_materials():
     from skosprovider.providers import DictionaryProvider
+    from skosprovider.uri import UriPatternGenerator
+    from skosprovider.skos import ConceptScheme
 
     materials = DictionaryProvider(
         {'id': 'MATERIALS'},
@@ -224,7 +233,11 @@ def _get_materials():
                 ],
                 'members': [654]
             }
-        ]
+        ],
+        concept_scheme = ConceptScheme(
+            uri = 'https://id.materials.org'
+        ),
+        uri_generator = UriPatternGenerator('https://id.materials.org/%s')
     )
     return materials
 
@@ -312,7 +325,7 @@ class TestImportProviderTests(DBTestCase):
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(p, cs, self.session)
+        import_provider(p, self.session, cs)
         scheme = self.session.get(ConceptSchemeModel, 68)
         assert scheme == cs
 
@@ -327,7 +340,7 @@ class TestImportProviderTests(DBTestCase):
         )
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(p, cs, self.session)
+        import_provider(p, self.session, cs)
         scheme = self.session.get(ConceptSchemeModel, 68)
         assert scheme == cs
         assert len(scheme.concepts) == 1
@@ -341,7 +354,7 @@ class TestImportProviderTests(DBTestCase):
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
+        import_provider(csvprovider, self.session, cs)
         lobster = self.session.execute(
             select(ConceptModel) 
             .filter(
@@ -363,7 +376,7 @@ class TestImportProviderTests(DBTestCase):
         geoprovider = _get_geo()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(geoprovider, cs, self.session)
+        import_provider(geoprovider, self.session, cs)
         self.session.flush()
         self.session.expire_all()
         world = self.session.execute(
@@ -413,7 +426,7 @@ class TestImportProviderTests(DBTestCase):
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(buildingprovider, cs, self.session)
+        import_provider(buildingprovider, self.session, cs)
         castle = self.session.execute(
             select(ConceptModel)
             .filter(
@@ -434,6 +447,24 @@ class TestImportProviderTests(DBTestCase):
         assert 'exactMatch' == hut.matches[0].matchtype_id
         assert 'http://vocab.getty.edu/aat/300004824' == hut.matches[0].uri
 
+    def test_conceptscheme_is_optional(self):
+        from skosprovider_sqlalchemy.models import (
+            Concept as ConceptModel
+        )
+
+        buildingprovider = _get_buildings()
+        cs = import_provider(buildingprovider, self.session)
+        assert 'https://id.buildings.org' == cs.uri
+        
+        castle = self.session.execute(
+            select(ConceptModel)
+            .filter(
+                ConceptModel.conceptscheme == cs,
+                ConceptModel.concept_id == '2'
+            )
+        ).scalar_one()
+        assert 2 == len(castle.broader_concepts)
+
     def test_heritage_types(self):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel,
@@ -442,7 +473,7 @@ class TestImportProviderTests(DBTestCase):
         heritagetypesprovider = _get_heritage_types()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(heritagetypesprovider, cs, self.session)
+        import_provider(heritagetypesprovider, self.session, cs)
         bomen = self.session.execute(
             select(ConceptModel)
             .filter(
@@ -464,7 +495,7 @@ class TestImportProviderTests(DBTestCase):
         eventtypesprovider = _get_event_types()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(eventtypesprovider, cs, self.session)
+        import_provider(eventtypesprovider, self.session, cs)
         archeologische_opgravingen = self.session.execute(
             select(ConceptModel)
             .filter(
@@ -482,13 +513,23 @@ class TestImportProviderTests(DBTestCase):
         materialsprovider = _get_materials()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(materialsprovider, cs, self.session)
+        import_provider(materialsprovider, self.session, cs)
         materials = self.session.execute(
             select(ThingModel)
             .filter(ThingModel.conceptscheme == cs)
         ).scalars().all()
         assert 2 == len(materials)
 
+    def test_materials_cs_is_created(self):
+        materialsprovider = _get_materials()
+        cs = self._get_cs()
+        self.session.add(cs)
+        cs = import_provider(materialsprovider, self.session, cs)
+
+        materialsprovider = _get_materials()
+        cs_from_provider = import_provider(materialsprovider, self.session)
+
+        assert cs_from_provider.id != cs.id
 
 class TestVisitationCalculator(DBTestCase):
 
@@ -518,7 +559,7 @@ class TestVisitationCalculator(DBTestCase):
         p = DictionaryProvider({'id': 'EMPTY'}, [])
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(p, cs, self.session)
+        import_provider(p, self.session, cs)
         vc = VisitationCalculator(self.session)
         v = vc.visit(cs)
         assert 0 == len(v)
@@ -541,13 +582,13 @@ class TestVisitationCalculator(DBTestCase):
             ])
             cs = self._get_cs()
             self.session.add(cs)
-            import_provider(p, cs, self.session)
+            import_provider(p, self.session, cs)
 
     def test_menu(self):
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
+        import_provider(csvprovider, self.session, cs)
         vc = VisitationCalculator(self.session)
         visit = vc.visit(cs)
         assert 11 == len(visit)
@@ -559,7 +600,7 @@ class TestVisitationCalculator(DBTestCase):
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(csvprovider, cs, self.session)
+        import_provider(csvprovider, self.session, cs)
         vc = VisitationCalculator(self.session)
         visit = vc.visit(cs)
         assert 11 == len(visit)
@@ -576,7 +617,7 @@ class TestVisitationCalculator(DBTestCase):
         geoprovider = _get_geo()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(geoprovider, cs, self.session)
+        import_provider(geoprovider, self.session, cs)
         vc = VisitationCalculator(self.session)
         visit = vc.visit(cs)
         assert 10 == len(visit)
@@ -601,13 +642,13 @@ class TestVisitationCalculator(DBTestCase):
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)
-        import_provider(buildingprovider, cs, self.session)
+        import_provider(buildingprovider, self.session, cs)
         vc = VisitationCalculator(self.session)
         visit = vc.visit(cs)
         assert len(visit) == 5
         # Check that castle is present twice
         ids = [self.session.get(ConceptModel, v['id']).concept_id for v in visit]
-        assert ids.count(2) == 2
+        assert ids.count('2') == 2
         for v in visit:
             # Check that fortification has one child
             if v['id'] == 1:
