@@ -41,15 +41,17 @@ def import_provider(provider: VocabularyProvider, session: Session, conceptschem
     :rtype: skosprovider_sqlalchemy.models.Conceptscheme
     '''
 
-    if not conceptscheme:
-        conceptscheme = ConceptSchemeModel()
-        session.add(conceptscheme)
 
     # Copy information about the scheme
     cs = provider.concept_scheme
-    if not conceptscheme.uri:
-        conceptscheme.uri = cs.uri
-    elif cs.uri and conceptscheme.uri != cs.uri:
+
+    if not conceptscheme:
+        conceptscheme = ConceptSchemeModel(
+            uri = cs.uri
+        )
+        session.add(conceptscheme)
+    
+    if conceptscheme.uri != cs.uri:
         log.warning('Conceptscheme model has different URI than conceptscheme attached to provider.')
 
     _add_labels(conceptscheme, cs.labels, session)
