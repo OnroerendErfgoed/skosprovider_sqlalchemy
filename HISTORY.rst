@@ -1,3 +1,9 @@
+2.1.0 (2023-03-30)
+------------------
+
+* **Minor BC break**: Changed the order of parameters to the import_provider 
+  function and make the conceptscheme argument optional. (#100)
+
 2.0.1 (2023-03-20)
 ------------------
 
