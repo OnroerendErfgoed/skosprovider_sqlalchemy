@@ -1,3 +1,8 @@
+2.1.1 (2023-04-28)
+------------------
+
+* Fixed an issue with casting ids to string during import. (#104)
+
 2.1.0 (2023-03-30)
 ------------------
 
