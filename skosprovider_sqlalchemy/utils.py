@@ -67,13 +67,13 @@ def import_provider(provider: VocabularyProvider, session: Session, conceptschem
         log.warning(c)
         if isinstance(c, Concept):
             cm = ConceptModel(
-                concept_id=c.id,
+                concept_id=str(c.id),
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
         elif isinstance(c, Collection):
             cm = CollectionModel(
-                concept_id=c.id,
+                concept_id=str(c.id),
                 uri=c.uri,
                 conceptscheme=conceptscheme
             )
