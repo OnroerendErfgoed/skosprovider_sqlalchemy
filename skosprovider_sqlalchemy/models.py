@@ -557,7 +557,7 @@ class Match(Base):
                                                       cascade='save-update, merge, '
                                                               'delete, delete-orphan'))
     concept_id = Column(
-        Integer,
+        String,
         ForeignKey('concept.id'),
         primary_key=True
     )
@@ -603,7 +603,7 @@ class Visitation(Base):
     )
     concept = relationship('Concept')
     concept_id = Column(
-        Integer,
+        String,
         ForeignKey('concept.id'),
         nullable=False,
         index=True
