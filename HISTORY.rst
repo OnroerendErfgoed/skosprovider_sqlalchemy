@@ -1,3 +1,11 @@
+2.2.0 (2025-12-12)
+------------------
+
+* Move to Github Actions (#110)
+* Upgrade to sqlalchemy > 2.0.0 (#107)
+* Replace setup.py with pyproject.toml (#102)
+* Update skosprovider dependency
+
 2.1.1 (2023-04-28)
 ------------------
 
