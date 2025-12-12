@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 [project]
-version = "1.2.0"
+version = "2.2.0"
 name = "skosprovider_sqlalchemy"
 dynamic = ["readme"]
 authors = [
