@@ -67,5 +67,4 @@ allow-direct-references = true
 content-type = "text/x-rst"
 fragments = [
     { path = "README.rst" },
-    { path = "HISTORY.rst" },
 ]
