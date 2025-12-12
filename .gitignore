@@ -38,6 +38,7 @@ nosetests.xml
 .project
 .pydevproject
 .idea
+.vscode
 
 #sqllite
 *.sqlite
