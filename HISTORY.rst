@@ -1,3 +1,16 @@
+2.2.0 (2025-12-12)
+------------------
+
+* Move to Github Actions (#110)
+* Upgrade to sqlalchemy > 2.0.0 (#107)
+* Replace setup.py with pyproject.toml (#102)
+* Update skosprovider dependency
+
+2.1.1 (2023-04-28)
+------------------
+
+* Fixed an issue with casting ids to string during import. (#104)
+
 2.1.0 (2023-03-30)
 ------------------
 

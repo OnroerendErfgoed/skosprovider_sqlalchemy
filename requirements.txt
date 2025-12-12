@@ -1,2 +1,0 @@
-SQLAlchemy==1.4.47
-skosprovider==1.2.0

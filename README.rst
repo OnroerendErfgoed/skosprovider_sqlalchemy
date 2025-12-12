@@ -44,3 +44,4 @@ skosprovider_sqlalchemy is present.
     $ make html
 
 .. _skosprovider: https://github.com/koenedaele/skosprovider
+
