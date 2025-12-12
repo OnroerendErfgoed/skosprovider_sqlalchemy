@@ -1,82 +1,88 @@
 alabaster==1.0.0
     # via sphinx
-babel==2.16.0
+babel==2.17.0
     # via sphinx
-cachetools==5.5.0
+cachetools==6.2.2
     # via pyld
-certifi==2024.8.30
+certifi==2025.11.12
     # via requests
-charset-normalizer==3.3.2
+charset-normalizer==3.4.4
     # via requests
-coverage==7.6.1
+coverage==7.13.0
     # via
     #   coveralls
     #   pytest-cov
-coveralls==4.0.1
+coveralls==4.0.2
     # via skosprovider-sqlalchemy (pyproject.toml)
 docopt==0.6.2
     # via coveralls
-docutils==0.21.2
+docutils==0.22.3
     # via sphinx
-flake8==7.1.1
+flake8==7.3.0
     # via skosprovider-sqlalchemy (pyproject.toml)
-frozendict==2.4.4
+frozendict==2.4.7
     # via pyld
-greenlet==3.1.0
+greenlet==3.3.0
     # via sqlalchemy
 html5lib==1.1
     # via skosprovider
-idna==3.10
+idna==3.11
     # via requests
 imagesize==1.4.1
     # via sphinx
-iniconfig==2.0.0
+iniconfig==2.3.0
     # via pytest
-jinja2==3.1.4
+jinja2==3.1.6
     # via sphinx
 language-tags==1.2.0
     # via skosprovider
-lxml==5.3.0
+lxml==6.0.2
     # via pyld
-markupsafe==2.1.5
+markupsafe==3.0.3
     # via jinja2
 mccabe==0.7.0
     # via flake8
-packaging==24.1
+packaging==25.0
     # via
     #   pytest
     #   sphinx
-pluggy==1.5.0
-    # via pytest
-psycopg2-binary==2.9.9
+pluggy==1.6.0
+    # via
+    #   pytest
+    #   pytest-cov
+psycopg2-binary==2.9.11
     # via skosprovider-sqlalchemy (pyproject.toml)
-pycodestyle==2.12.1
+pycodestyle==2.14.0
     # via flake8
-pyflakes==3.2.0
+pyflakes==3.4.0
     # via flake8
-pygments==2.18.0
-    # via sphinx
-pyld==2.0.4
+pygments==2.19.2
+    # via
+    #   pytest
+    #   sphinx
+pyld==2.0.3
     # via skosprovider
-pytest==8.3.3
+pytest==9.0.2
     # via
     #   skosprovider-sqlalchemy (pyproject.toml)
     #   pytest-cov
-pytest-cov==5.0.0
+pytest-cov==7.0.0
     # via skosprovider-sqlalchemy (pyproject.toml)
-requests==2.32.3
+requests==2.32.5
     # via
     #   coveralls
     #   sphinx
 rfc3987==1.3.8
     # via skosprovider
-six==1.16.0
-    # via html5lib
-skosprovider==1.2.0
-    # via skosprovider-sqlalchemy (pyproject.toml)
-snowballstemmer==2.2.0
+roman-numerals==3.1.0
     # via sphinx
-sphinx==8.0.2
+six==1.17.0
+    # via html5lib
+skosprovider==1.5.1
+    # via skosprovider-sqlalchemy (pyproject.toml)
+snowballstemmer==3.0.1
+    # via sphinx
+sphinx==9.0.4
     # via skosprovider-sqlalchemy (pyproject.toml)
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -90,13 +96,15 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlalchemy==2.0.35
+sqlalchemy==2.0.45
     # via skosprovider-sqlalchemy (pyproject.toml)
-typing-extensions==4.12.2
+tomli==2.3.0
+    # via coverage
+typing-extensions==4.15.0
     # via sqlalchemy
-urllib3==2.2.3
+urllib3==2.6.2
     # via requests
-uv==0.4.11
+uv==0.9.17
     # via skosprovider-sqlalchemy (pyproject.toml)
 webencodings==0.5.1
     # via html5lib
