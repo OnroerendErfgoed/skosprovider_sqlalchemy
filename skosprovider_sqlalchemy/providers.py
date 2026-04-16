@@ -7,7 +7,6 @@ from skosprovider.skos import ConceptScheme
 from skosprovider.skos import Label
 from skosprovider.skos import Note
 from skosprovider.skos import Source
-from skosprovider.uri import DefaultUrnGenerator
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
@@ -24,19 +23,19 @@ log = logging.getLogger(__name__)
 
 
 class SQLAlchemyProvider(VocabularyProvider):
-    '''
+    """
     A :class:`skosprovider.providers.VocabularyProvider` that uses SQLAlchemy
     as backend.
-    '''
+    """
 
     _conceptscheme = None
-    '''
+    """
     The concept scheme, once it has been loaded. Should never be accessed
     directly.
-    '''
+    """
 
     expand_strategy = 'recurse'
-    '''
+    """
     Determines how the expand method will operate. Options are:
 
     * `recurse`: Determine all narrower concepts by recursivly querying the
@@ -46,22 +45,22 @@ class SQLAlchemyProvider(VocabularyProvider):
       :class:`Visitation <skosprovider_sqlalchemy.models.Visitation>` table.
       This table contains a nested set representation of each conceptscheme.
       Actually creating the data in this table needs to be scheduled.
-    '''
+    """
 
     def __init__(self, metadata, session, **kwargs):
-        '''
+        """
         Create a new provider
 
         :param dict metadata: Metadata about the provider. Apart from the usual
         id, a conceptscheme_id can also be passed.
         :param :class:`sqlachemy.orm.session.Session` session: The database
         session. This can also be a callable that returns a Session.
-        '''
+        """
         super().__init__(
             metadata,
             allowed_instance_scopes=['single', 'threaded_thread'],
             concept_scheme=None,
-            **kwargs
+            **kwargs,
         )
         try:
             self.session = session()
@@ -73,17 +72,13 @@ class SQLAlchemyProvider(VocabularyProvider):
                 metadata.get('conceptscheme_id', metadata.get('id'))
             )
         except (ValueError, TypeError):
-            raise ValueError(
-                'Please provide a valid integer for the conceptscheme_id.'
-            )
+            raise ValueError('Please provide a valid integer for the conceptscheme_id.')
 
         if 'expand_strategy' in kwargs:
             if kwargs['expand_strategy'] in ['recurse', 'visit']:
                 self.expand_strategy = kwargs['expand_strategy']
             else:
-                raise ValueError(
-                    'Unknown expand strategy.'
-                )
+                raise ValueError('Unknown expand strategy.')
 
     @property
     def concept_scheme(self):
@@ -96,23 +91,20 @@ class SQLAlchemyProvider(VocabularyProvider):
         """Ignore the super class setting a concept_scheme."""
 
     def _get_concept_scheme(self):
-        '''
+        """
         Find a :class:`skosprovider.skos.ConceptScheme` for this provider.
 
         :rtype: :class:`skosprovider.skos.ConceptScheme`
-        '''
-        csm = (
-            self.session
-            .get(
-                ConceptSchemeModel,
-                self.conceptscheme_id,
-                options=[
-                    joinedload(ConceptSchemeModel.labels),
-                    joinedload(ConceptSchemeModel.notes),
-                    joinedload(ConceptSchemeModel.languages),
-                    joinedload(ConceptSchemeModel.sources),
-                ]
-            )
+        """
+        csm = self.session.get(
+            ConceptSchemeModel,
+            self.conceptscheme_id,
+            options=[
+                joinedload(ConceptSchemeModel.labels),
+                joinedload(ConceptSchemeModel.notes),
+                joinedload(ConceptSchemeModel.languages),
+                joinedload(ConceptSchemeModel.sources),
+            ],
         )
         return ConceptScheme(
             uri=csm.uri,
@@ -121,24 +113,19 @@ class SQLAlchemyProvider(VocabularyProvider):
                 for label in csm.labels
             ],
             notes=[
-                Note(n.note, n.notetype_id, n.language_id, n.markup)
-                for n in csm.notes
+                Note(n.note, n.notetype_id, n.language_id, n.markup) for n in csm.notes
             ],
-            languages=[
-                language.id for language in csm.languages
-            ],
-            sources=[
-                Source(s.citation, s.markup) for s in csm.sources
-            ]
+            languages=[language.id for language in csm.languages],
+            sources=[Source(s.citation, s.markup) for s in csm.sources],
         )
 
     def _from_thing(self, thing):
-        '''
+        """
         Load one concept or collection from the database.
 
         :param :class:`skosprovider_sqlalchemy.models.Thing` thing: Thing
             to load.
-        '''
+        """
         if thing.type and thing.type == 'collection':
             if thing.uri is not None:
                 uri = thing.uri
@@ -156,16 +143,14 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
                 ],
-                sources=[
-                    Source(s.citation, s.markup) for s in thing.sources
-                ],
+                sources=[Source(s.citation, s.markup) for s in thing.sources],
                 members=[member.concept_id for member in getattr(thing, 'members', [])],
                 member_of=[member_of.concept_id for member_of in thing.member_of],
                 superordinates=[
                     broader_concept.concept_id
                     for broader_concept in thing.broader_concepts
                 ],
-                infer_concept_relations=thing.infer_concept_relations
+                infer_concept_relations=thing.infer_concept_relations,
             )
         else:
             if thing.uri is not None:
@@ -174,7 +159,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 uri = self.uri_generator.generate(type='concept', id=thing.concept_id)
             matches = {}
             for m in thing.matches:
-                key = m.matchtype.name[:m.matchtype.name.find('Match')]
+                key = m.matchtype.name[: m.matchtype.name.find('Match')]
                 if key not in matches:
                     matches[key] = []
                 matches[key].append(m.uri)
@@ -190,9 +175,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                     Note(n.note, n.notetype_id, n.language_id, n.markup)
                     for n in thing.notes
                 ],
-                sources=[
-                    Source(s.citation, s.markup) for s in thing.sources
-                ],
+                sources=[Source(s.citation, s.markup) for s in thing.sources],
                 broader=[c.concept_id for c in thing.broader_concepts],
                 narrower=[c.concept_id for c in thing.narrower_concepts],
                 related=[c.concept_id for c in thing.related_concepts],
@@ -201,27 +184,31 @@ class SQLAlchemyProvider(VocabularyProvider):
                     narrower_collection.concept_id
                     for narrower_collection in thing.narrower_collections
                 ],
-                matches=matches
+                matches=matches,
             )
 
     def get_by_id(self, concept_id):
         try:
-            thing = self.session.execute(
-                select(Thing)
-                .options(joinedload(Thing.labels))
-                .options(joinedload(Thing.notes))
-                .options(joinedload(Thing.sources))
-                .filter(
-                    Thing.concept_id == str(concept_id),
-                    Thing.conceptscheme_id == self.conceptscheme_id
+            thing = (
+                self.session.execute(
+                    select(Thing)
+                    .options(joinedload(Thing.labels))
+                    .options(joinedload(Thing.notes))
+                    .options(joinedload(Thing.sources))
+                    .filter(
+                        Thing.concept_id == str(concept_id),
+                        Thing.conceptscheme_id == self.conceptscheme_id,
+                    )
                 )
-            ).unique().scalar_one()
+                .unique()
+                .scalar_one()
+            )
         except NoResultFound:
             return False
         return self._from_thing(thing)
 
     def get_by_uri(self, uri):
-        '''Get all information on a concept or collection, based on a
+        """Get all information on a concept or collection, based on a
         :term:`URI`.
 
         This method will only find concepts or collections whose :term:`URI` is
@@ -232,33 +219,36 @@ class SQLAlchemyProvider(VocabularyProvider):
         :rtype: :class:`skosprovider.skos.Concept` or
             :class:`skosprovider.skos.Collection` or `False` if the concept or
             collection is unknown to the provider.
-        '''
+        """
         try:
-            thing = self.session.execute(
-                select(Thing)
-                .options(joinedload(Thing.labels))
-                .options(joinedload(Thing.notes))
-                .options(joinedload(Thing.sources))
-                .filter(
-                    Thing.uri == uri,
-                    Thing.conceptscheme_id == self.conceptscheme_id
+            thing = (
+                self.session.execute(
+                    select(Thing)
+                    .options(joinedload(Thing.labels))
+                    .options(joinedload(Thing.notes))
+                    .options(joinedload(Thing.sources))
+                    .filter(
+                        Thing.uri == uri, Thing.conceptscheme_id == self.conceptscheme_id
+                    )
                 )
-            ).unique().scalar_one()
+                .unique()
+                .scalar_one()
+            )
         except NoResultFound:
             return False
         return self._from_thing(thing)
 
     def _get_id_and_label(self, c, lan):
-        '''
+        """
         :param skosprovider_sqlalchemy.models.Thing c: A concept or collection.
         :param string lan: A language (eg. "en", "nl", "la", "fr")
-        '''
+        """
         label = c.label(lan)
         return {
             'id': c.concept_id,
             'uri': c.uri,
             'type': c.type,
-            'label': label.label if label is not None else None
+            'label': label.label if label is not None else None,
         }
 
     def find(self, query, **kwargs):
@@ -267,9 +257,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         if 'matches' in query:
             match_uri = query['matches'].get('uri', None)
             if not match_uri:
-                raise ValueError(
-                    'Please provide a URI to match with.'
-                )
+                raise ValueError('Please provide a URI to match with.')
             model = ConceptModel
             q = (
                 select(model)
@@ -284,8 +272,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 if mtype == 'closeMatch':
                     mtypes.append('exactMatch')
                 q = q.filter(
-                    MatchModel.uri == match_uri,
-                    MatchModel.matchtype_id.in_(mtypes)
+                    MatchModel.uri == match_uri, MatchModel.matchtype_id.in_(mtypes)
                 )
             else:
                 q = q.filter(MatchModel.uri == match_uri)
@@ -323,11 +310,16 @@ class SQLAlchemyProvider(VocabularyProvider):
         ]
 
     def get_all(self, **kwargs):
-        things = self.session.execute(
-            select(Thing)
-            .options(joinedload(Thing.labels))
-            .filter(Thing.conceptscheme_id == self.conceptscheme_id)
-        ).unique().scalars().all()
+        things = (
+            self.session.execute(
+                select(Thing)
+                .options(joinedload(Thing.labels))
+                .filter(Thing.conceptscheme_id == self.conceptscheme_id)
+            )
+            .unique()
+            .scalars()
+            .all()
+        )
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
         sort_order = self._get_sort_order(**kwargs)
@@ -338,24 +330,31 @@ class SQLAlchemyProvider(VocabularyProvider):
 
     def get_top_concepts(self, **kwargs):
         # get the concepts that have no direct broader concept
-        top = self.session.execute(
-            select(ConceptModel)
-            .options(joinedload(ConceptModel.labels))
-            .filter(
-                ConceptModel.conceptscheme_id == self.conceptscheme_id,
-                ~ConceptModel.broader_concepts.any()
+        top = (
+            self.session.execute(
+                select(ConceptModel)
+                .options(joinedload(ConceptModel.labels))
+                .filter(
+                    ConceptModel.conceptscheme_id == self.conceptscheme_id,
+                    ~ConceptModel.broader_concepts.any(),
+                )
             )
-        ).unique().scalars().all()
+            .unique()
+            .scalars()
+            .all()
+        )
 
         # check if they have an indirect broader concept
         def _has_higher_concept(c):
             for coll in c.member_of:
                 if (
                     coll.infer_concept_relations
-                    and coll.broader_concepts or _has_higher_concept(coll)
+                    and coll.broader_concepts
+                    or _has_higher_concept(coll)
                 ):
                     return True
             return False
+
         top = [c for c in top if not _has_higher_concept(c)]
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
@@ -369,10 +368,9 @@ class SQLAlchemyProvider(VocabularyProvider):
     def expand(self, concept_id):
         try:
             thing = self.session.execute(
-                select(Thing)
-                .filter(
+                select(Thing).filter(
                     Thing.concept_id == str(concept_id),
-                    Thing.conceptscheme_id == self.conceptscheme_id
+                    Thing.conceptscheme_id == self.conceptscheme_id,
                 )
             ).scalar_one()
         except NoResultFound:
@@ -405,27 +403,30 @@ class SQLAlchemyProvider(VocabularyProvider):
         else:
             try:
                 visitation = self.session.execute(
-                    select(Visitation.lft, Visitation.rght)
-                    .filter(
+                    select(Visitation.lft, Visitation.rght).filter(
                         Visitation.conceptscheme_id == self.conceptscheme_id,
-                        Visitation.concept_id == thing.id
+                        Visitation.concept_id == thing.id,
                     )
                 ).one()
             except NoResultFound:
                 return self._expand_recurse(thing)
 
-            concept_ids = self.session.execute(
-                select(Thing.concept_id)
-                .join(Visitation)
-                .filter(
-                    Thing.conceptscheme_id == self.conceptscheme_id,
-                    Visitation.lft.between(visitation.lft, visitation.rght)
+            concept_ids = (
+                self.session.execute(
+                    select(Thing.concept_id)
+                    .join(Visitation)
+                    .filter(
+                        Thing.conceptscheme_id == self.conceptscheme_id,
+                        Visitation.lft.between(visitation.lft, visitation.rght),
+                    )
                 )
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
         return list(set(concept_ids))
 
     def get_top_display(self, **kwargs):
-        '''
+        """
         Returns all concepts or collections that form the top-level of a display
         hierarchy.
 
@@ -436,25 +437,35 @@ class SQLAlchemyProvider(VocabularyProvider):
             id is present and a label. The label is determined by looking at
             the `**kwargs` parameter, the default language of the provider
             and falls back to `en` if nothing is present.
-        '''
-        top_concepts = self.session.execute(
-            select(ConceptModel)
-            .options(joinedload(ConceptModel.labels))
-            .filter(
-                ConceptModel.conceptscheme_id == self.conceptscheme_id,
-                ~ConceptModel.broader_concepts.any(),
-                ~ConceptModel.member_of.any()
+        """
+        top_concepts = (
+            self.session.execute(
+                select(ConceptModel)
+                .options(joinedload(ConceptModel.labels))
+                .filter(
+                    ConceptModel.conceptscheme_id == self.conceptscheme_id,
+                    ~ConceptModel.broader_concepts.any(),
+                    ~ConceptModel.member_of.any(),
+                )
             )
-        ).unique().scalars().all()
-        top_collections = self.session.execute(
-            select(CollectionModel)
-            .options(joinedload(CollectionModel.labels))
-            .filter(
-                CollectionModel.conceptscheme_id == self.conceptscheme_id,
-                ~CollectionModel.broader_concepts.any(),
-                ~CollectionModel.member_of.any()
+            .unique()
+            .scalars()
+            .all()
+        )
+        top_collections = (
+            self.session.execute(
+                select(CollectionModel)
+                .options(joinedload(CollectionModel.labels))
+                .filter(
+                    CollectionModel.conceptscheme_id == self.conceptscheme_id,
+                    ~CollectionModel.broader_concepts.any(),
+                    ~CollectionModel.member_of.any(),
+                )
             )
-        ).unique().scalars().all()
+            .unique()
+            .scalars()
+            .all()
+        )
         res = top_concepts + top_collections
         lan = self._get_language(**kwargs)
         sort = self._get_sort(**kwargs)
@@ -465,7 +476,7 @@ class SQLAlchemyProvider(VocabularyProvider):
         ]
 
     def get_children_display(self, thing_id, **kwargs):
-        '''
+        """
         Return a list of concepts or collections that should be displayed
         under this concept or collection.
 
@@ -475,13 +486,12 @@ class SQLAlchemyProvider(VocabularyProvider):
             the `**kwargs` parameter, the default language of the provider
             and falls back to `en` if nothing is present. If the id does not
             exist, return `False`.
-        '''
+        """
         try:
             thing = self.session.execute(
-                select(Thing)
-                .filter(
+                select(Thing).filter(
                     Thing.concept_id == str(thing_id),
-                    Thing.conceptscheme_id == self.conceptscheme_id
+                    Thing.conceptscheme_id == self.conceptscheme_id,
                 )
             ).scalar_one()
         except NoResultFound:

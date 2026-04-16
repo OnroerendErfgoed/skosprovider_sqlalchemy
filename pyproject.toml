@@ -43,7 +43,7 @@ dev = [
     "pytest>=8.3.3",
     "pytest-cov>=5.0.0",
     "coveralls>=4.0.1",
-    "flake8>=7.1.1",
+    "pre-commit",
 ]
 
 [project.scripts]
@@ -68,3 +68,17 @@ content-type = "text/x-rst"
 fragments = [
     { path = "README.rst" },
 ]
+
+[tool.ruff]
+line-length = 90
+
+[tool.ruff.lint]
+ignore = ["E741"]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+force-sort-within-sections = true
+known-first-party = ["skosprovider_sqlalchemy"]
+
+[tool.ruff.format]
+quote-style = "single"

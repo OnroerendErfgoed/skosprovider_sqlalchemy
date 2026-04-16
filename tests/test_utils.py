@@ -13,16 +13,11 @@ from tests import DBTestCase
 
 
 def _get_menu():
-    from skosprovider.providers import (
-        SimpleCsvProvider
-    )
+    from skosprovider.providers import SimpleCsvProvider
 
     ifile = open(os.path.join(os.path.dirname(__file__), 'data', 'menu.csv'))
     reader = csv.reader(ifile)
-    csvprovider = SimpleCsvProvider(
-        {'id': 'MENU'},
-        reader
-    )
+    csvprovider = SimpleCsvProvider({'id': 'MENU'}, reader)
     ifile.close()
     return csvprovider
 
@@ -35,105 +30,84 @@ def _get_geo():
         [
             {
                 'id': '1',
-                'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'World'}
-                ],
-                'narrower': [2, 3]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'World'}],
+                'narrower': [2, 3],
+            },
+            {
                 'id': 2,
-                'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Europe'}
-                ],
-                'narrower': [4, 5, 10], 'broader': [1]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Europe'}],
+                'narrower': [4, 5, 10],
+                'broader': [1],
+            },
+            {
                 'id': 3,
                 'labels': [
-                    {
-                        'type': 'prefLabel', 'language': 'en',
-                        'label': 'North-America'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'North-America'}
                 ],
-                'narrower': [6], 'broader': [1]
-            }, {
+                'narrower': [6],
+                'broader': [1],
+            },
+            {
                 'id': 4,
-                'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Belgium'}
-                ],
-                'narrower': [7, 8, 9], 'broader': [2], 'related': [10]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Belgium'}],
+                'narrower': [7, 8, 9],
+                'broader': [2],
+                'related': [10],
+            },
+            {
                 'id': 5,
                 'labels': [
-                    {
-                        'type': 'prefLabel', 'language': 'en',
-                        'label': 'United Kingdom'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'United Kingdom'}
                 ],
-                'broader': [2]
-            }, {
+                'broader': [2],
+            },
+            {
                 'id': 6,
                 'labels': [
                     {
-                        'type': 'prefLabel', 'language': 'en',
-                        'label': 'United States of America'
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'United States of America',
                     }
                 ],
-                'broader': [3]
-            }, {
+                'broader': [3],
+            },
+            {
                 'id': 7,
                 'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Flanders'
-                    }, {
-                        'type': 'prefLabel',
-                        'language': 'nl-BE',
-                        'label': 'Vlaanderen'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Flanders'},
+                    {'type': 'prefLabel', 'language': 'nl-BE', 'label': 'Vlaanderen'},
                 ],
-                'broader': [4]
-            }, {
+                'broader': [4],
+            },
+            {
                 'id': 8,
-                'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Brussels'
-                    }
-                ],
-                'broader': [4]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Brussels'}],
+                'broader': [4],
+            },
+            {
                 'id': 9,
-                'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Wallonie'
-                    }
-                ],
-                'broader': [4]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Wallonie'}],
+                'broader': [4],
+            },
+            {
                 'id': 10,
-                'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'nl',
-                        'label': 'Nederland'
-                    }
-                ],
-                'related': [4]
-            }, {
+                'labels': [{'type': 'prefLabel', 'language': 'nl', 'label': 'Nederland'}],
+                'related': [4],
+            },
+            {
                 'id': '333',
                 'type': 'collection',
                 'labels': [
                     {
-                        'type': 'prefLabel', 'language': 'en',
-                        'label': 'Places where dutch is spoken'
+                        'type': 'prefLabel',
+                        'language': 'en',
+                        'label': 'Places where dutch is spoken',
                     }
                 ],
-                'members': ['4', '7', 8, 10]
-            }
-        ]
+                'members': ['4', '7', 8, 10],
+            },
+        ],
     )
     return geo
 
@@ -149,54 +123,37 @@ def _get_buildings():
             {
                 'id': '1',
                 'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Fortifications'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Fortifications'}
                 ],
                 'narrower': [2],
-                'matches': {
-                    'exact': ['http://vocab.getty.edu/aat/300006888']
-                }
-            }, {
+                'matches': {'exact': ['http://vocab.getty.edu/aat/300006888']},
+            },
+            {
                 'id': '2',
-                'labels': [
-                    {'type': 'prefLabel', 'language': 'en', 'label': 'Castle'}
-                ],
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Castle'}],
                 'broader': [1, 3],
-                'matches': {
-                    'broad': ['http://vocab.getty.edu/aat/300006888']
-                }
-            }, {
+                'matches': {'broad': ['http://vocab.getty.edu/aat/300006888']},
+            },
+            {
                 'id': '3',
                 'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Habitations'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Habitations'}
                 ],
                 'narrower': [2, 4],
-                'matches': {
-                    'close': ['http://vocab.getty.edu/aat/300005425']
-                }
-            }, {
+                'matches': {'close': ['http://vocab.getty.edu/aat/300005425']},
+            },
+            {
                 'id': '4',
                 'labels': [
                     {'type': 'prefLabel', 'language': 'en', 'label': 'Huts'},
-                    {'type': 'prefLabel', 'language': None, 'label': 'Hutten'}
+                    {'type': 'prefLabel', 'language': None, 'label': 'Hutten'},
                 ],
                 'broader': [3],
-                'matches': {
-                    'exact': ['http://vocab.getty.edu/aat/300004824']
-                }
-            }
+                'matches': {'exact': ['http://vocab.getty.edu/aat/300004824']},
+            },
         ],
-        concept_scheme = ConceptScheme(
-            uri = 'https://id.buildings.org'
-        ),
-        uri_generator = UriPatternGenerator('https://id.buildings.org/%s')
+        concept_scheme=ConceptScheme(uri='https://id.buildings.org'),
+        uri_generator=UriPatternGenerator('https://id.buildings.org/%s'),
     )
     return buildings
 
@@ -211,33 +168,22 @@ def _get_materials():
         [
             {
                 'id': '1',
-                'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Cardboard'
-                    }
-                ],
+                'labels': [{'type': 'prefLabel', 'language': 'en', 'label': 'Cardboard'}],
                 'narrower': [2],
                 'related': [3],
-                'subordinate_arrays': [56]
-            }, {
+                'subordinate_arrays': [56],
+            },
+            {
                 'id': '789',
                 'type': 'collection',
                 'labels': [
-                    {
-                        'type': 'prefLabel',
-                        'language': 'en',
-                        'label': 'Wood by Tree'
-                    }
+                    {'type': 'prefLabel', 'language': 'en', 'label': 'Wood by Tree'}
                 ],
-                'members': [654]
-            }
+                'members': [654],
+            },
         ],
-        concept_scheme = ConceptScheme(
-            uri = 'https://id.materials.org'
-        ),
-        uri_generator = UriPatternGenerator('https://id.materials.org/%s')
+        concept_scheme=ConceptScheme(uri='https://id.materials.org'),
+        uri_generator=UriPatternGenerator('https://id.materials.org/%s'),
     )
     return materials
 
@@ -254,26 +200,29 @@ def _get_heritage_types():
     heritage_types = DictionaryProvider(
         {'id': 'HERITAGE_TYPES'},
         typology_data,
-        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/erfgoedtypes/%s'),
+        uri_generator=UriPatternGenerator(
+            'https://id.erfgoed.net/thesauri/erfgoedtypes/%s'
+        ),
         concept_scheme=ConceptScheme(
             uri='https://id.erfgoed.net/thesauri/erfgoedtypes',
             labels=[
                 {'label': 'Erfgoedtypes', 'type': 'prefLabel', 'language': 'nl-BE'},
-                {'label': 'Heritagetypes', 'type': 'prefLabel', 'language': 'en'}
+                {'label': 'Heritagetypes', 'type': 'prefLabel', 'language': 'en'},
             ],
             notes=[
                 {
                     'note': 'Different types of heritage.',
                     'type': 'definition',
-                    'language': 'en'
-                }, {
+                    'language': 'en',
+                },
+                {
                     'note': 'Verschillende types van erfgoed.',
                     'type': 'definition',
-                    'language': 'nl'
-                }
+                    'language': 'nl',
+                },
             ],
-            languages=['nl', 'en']
-        )
+            languages=['nl', 'en'],
+        ),
     )
     return heritage_types
 
@@ -289,13 +238,14 @@ def _get_event_types():
     heritage_types = DictionaryProvider(
         {'id': 'EVENT_TYPES'},
         event_data,
-        uri_generator=UriPatternGenerator('https://id.erfgoed.net/thesauri/gebeurtenistypes/%s')
+        uri_generator=UriPatternGenerator(
+            'https://id.erfgoed.net/thesauri/gebeurtenistypes/%s'
+        ),
     )
     return heritage_types
 
 
 class TestImportProviderTests(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -307,19 +257,12 @@ class TestImportProviderTests(DBTestCase):
         Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
-        from skosprovider_sqlalchemy.models import (
-            ConceptScheme as ConceptSchemeModel
-        )
+        from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
 
-        return ConceptSchemeModel(
-            id=68,
-            uri='urn:x-skosprovider:cs:68'
-        )
+        return ConceptSchemeModel(id=68, uri='urn:x-skosprovider:cs:68')
 
     def test_empty_provider(self):
-        from skosprovider_sqlalchemy.models import (
-            ConceptScheme as ConceptSchemeModel
-        )
+        from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
         from skosprovider.providers import DictionaryProvider
 
         p = DictionaryProvider({'id': 'EMPTY'}, [])
@@ -330,13 +273,12 @@ class TestImportProviderTests(DBTestCase):
         assert scheme == cs
 
     def test_string_concept_id_provider(self):
-        from skosprovider_sqlalchemy.models import (
-            ConceptScheme as ConceptSchemeModel
-        )
+        from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
         from skosprovider.providers import DictionaryProvider
 
         p = DictionaryProvider(
-            {'id': 'EMPTY'}, [{'id': 'manual-1', 'uri': 'urn:x-skosprovider:manual/manual-1'}]
+            {'id': 'EMPTY'},
+            [{'id': 'manual-1', 'uri': 'urn:x-skosprovider:manual/manual-1'}],
         )
         cs = self._get_cs()
         self.session.add(cs)
@@ -347,19 +289,15 @@ class TestImportProviderTests(DBTestCase):
         assert scheme.concepts[0].concept_id == 'manual-1'
 
     def test_menu(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
+        from skosprovider_sqlalchemy.models import Concept as ConceptModel
 
         csvprovider = _get_menu()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(csvprovider, self.session, cs)
         lobster = self.session.execute(
-            select(ConceptModel) 
-            .filter(
-                ConceptModel.conceptscheme == cs, 
-                ConceptModel.concept_id == '11'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '11'
             )
         ).scalar_one()
         assert '11' == lobster.concept_id
@@ -370,7 +308,7 @@ class TestImportProviderTests(DBTestCase):
     def test_geo(self):
         from skosprovider_sqlalchemy.models import (
             Concept as ConceptModel,
-            Collection as CollectionModel
+            Collection as CollectionModel,
         )
 
         geoprovider = _get_geo()
@@ -380,10 +318,8 @@ class TestImportProviderTests(DBTestCase):
         self.session.flush()
         self.session.expire_all()
         world = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs,
-                ConceptModel.concept_id == '1'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '1'
             )
         ).scalar_one()
         assert world.concept_id == '1'
@@ -393,10 +329,8 @@ class TestImportProviderTests(DBTestCase):
         assert 2 == len(world.narrower_concepts)
 
         dutch = self.session.execute(
-            select(CollectionModel)
-            .filter(
-                CollectionModel.conceptscheme == cs,
-                CollectionModel.concept_id == '333'
+            select(CollectionModel).filter(
+                CollectionModel.conceptscheme == cs, CollectionModel.concept_id == '333'
             )
         ).scalar_one()
         assert '333' == dutch.concept_id
@@ -406,9 +340,8 @@ class TestImportProviderTests(DBTestCase):
         assert 4 == len(dutch.members)
 
         netherlands = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs, 
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs,
                 ConceptModel.concept_id == '10',
             )
         ).scalar_one()
@@ -419,27 +352,21 @@ class TestImportProviderTests(DBTestCase):
         assert 1 == len(netherlands.related_concepts)
 
     def test_buildings(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
+        from skosprovider_sqlalchemy.models import Concept as ConceptModel
 
         buildingprovider = _get_buildings()
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(buildingprovider, self.session, cs)
         castle = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs,
-                ConceptModel.concept_id == '2'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '2'
             )
         ).scalar_one()
         assert 2 == len(castle.broader_concepts)
         hut = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs, 
-                ConceptModel.concept_id == '4'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '4'
             )
         ).scalar_one()
         assert 1 == len(hut.broader_concepts)
@@ -448,19 +375,15 @@ class TestImportProviderTests(DBTestCase):
         assert 'http://vocab.getty.edu/aat/300004824' == hut.matches[0].uri
 
     def test_conceptscheme_is_optional(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
+        from skosprovider_sqlalchemy.models import Concept as ConceptModel
 
         buildingprovider = _get_buildings()
         cs = import_provider(buildingprovider, self.session)
         assert 'https://id.buildings.org' == cs.uri
-        
+
         castle = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs,
-                ConceptModel.concept_id == '2'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '2'
             )
         ).scalar_one()
         assert 2 == len(castle.broader_concepts)
@@ -475,10 +398,8 @@ class TestImportProviderTests(DBTestCase):
         self.session.add(cs)
         import_provider(heritagetypesprovider, self.session, cs)
         bomen = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs, 
-                ConceptModel.concept_id == '72'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '72'
             )
         ).scalar_one()
         assert 2 == len(bomen.narrower_collections)
@@ -497,10 +418,8 @@ class TestImportProviderTests(DBTestCase):
         self.session.add(cs)
         import_provider(eventtypesprovider, self.session, cs)
         archeologische_opgravingen = self.session.execute(
-            select(ConceptModel)
-            .filter(
-                ConceptModel.conceptscheme == cs,
-                ConceptModel.concept_id == '38'
+            select(ConceptModel).filter(
+                ConceptModel.conceptscheme == cs, ConceptModel.concept_id == '38'
             )
         ).scalar_one()
         assert 3 == len(archeologische_opgravingen.narrower_collections)
@@ -514,10 +433,13 @@ class TestImportProviderTests(DBTestCase):
         cs = self._get_cs()
         self.session.add(cs)
         import_provider(materialsprovider, self.session, cs)
-        materials = self.session.execute(
-            select(ThingModel)
-            .filter(ThingModel.conceptscheme == cs)
-        ).scalars().all()
+        materials = (
+            self.session.execute(
+                select(ThingModel).filter(ThingModel.conceptscheme == cs)
+            )
+            .scalars()
+            .all()
+        )
         assert 2 == len(materials)
 
     def test_materials_cs_is_created(self):
@@ -531,8 +453,8 @@ class TestImportProviderTests(DBTestCase):
 
         assert cs_from_provider.id != cs.id
 
-class TestVisitationCalculator(DBTestCase):
 
+class TestVisitationCalculator(DBTestCase):
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -544,14 +466,9 @@ class TestVisitationCalculator(DBTestCase):
         Base.metadata.drop_all(self.engine)
 
     def _get_cs(self):
-        from skosprovider_sqlalchemy.models import (
-            ConceptScheme as ConceptSchemeModel
-        )
+        from skosprovider_sqlalchemy.models import ConceptScheme as ConceptSchemeModel
 
-        return ConceptSchemeModel(
-            id=1,
-            uri='urn:x-skosprovider:cs:1'
-        )
+        return ConceptSchemeModel(id=1, uri='urn:x-skosprovider:cs:1')
 
     def test_empty_provider(self):
         from skosprovider.providers import DictionaryProvider
@@ -568,18 +485,21 @@ class TestVisitationCalculator(DBTestCase):
         from skosprovider.providers import DictionaryProvider
 
         with self.assertRaises(ValueError):
-            p = DictionaryProvider({'id': 'EMPTY'}, [
-                {
-                    'id': '1',
-                    'labels': [
-                        {
-                            'type': 'prefLabel',
-                            'language': 'nederlands',
-                            'label': 'Versterkingen'
-                        }
-                    ]
-                }
-            ])
+            p = DictionaryProvider(
+                {'id': 'EMPTY'},
+                [
+                    {
+                        'id': '1',
+                        'labels': [
+                            {
+                                'type': 'prefLabel',
+                                'language': 'nederlands',
+                                'label': 'Versterkingen',
+                            }
+                        ],
+                    }
+                ],
+            )
             cs = self._get_cs()
             self.session.add(cs)
             import_provider(p, self.session, cs)
@@ -610,9 +530,7 @@ class TestVisitationCalculator(DBTestCase):
             left += 2
 
     def test_geo(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
+        from skosprovider_sqlalchemy.models import Concept as ConceptModel
 
         geoprovider = _get_geo()
         cs = self._get_cs()
@@ -635,9 +553,7 @@ class TestVisitationCalculator(DBTestCase):
                 assert 3 == v['depth']
 
     def test_buildings(self):
-        from skosprovider_sqlalchemy.models import (
-            Concept as ConceptModel
-        )
+        from skosprovider_sqlalchemy.models import Concept as ConceptModel
 
         buildingprovider = _get_buildings()
         cs = self._get_cs()
