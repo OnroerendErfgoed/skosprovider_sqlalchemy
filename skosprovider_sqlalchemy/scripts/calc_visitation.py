@@ -9,11 +9,12 @@ from ..models import Visitation
 from ..utils import VisitationCalculator
 
 
-
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <connect_uri> <concept_scheme_id>\n'
-          '(example: "%s sqlite:///skos.db 1")' % (cmd, cmd))
+    print(
+        'usage: %s <connect_uri> <concept_scheme_id>\n'
+        '(example: "%s sqlite:///skos.db 1")' % (cmd, cmd)
+    )
     sys.exit(1)
 
 
@@ -35,7 +36,7 @@ def main(argv=sys.argv):
             concept_id=v['id'],
             lft=v['lft'],
             rght=v['rght'],
-            depth=v['depth']
+            depth=v['depth'],
         )
         session.add(vrow)
     session.commit()
