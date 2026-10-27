@@ -30,8 +30,6 @@ filelock==3.25.2
     #   virtualenv
 frozendict==2.4.7
     # via pyld
-greenlet==3.3.0
-    # via sqlalchemy
 html5lib==1.1
     # via skosprovider
 identify==2.6.18
@@ -112,7 +110,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlalchemy==2.0.45
+sqlalchemy==2.1.6
     # via skosprovider-sqlalchemy (pyproject.toml)
 typing-extensions==4.15.0
     # via sqlalchemy
