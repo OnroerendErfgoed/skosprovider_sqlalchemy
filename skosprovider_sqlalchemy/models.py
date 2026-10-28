@@ -267,7 +267,7 @@ class Concept(Thing):
         secondary=concept_hierarchy_collection,
         backref=backref('broader_concepts', collection_class=set, cascade_backrefs=False),
         primaryjoin='Concept.id==concept_hierarchy_collection.c.concept_id_broader',
-        secondaryjoin='Concept.id==concept_hierarchy_collection.c.collection_id_narrower',
+        secondaryjoin='Collection.id==concept_hierarchy_collection.c.collection_id_narrower',
         collection_class=set,
         cascade_backrefs=False,
     )

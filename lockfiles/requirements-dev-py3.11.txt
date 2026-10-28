@@ -22,8 +22,6 @@ flake8==7.3.0
     # via skosprovider-sqlalchemy (pyproject.toml)
 frozendict==2.4.7
     # via pyld
-greenlet==3.3.0
-    # via sqlalchemy
 html5lib==1.1
     # via skosprovider
 idna==3.11
@@ -96,7 +94,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlalchemy==2.0.45
+sqlalchemy==2.1.6
     # via skosprovider-sqlalchemy (pyproject.toml)
 tomli==2.3.0
     # via coverage
