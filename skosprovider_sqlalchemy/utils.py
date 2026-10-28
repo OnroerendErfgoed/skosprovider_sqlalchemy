@@ -151,16 +151,16 @@ def import_provider(
         elif isinstance(c, Collection) and len(c.members) > 0:
             cm = session.execute(
                 select(CollectionModel).filter(
-                    ConceptModel.conceptscheme_id == conceptscheme.id,
-                    ConceptModel.concept_id == str(c.id),
+                    CollectionModel.conceptscheme_id == conceptscheme.id,
+                    CollectionModel.concept_id == str(c.id),
                 )
             ).scalar_one()
             for mc in c.members:
                 try:
                     mc = session.execute(
                         select(ThingModel).filter(
-                            ConceptModel.conceptscheme_id == conceptscheme.id,
-                            ConceptModel.concept_id == str(mc),
+                            ThingModel.conceptscheme_id == conceptscheme.id,
+                            ThingModel.concept_id == str(mc),
                         )
                     ).scalar_one()
                     cm.members.add(mc)
