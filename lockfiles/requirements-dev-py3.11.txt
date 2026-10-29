@@ -4,7 +4,7 @@ babel==2.17.0
     # via sphinx
 cachetools==6.2.2
     # via pyld
-certifi==2025.11.12
+certifi==2026.10.23
     # via requests
 charset-normalizer==3.4.4
     # via requests
