@@ -7,6 +7,7 @@ from skosprovider.skos import ConceptScheme
 from skosprovider.skos import Label
 from skosprovider.skos import Note
 from skosprovider.skos import Source
+from sqlalchemy import exists
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
@@ -18,6 +19,8 @@ from skosprovider_sqlalchemy.models import Label as LabelModel
 from skosprovider_sqlalchemy.models import Match as MatchModel
 from skosprovider_sqlalchemy.models import Thing
 from skosprovider_sqlalchemy.models import Visitation
+from skosprovider_sqlalchemy.models import collection_concept
+from skosprovider_sqlalchemy.models import concept_hierarchy_collection
 
 log = logging.getLogger(__name__)
 
@@ -445,7 +448,7 @@ class SQLAlchemyProvider(VocabularyProvider):
                 .filter(
                     ConceptModel.conceptscheme_id == self.conceptscheme_id,
                     ~ConceptModel.broader_concepts.any(),
-                    ~ConceptModel.member_of.any(),
+                    ~exists().where(collection_concept.c.concept_id == ConceptModel.id),
                 )
             )
             .unique()
@@ -458,8 +461,13 @@ class SQLAlchemyProvider(VocabularyProvider):
                 .options(joinedload(CollectionModel.labels))
                 .filter(
                     CollectionModel.conceptscheme_id == self.conceptscheme_id,
-                    ~CollectionModel.broader_concepts.any(),
-                    ~CollectionModel.member_of.any(),
+                    ~exists().where(
+                        concept_hierarchy_collection.c.collection_id_narrower
+                        == CollectionModel.id
+                    ),
+                    ~exists().where(
+                        collection_concept.c.concept_id == CollectionModel.id
+                    ),
                 )
             )
             .unique()
