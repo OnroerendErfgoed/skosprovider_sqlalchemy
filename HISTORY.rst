@@ -1,3 +1,16 @@
+3.0.0 (29-10-2026)
+------------------
+
+🐛 Bugs
+
+- Contradicting discriminator criteria with SQLAlchemy 2.1 (#128)
+
+✨ Features
+
+- Use proper linting tools (#120)
+- Drop support for 3.10 & Unpin Python 3.13 patch version (#121)
+- Deprecate skosprovider-sqlalchemy and merge into skosprovider 2.0.0 (#124)
+
 2.2.1 (2026-10-29)
 ------------------
 

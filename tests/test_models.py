@@ -12,35 +12,25 @@ class ModelTestCase(unittest.TestCase):
 
 
 class ConceptTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Concept
+
         return Concept
 
     def test_simple(self):
         from skosprovider_sqlalchemy.models import Label, Source
+
         l = Label('Churches', 'prefLabel', 'en')
         s = Source('Carlisle, P. 2014.')
-        c = self._get_target_class()(
-            id=1,
-            concept_id=1,
-            labels=[l],
-            sources=[s]
-        )
+        c = self._get_target_class()(id=1, concept_id=1, labels=[l], sources=[s])
         assert 1 == c.id
         assert l == c.label()
         assert s in c.sources
         assert 'Concept-1' == str(c)
 
     def test_related(self):
-        c1 = self._get_target_class()(
-            id=1,
-            concept_id=1
-        )
-        c2 = self._get_target_class()(
-            id=2,
-            concept_id=2
-        )
+        c1 = self._get_target_class()(id=1, concept_id=1)
+        c2 = self._get_target_class()(id=2, concept_id=2)
         c1.related_concepts.add(c2)
         self.assertEqual(1, len(c1.related_concepts))
         self.assertIn(c2, c1.related_concepts)
@@ -51,12 +41,8 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(0, len(c2.related_concepts))
 
     def test_related_no_duplicates(self):
-        c1 = self._get_target_class()(
-            id=1
-        )
-        c2 = self._get_target_class()(
-            id=2
-        )
+        c1 = self._get_target_class()(id=1)
+        c2 = self._get_target_class()(id=2)
         c1.related_concepts.add(c2)
         self.assertEqual(1, len(c1.related_concepts))
         self.assertIn(c2, c1.related_concepts)
@@ -67,14 +53,8 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(1, len(c2.related_concepts))
 
     def test_broader_narrower(self):
-        c1 = self._get_target_class()(
-            id=1,
-            concept_id=1
-        )
-        c2 = self._get_target_class()(
-            id=2,
-            concept_id=2
-        )
+        c1 = self._get_target_class()(id=1, concept_id=1)
+        c2 = self._get_target_class()(id=2, concept_id=2)
         c1.narrower_concepts.add(c2)
         self.assertEqual(1, len(c1.narrower_concepts))
         self.assertEqual(1, len(c2.broader_concepts))
@@ -83,14 +63,8 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(0, len(c2.broader_concepts))
 
     def test_broader_narrower_duplicate(self):
-        c1 = self._get_target_class()(
-            id=1,
-            concept_id=2
-        )
-        c2 = self._get_target_class()(
-            id=2,
-            concept_id=3
-        )
+        c1 = self._get_target_class()(id=1, concept_id=2)
+        c2 = self._get_target_class()(id=2, concept_id=3)
         c1.narrower_concepts.add(c2)
         self.assertEqual(1, len(c1.narrower_concepts))
         self.assertEqual(1, len(c2.broader_concepts))
@@ -99,41 +73,29 @@ class ConceptTests(ModelTestCase):
         self.assertEqual(1, len(c2.broader_concepts))
 
     def test_broader_narrower_collection(self):
-        c1 = self._get_target_class()(
-            id=1,
-            concept_id=2
-        )
-        c2 = self._get_target_class()(
-            id=7,
-            concept_id=253
-        )
+        self._get_target_class()(id=1, concept_id=2)
+        c2 = self._get_target_class()(id=7, concept_id=253)
         from skosprovider_sqlalchemy.models import Collection
-        c3 = Collection(
-            id=2,
-            concept_id=3
-        )
+
+        c3 = Collection(id=2, concept_id=3)
         c2.narrower_collections.add(c3)
         self.assertEqual(1, len(c2.narrower_collections))
         self.assertEqual(1, len(c3.broader_concepts))
 
 
 class ConceptSchemeTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import ConceptScheme
+
         return ConceptScheme
 
     def test_simple(self):
         from skosprovider_sqlalchemy.models import Label, Language, Source
+
         l = Label('Heritage types', 'prefLabel', 'en')
         en = Language('en', 'English')
         s = Source('Carlisle, P. 2014.')
-        c = self._get_target_class()(
-            id=1,
-            labels=[l],
-            languages=[en],
-            sources=[s]
-        )
+        c = self._get_target_class()(id=1, labels=[l], languages=[en], sources=[s])
         assert 1 == c.id
         assert l == c.label()
         assert 1 == len(c.languages)
@@ -143,47 +105,38 @@ class ConceptSchemeTests(ModelTestCase):
 
 
 class CollectionTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Collection
+
         return Collection
 
     def _get_concept(self):
         from skosprovider_sqlalchemy.models import Concept, Label
+
         return Concept(
-            id=2,
-            concept_id=456,
-            labels=[Label('Cathedrals', 'prefLabel', 'en')]
+            id=2, concept_id=456, labels=[Label('Cathedrals', 'prefLabel', 'en')]
         )
 
     def test_simple(self):
         from skosprovider_sqlalchemy.models import Label
+
         l = Label('Churches by function', 'prefLabel', 'en')
         c = self._get_target_class()(
-            id=1,
-            concept_id=253,
-            labels=[l],
-            infer_concept_relations=True
+            id=1, concept_id=253, labels=[l], infer_concept_relations=True
         )
         self.assertEqual(1, c.id)
         self.assertEqual(l, c.label())
         self.assertTrue(c.infer_concept_relations)
 
     def test_members(self):
-        col = self._get_target_class()(
-            id=1,
-            concept_id=1
-        )
+        col = self._get_target_class()(id=1, concept_id=1)
         c = self._get_concept()
         col.members.add(c)
         self.assertEqual(1, len(c.member_of))
         self.assertIn(col, c.member_of)
 
     def test_duplicate_members(self):
-        col = self._get_target_class()(
-            id=1,
-            concept_id=7
-        )
+        col = self._get_target_class()(id=1, concept_id=7)
         c = self._get_concept()
         col.members.add(c)
         self.assertEqual(1, len(c.member_of))
@@ -192,7 +145,6 @@ class CollectionTests(ModelTestCase):
 
 
 class TestLabel(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -205,6 +157,7 @@ class TestLabel(DBTestCase):
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Label
+
         return Label
 
     def test_simple(self):
@@ -220,21 +173,20 @@ class TestLabel(DBTestCase):
         self.session.flush()
 
         assert 'Dutch' == l.language.name
-        assert 'prefLabel' ==l.labeltype.name
+        assert 'prefLabel' == l.labeltype.name
 
     def test_no_language(self):
         l = self._get_target_class()('Kerken', 'prefLabel')
-        assert None == l.language_id
+        assert None is l.language_id
         assert 'prefLabel' == l.labeltype_id
         assert 'Kerken' == l.__str__()
         self.session.add(l)
         self.session.flush()
-        assert None == l.language_id
+        assert None is l.language_id
         assert 'prefLabel' == l.labeltype.name
 
 
 class TestNote(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -247,14 +199,12 @@ class TestNote(DBTestCase):
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Note
+
         return Note
 
     def test_simple(self):
         n = self._get_target_class()(
-            'Een kerk is een religieus gebouw.',
-            'definition',
-            'nl',
-            'HTML'
+            'Een kerk is een religieus gebouw.', 'definition', 'nl', 'HTML'
         )
         assert 'nl' == n.language_id
         assert 'definition' == n.notetype_id
@@ -263,36 +213,32 @@ class TestNote(DBTestCase):
 
     def test_load_objects(self):
         n = self._get_target_class()(
-            'Een kerk is een religieus gebouw.',
-            'definition',
-            'nl'
+            'Een kerk is een religieus gebouw.', 'definition', 'nl'
         )
         self.session.add(n)
         self.session.flush()
         assert 'Dutch' == n.language.name
         assert 'definition' == n.notetype.name
-        assert None == n.markup
+        assert None is n.markup
 
     def test_no_language(self):
         n = self._get_target_class()(
-            'Een kerk is een religieus gebouw.',
-            'definition',
-            None
+            'Een kerk is een religieus gebouw.', 'definition', None
         )
-        assert None == n.language_id
+        assert None is n.language_id
         assert 'definition' == n.notetype_id
         assert 'Een kerk is een religieus gebouw.' == n.__str__()
         self.session.add(n)
         self.session.flush()
-        assert None == n.language
+        assert None is n.language
         assert 'definition' == n.notetype.name
-        assert None == n.markup
+        assert None is n.markup
 
 
 class LanguageTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Language
+
         return Language
 
     def test_simple(self):
@@ -303,9 +249,9 @@ class LanguageTests(ModelTestCase):
 
 
 class LabelTypeTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import LabelType
+
         return LabelType
 
     def test_simple(self):
@@ -316,9 +262,9 @@ class LabelTypeTests(ModelTestCase):
 
 
 class NoteTypeTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import NoteType
+
         return NoteType
 
     def test_simple(self):
@@ -329,7 +275,6 @@ class NoteTypeTests(ModelTestCase):
 
 
 class TestSource(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -342,33 +287,38 @@ class TestSource(DBTestCase):
 
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Source
+
         return Source
 
     def test_simple(self):
         s = self._get_target_class()(
             'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.'
         )
-        assert 'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.' == s.citation
+        assert (
+            'Van Daele, K; Meganck M. & Mortier S 2014. Data Driven Systems and System Driven Data.'
+            == s.citation
+        )
         assert str(s) == s.citation
         assert s.markup is None
 
     def test_markup(self):
         s = self._get_target_class()(
             'Van Daele, K; Meganck M. & Mortier S 2014. <em>Data Driven Systems and System Driven Data.</em>',
-            'HTML'
+            'HTML',
         )
         assert s.markup == 'HTML'
 
 
 class VisitationTests(ModelTestCase):
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Visitation
+
         return Visitation
 
     def test_simple(self):
-        v = self._get_target_class()(id=0, lft=1, rght=2, depth=3,
-                                     conceptscheme_id=4, concept_id=5)
+        v = self._get_target_class()(
+            id=0, lft=1, rght=2, depth=3, conceptscheme_id=4, concept_id=5
+        )
         assert 0 == v.id
         assert 1 == v.lft
         assert 2 == v.rght
@@ -379,9 +329,9 @@ class VisitationTests(ModelTestCase):
 
 
 class TestMatchType:
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import MatchType
+
         return MatchType
 
     def test_simple(self):
@@ -392,24 +342,21 @@ class TestMatchType:
 
 
 class TestMatch:
-
     def _get_target_class(self):
         from skosprovider_sqlalchemy.models import Match
+
         return Match
 
     def _get_concept(self):
         from skosprovider_sqlalchemy.models import Concept
-        return Concept(
-            id=1,
-            concept_id=1,
-            uri='urn:x-skosprovider:birds:8300'
-        )
+
+        return Concept(id=1, concept_id=1, uri='urn:x-skosprovider:birds:8300')
 
     def test_simple(self):
         m = self._get_target_class()(
-            concept = self._get_concept(),
-            matchtype_id = 'closeMatch',
-            uri = 'urn:x-skosprovider:heron:grey'
+            concept=self._get_concept(),
+            matchtype_id='closeMatch',
+            uri='urn:x-skosprovider:heron:grey',
         )
         assert 'closeMatch' == m.matchtype_id
         assert 'urn:x-skosprovider:birds:8300' == m.concept.uri
@@ -418,22 +365,25 @@ class TestMatch:
 
 
 class LabelFunctionTest(ModelTestCase):
-
     def _get_fut(self):
         from skosprovider_sqlalchemy.models import label
+
         return label
 
     def _get_knokke_heist_nl(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Knokke-Heist', "prefLabel", 'nl-BE')
+
+        return Label('Knokke-Heist', 'prefLabel', 'nl-BE')
 
     def _get_cnocke_heyst_nl(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Cnock-Heyst', "altLabel", 'nl-BE')
+
+        return Label('Cnock-Heyst', 'altLabel', 'nl-BE')
 
     def _get_knokke_heist_en(self):
         from skosprovider_sqlalchemy.models import Label
-        return Label('Knocke-Heyst', "prefLabel", 'en-GB')
+
+        return Label('Knocke-Heyst', 'prefLabel', 'en-GB')
 
     def test_label_empty(self):
         label = self._get_fut()
@@ -492,9 +442,10 @@ class LabelFunctionTest(ModelTestCase):
     def test_exact_precedes_inexact_match(self):
         label = self._get_fut()
         from skosprovider_sqlalchemy.models import Label
-        khnl = Label('Knokke-Heist', "prefLabel", 'nl')
-        chnl = Label('Cnock-Heyst', "altLabel", 'nl')
-        khen = Label('Knocke-Heyst', "prefLabel", 'en')
+
+        khnl = Label('Knokke-Heist', 'prefLabel', 'nl')
+        chnl = Label('Cnock-Heyst', 'altLabel', 'nl')
+        khen = Label('Knocke-Heyst', 'prefLabel', 'en')
         khnlbe = self._get_knokke_heist_nl()
         chnlbe = self._get_cnocke_heyst_nl()
         khengb = self._get_knokke_heist_en()
@@ -506,10 +457,11 @@ class LabelFunctionTest(ModelTestCase):
     def test_sort_precedes_pref(self):
         label = self._get_fut()
         from skosprovider_sqlalchemy.models import Label
-        khnl = Label('Knokke-Heist', "prefLabel", 'nl')
-        chnl = Label('Cnock-Heyst', "altLabel", 'nl')
-        khen = Label('Knocke-Heyst', "prefLabel", 'en')
-        khensort = Label('123MeFirst', "sortLabel", 'en')
+
+        khnl = Label('Knokke-Heist', 'prefLabel', 'nl')
+        chnl = Label('Cnock-Heyst', 'altLabel', 'nl')
+        khen = Label('Knocke-Heyst', 'prefLabel', 'en')
+        khensort = Label('123MeFirst', 'sortLabel', 'en')
         khnlbe = self._get_knokke_heist_nl()
         chnlbe = self._get_cnocke_heyst_nl()
         khengb = self._get_knokke_heist_en()

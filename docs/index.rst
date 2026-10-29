@@ -6,7 +6,16 @@
 SkosProvider_SQLAlchemy
 =======================
 
-This library offers an implementation of the 
+.. warning::
+
+   This package is deprecated. Starting from ``skosprovider`` 2.0.0 the
+   functionality of this package has been merged into the main
+   `skosprovider <https://github.com/OnroerendErfgoed/skosprovider/>`_
+   repository. This package will remain usable with ``skosprovider < 2.0.0``,
+   but is no longer actively maintained. It is recommended to upgrade to
+   ``skosprovider >= 2.0.0`` and use ``skosprovider_sqlalchemy`` from there.
+
+This library offers an implementation of the
 :class:`skosprovider.providers.VocabularyProvider`
 interface that uses a SQLALchemy_ backend. While a 
 :class:`VocabularyProvider <skosprovider.providers.VocabularyProvider>` is

@@ -10,8 +10,7 @@ from ..models import Initialiser
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
-    print('usage: %s <connect_uri>\n'
-          '(example: "%s sqlite:///skos.db")' % (cmd, cmd))
+    print('usage: %s <connect_uri>\n(example: "%s sqlite:///skos.db")' % (cmd, cmd))
     sys.exit(1)
 
 

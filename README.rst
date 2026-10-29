@@ -1,6 +1,27 @@
 skosprovider_sqlalchemy
 =======================
 
+⚠️ This package is deprecated. Use skosprovider_ instead.
+
+Starting from `skosprovider` 2.0.0 the functionality of this package has been
+merged into the main `skosprovider <https://github.com/OnroerendErfgoed/skosprovider/>`_
+repository. This package will remain usable with ``skosprovider < 2.0.0``, but is
+no longer actively maintained. It is recommended to upgrade to
+``skosprovider >= 2.0.0`` and use ``skosprovider_sqlalchemy`` from there.
+
+Migrating to skosprovider 2.0.0
+-------------------------------
+
+1. Uninstall ``skosprovider_sqlalchemy`` and install ``skosprovider >= 2.0.0``::
+
+       pip uninstall skosprovider_sqlalchemy
+       pip install "skosprovider>=2.0.0"
+
+2. Replace any ``skosprovider_sqlalchemy`` imports with their equivalent under
+   ``skosprovider`` (see the `skosprovider
+   <https://github.com/OnroerendErfgoed/skosprovider/>`_ documentation for the
+   full mapping).
+
 A SQLAlchemy implementation of the skosprovider_ interface.
 
 .. image:: https://img.shields.io/pypi/v/skosprovider_sqlalchemy.svg
@@ -43,5 +64,5 @@ skosprovider_sqlalchemy is present.
     $ cd docs
     $ make html
 
-.. _skosprovider: https://github.com/koenedaele/skosprovider
+.. _skosprovider: https://github.com/OnroerendErfgoed/skosprovider
 

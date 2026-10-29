@@ -11,7 +11,6 @@ from tests.conftest import create_visitation
 
 
 class TestSQLAlchemyProvider(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
@@ -20,7 +19,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         self.provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
             self.session,
-            uri_generator=UriPatternGenerator('urn:x-skosprovider-sa:test:%s')
+            uri_generator=UriPatternGenerator('urn:x-skosprovider-sa:test:%s'),
         )
 
     def tearDown(self):
@@ -30,8 +29,7 @@ class TestSQLAlchemyProvider(DBTestCase):
 
     def test_session_maker(self):
         self.provider = SQLAlchemyProvider(
-            {'id': 'SOORTEN', 'conceptscheme_id': 1},
-            self.session_maker
+            {'id': 'SOORTEN', 'conceptscheme_id': 1}, self.session_maker
         )
         cs = self.provider.concept_scheme
         assert 'urn:x-skosprovider:test' == cs.uri
@@ -50,7 +48,7 @@ class TestSQLAlchemyProvider(DBTestCase):
         provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
             self.session_maker,
-            expand_strategy='visit'
+            expand_strategy='visit',
         )
         assert 'visit' == provider.expand_strategy
 
@@ -59,39 +57,41 @@ class TestSQLAlchemyProvider(DBTestCase):
             SQLAlchemyProvider(
                 {'id': 'SOORTEN', 'conceptscheme_id': 1},
                 self.session,
-                expand_strategy='invalid'
+                expand_strategy='invalid',
             )
 
     def test_provider_without_cs_id(self):
         with pytest.raises(ValueError):
-            SQLAlchemyProvider(
-                {'id': 'SOORTEN'},
-                self.session
-            )
+            SQLAlchemyProvider({'id': 'SOORTEN'}, self.session)
 
     def test_get_vocabulary_id(self):
         assert 'SOORTEN' == self.provider.get_vocabulary_id()
 
     def test_set_uri_generator(self):
         from skosprovider.uri import UriPatternGenerator
+
         # Set up provider
         provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
             self.session,
-            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
+            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s'),
         )
         assert 'http://id.example.com/trees/1' == provider.uri_generator.generate(id=1)
 
     def test_gen_uri(self):
         from skosprovider_sqlalchemy.models import Concept, ConceptScheme
         from skosprovider.uri import UriPatternGenerator
+
         # Set up provider
         provider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 99},
             self.session,
-            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s')
+            uri_generator=UriPatternGenerator('http://id.example.com/trees/%s'),
         )
-        c1 = Concept(concept_id=1, conceptscheme=ConceptScheme(id=99, uri='http://id.example.com/trees'))
+        c1 = Concept(
+            concept_id=1,
+            conceptscheme=ConceptScheme(id=99, uri='http://id.example.com/trees'),
+        )
         session = self.session_maker()
         session.add(c1)
         session.commit()
@@ -100,9 +100,8 @@ class TestSQLAlchemyProvider(DBTestCase):
         assert c2.uri == 'http://id.example.com/trees/1'
 
     def test_concept_scheme(self):
-        from skosprovider.skos import (
-            ConceptScheme
-        )
+        from skosprovider.skos import ConceptScheme
+
         cs = self.provider.concept_scheme
         assert isinstance(cs, ConceptScheme)
         assert 'urn:x-skosprovider:test' == cs.uri
@@ -124,9 +123,8 @@ class TestSQLAlchemyProvider(DBTestCase):
         assert ['2', '8'] == sorted(con.subordinate_arrays)
 
     def test_concept_has_concept_scheme(self):
-        from skosprovider.skos import (
-            ConceptScheme
-        )
+        from skosprovider.skos import ConceptScheme
+
         con = self.provider.get_by_id(1)
         assert isinstance(con.concept_scheme, ConceptScheme)
         assert 'urn:x-skosprovider:test' == con.concept_scheme.uri
@@ -193,53 +191,53 @@ class TestSQLAlchemyProvider(DBTestCase):
         all = self.provider.get_all()
         assert len(all) == 9
         assert {
-                   'id': '1',
-                   'uri': 'urn:x-skosprovider:test:1',
-                   'type': 'concept',
-                   'label': 'Churches'
-               } in all
+            'id': '1',
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches',
+        } in all
 
         assert {
-                   'id': '2',
-                   'uri': 'urn:x-skosprovider:test:2',
-                   'type': 'collection',
-                   'label': 'Churches by function'
-               } in all
+            'id': '2',
+            'uri': 'urn:x-skosprovider:test:2',
+            'type': 'collection',
+            'label': 'Churches by function',
+        } in all
 
         assert {
-                   'id': '3',
-                   'uri': 'urn:x-skosprovider:test:3',
-                   'type': 'concept',
-                   'label': 'Chapels'
-               } in all
+            'id': '3',
+            'uri': 'urn:x-skosprovider:test:3',
+            'type': 'concept',
+            'label': 'Chapels',
+        } in all
 
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in all
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in all
 
         assert {
-                   'id': '5',
-                   'uri': 'urn:x-skosprovider:test:5',
-                   'type': 'concept',
-                   'label': 'Boomkapellen'
-               } in all
+            'id': '5',
+            'uri': 'urn:x-skosprovider:test:5',
+            'type': 'concept',
+            'label': 'Boomkapellen',
+        } in all
 
         assert {
-                   'id': '6',
-                   'uri': 'urn:x-skosprovider:test:6',
-                   'type': 'concept',
-                   'label': 'Parochiekerken'
-               } in all
+            'id': '6',
+            'uri': 'urn:x-skosprovider:test:6',
+            'type': 'concept',
+            'label': 'Parochiekerken',
+        } in all
 
         assert {
-                   'id': '7',
-                   'uri': 'urn:x-skosprovider:test:7',
-                   'type': 'concept',
-                   'label': 'Hulpkerken'
-               } in all
+            'id': '7',
+            'uri': 'urn:x-skosprovider:test:7',
+            'type': 'concept',
+            'label': 'Hulpkerken',
+        } in all
 
     def test_get_all_sorted_id_desc(self):
         all = self.provider.get_all(sort='id', sort_order='desc')
@@ -250,13 +248,15 @@ class TestSQLAlchemyProvider(DBTestCase):
         all = self.provider.get_all(sort='label')
         assert len(all) == 9
         assert [
-            'Boomkapellen', 'Cathedrals',
-            'Chapels', 'Churches',
+            'Boomkapellen',
+            'Cathedrals',
+            'Chapels',
+            'Churches',
             'Churches by function',
             'Churchtowers',
             'Hulpkerken',
             'Parochiekerken',
-            'Parts of churches'
+            'Parts of churches',
         ] == [c['label'] for c in all]
 
     def test_get_all_sorted_sortlabel_desc(self):
@@ -271,7 +271,7 @@ class TestSQLAlchemyProvider(DBTestCase):
             'Chapels',
             'Cathedrals',
             'Boomkapellen',
-            'Churches by function'
+            'Churches by function',
         ] == [c['label'] for c in all]
 
     def test_get_top_concepts(self):
@@ -279,25 +279,25 @@ class TestSQLAlchemyProvider(DBTestCase):
         assert len(all) == 3
 
         assert {
-                   'id': '1',
-                   'uri': 'urn:x-skosprovider:test:1',
-                   'type': 'concept',
-                   'label': 'Churches'
-               } in all
+            'id': '1',
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches',
+        } in all
 
         assert {
-                   'id': '3',
-                   'uri': 'urn:x-skosprovider:test:3',
-                   'type': 'concept',
-                   'label': 'Chapels'
-               } in all
+            'id': '3',
+            'uri': 'urn:x-skosprovider:test:3',
+            'type': 'concept',
+            'label': 'Chapels',
+        } in all
 
         assert {
-                   'id': '9',
-                   'uri': 'urn:x-skosprovider:test:9',
-                   'type': 'concept',
-                   'label': 'Churchtowers'
-               } in all
+            'id': '9',
+            'uri': 'urn:x-skosprovider:test:9',
+            'type': 'concept',
+            'label': 'Churchtowers',
+        } in all
 
     def test_get_top_concepts_sort_uri_desc(self):
         all = self.provider.get_top_concepts(sort='uri', sort_order='desc')
@@ -313,27 +313,26 @@ class TestSQLAlchemyProvider(DBTestCase):
         all = self.provider.get_top_display()
         assert len(all) == 2
         assert {
-                   'id': '3',
-                   'uri': 'urn:x-skosprovider:test:3',
-                   'type': 'concept',
-                   'label': 'Chapels'
-               } in all
+            'id': '3',
+            'uri': 'urn:x-skosprovider:test:3',
+            'type': 'concept',
+            'label': 'Chapels',
+        } in all
 
         assert {
-                   'id': '1',
-                   'uri': 'urn:x-skosprovider:test:1',
-                   'type': 'concept',
-                   'label': 'Churches'
-               } in all
+            'id': '1',
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches',
+        } in all
 
     def test_get_top_display_british_sort_label_desc(self):
-        all = self.provider.get_top_display(language='en-GB', sort='label', sort_order='desc')
+        all = self.provider.get_top_display(
+            language='en-GB', sort='label', sort_order='desc'
+        )
         assert len(all) == 2
 
-        assert [
-            'Churches',
-            'Chapels'
-        ] == [c['label'] for c in all]
+        assert ['Churches', 'Chapels'] == [c['label'] for c in all]
 
     def test_get_children_display_unexisting(self):
         children = self.provider.get_children_display(700)
@@ -343,41 +342,41 @@ class TestSQLAlchemyProvider(DBTestCase):
         children = self.provider.get_children_display(2)
         assert len(children) == 2
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in children
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in children
 
     def test_get_children_display_collection_sort_id(self):
         children = self.provider.get_children_display(2, sort='id')
         assert len(children) == 2
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in children
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in children
 
     def test_get_children_display_concept_with_narrower_collection(self):
         children = self.provider.get_children_display(1)
         assert len(children) == 2
         assert {
-                   'id': '2',
-                   'uri': 'urn:x-skosprovider:test:2',
-                   'type': 'collection',
-                   'label': 'Churches by function'
-               } in children
+            'id': '2',
+            'uri': 'urn:x-skosprovider:test:2',
+            'type': 'collection',
+            'label': 'Churches by function',
+        } in children
 
     def test_get_children_display_concept_with_narrower_concept(self):
         children = self.provider.get_children_display(3)
         assert len(children) == 1
         assert {
-                   'id': '5',
-                   'uri': 'urn:x-skosprovider:test:5',
-                   'type': 'concept',
-                   'label': 'Boomkapellen'
-               } in children
+            'id': '5',
+            'uri': 'urn:x-skosprovider:test:5',
+            'type': 'concept',
+            'label': 'Boomkapellen',
+        } in children
 
     def test_get_children_display_concept_with_no_narrower(self):
         children = self.provider.get_children_display(4)
@@ -395,11 +394,11 @@ class TestSQLAlchemyProvider(DBTestCase):
         all = self.provider.find({'type': 'concept'})
         assert len(all) == 7
         assert {
-                   'id': '2',
-                   'uri': 'urn:x-skosprovider:test:2',
-                   'type': 'collection',
-                   'label': 'Churches by function'
-               } not in all
+            'id': '2',
+            'uri': 'urn:x-skosprovider:test:2',
+            'type': 'collection',
+            'label': 'Churches by function',
+        } not in all
 
     def test_find_type_concept_sorted_uri_desc(self):
         all = self.provider.find({'type': 'concept'}, sort='uri', sort_order='desc')
@@ -412,55 +411,55 @@ class TestSQLAlchemyProvider(DBTestCase):
             'urn:x-skosprovider:test:4',
             'urn:x-skosprovider:test:3',
             'urn:x-skosprovider:test:1',
-            ] == [c['uri'] for c in all]
+        ] == [c['uri'] for c in all]
 
     def test_find_type_collection(self):
         all = self.provider.find({'type': 'collection'})
         assert len(all) == 2
         assert {
-                   'id': '2',
-                   'uri': 'urn:x-skosprovider:test:2',
-                   'type': 'collection',
-                   'label': 'Churches by function'
-               } in all
+            'id': '2',
+            'uri': 'urn:x-skosprovider:test:2',
+            'type': 'collection',
+            'label': 'Churches by function',
+        } in all
         assert {
-                   'id': '8',
-                   'uri': 'urn:x-skosprovider:test:8',
-                   'type': 'collection',
-                   'label': 'Parts of churches'
-               } in all
+            'id': '8',
+            'uri': 'urn:x-skosprovider:test:8',
+            'type': 'collection',
+            'label': 'Parts of churches',
+        } in all
 
     def test_find_label_kerken(self):
         all = self.provider.find({'label': 'kerken'})
         assert len(all) == 3
         assert {
-                   'id': '1',
-                   'uri': 'urn:x-skosprovider:test:1',
-                   'type': 'concept',
-                   'label': 'Churches'
-               } in all
+            'id': '1',
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches',
+        } in all
         assert {
-                   'id': '6',
-                   'uri': 'urn:x-skosprovider:test:6',
-                   'type': 'concept',
-                   'label': 'Parochiekerken'
-               } in all
+            'id': '6',
+            'uri': 'urn:x-skosprovider:test:6',
+            'type': 'concept',
+            'label': 'Parochiekerken',
+        } in all
         assert {
-                   'id': '7',
-                   'uri': 'urn:x-skosprovider:test:7',
-                   'type': 'concept',
-                   'label': 'Hulpkerken'
-               } in all
+            'id': '7',
+            'uri': 'urn:x-skosprovider:test:7',
+            'type': 'concept',
+            'label': 'Hulpkerken',
+        } in all
 
     def test_find_label_churches_type_concept(self):
         all = self.provider.find({'label': 'churches', 'type': 'concept'})
         assert len(all) == 1
         assert {
-                   'id': '1',
-                   'uri': 'urn:x-skosprovider:test:1',
-                   'type': 'concept',
-                   'label': 'Churches'
-               } in all
+            'id': '1',
+            'uri': 'urn:x-skosprovider:test:1',
+            'type': 'concept',
+            'label': 'Churches',
+        } in all
 
     def test_find_collection_unexisting(self):
         with pytest.raises(ValueError):
@@ -468,109 +467,92 @@ class TestSQLAlchemyProvider(DBTestCase):
 
     def test_find_collection_2_depth_default_members(self):
         nodepth = self.provider.find({'collection': {'id': 2}})
-        depth = self.provider.find({
-            'collection': {
-                'id': '2',
-                'depth': 'members'
-            }
-        })
+        depth = self.provider.find({'collection': {'id': '2', 'depth': 'members'}})
         assert len(depth) == len(nodepth)
 
     def test_find_collection_2_depth_all(self):
-        all = self.provider.find({
-            'collection': {
-                'id': '2',
-                'depth': 'all'
-            }
-        })
+        all = self.provider.find({'collection': {'id': '2', 'depth': 'all'}})
         assert len(all) == 3
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in all
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in all
         assert {
-                   'id': '6',
-                   'uri': 'urn:x-skosprovider:test:6',
-                   'type': 'concept',
-                   'label': 'Parochiekerken'
-               } in all
+            'id': '6',
+            'uri': 'urn:x-skosprovider:test:6',
+            'type': 'concept',
+            'label': 'Parochiekerken',
+        } in all
         assert {
-                   'id': '7',
-                   'uri': 'urn:x-skosprovider:test:7',
-                   'type': 'concept',
-                   'label': 'Hulpkerken'
-               } in all
+            'id': '7',
+            'uri': 'urn:x-skosprovider:test:7',
+            'type': 'concept',
+            'label': 'Hulpkerken',
+        } in all
 
     def test_find_collection_2_depth_members(self):
-        all = self.provider.find({
-            'collection': {
-                'id': '2',
-                'depth': 'members'
-            }
-        })
+        all = self.provider.find({'collection': {'id': '2', 'depth': 'members'}})
         assert len(all) == 2
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in all
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in all
         assert {
-                   'id': '6',
-                   'uri': 'urn:x-skosprovider:test:6',
-                   'type': 'concept',
-                   'label': 'Parochiekerken'
-               } in all
+            'id': '6',
+            'uri': 'urn:x-skosprovider:test:6',
+            'type': 'concept',
+            'label': 'Parochiekerken',
+        } in all
 
     def test_find_matches_no_uri(self):
         with pytest.raises(ValueError):
-            all = self.provider.find({'matches': {}})
+            self.provider.find({'matches': {}})
 
     def test_find_matches_none(self):
-        all = self.provider.find({'matches': {
-            'uri': 'http://vocab.getty.edu/aat/notpresent'
-        }})
+        all = self.provider.find(
+            {'matches': {'uri': 'http://vocab.getty.edu/aat/notpresent'}}
+        )
         assert len(all) == 0
 
     def test_find_matches_one(self):
-        all = self.provider.find({'matches': {
-            'uri': 'http://vocab.getty.edu/aat/300007501'
-        }})
+        all = self.provider.find(
+            {'matches': {'uri': 'http://vocab.getty.edu/aat/300007501'}}
+        )
         assert len(all) == 1
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in all
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in all
 
     def test_find_matches_one_close(self):
-        all = self.provider.find({'matches': {
-            'type': 'close',
-            'uri': 'http://vocab.getty.edu/aat/300007501'
-        }})
+        all = self.provider.find(
+            {'matches': {'type': 'close', 'uri': 'http://vocab.getty.edu/aat/300007501'}}
+        )
         assert len(all) == 1
         assert {
-                   'id': '4',
-                   'uri': 'urn:x-skosprovider:test:4',
-                   'type': 'concept',
-                   'label': 'Cathedrals'
-               } in all
+            'id': '4',
+            'uri': 'urn:x-skosprovider:test:4',
+            'type': 'concept',
+            'label': 'Cathedrals',
+        } in all
 
     def test_find_matches_one_close_inherits_exact(self):
-        all = self.provider.find({'matches': {
-            'type': 'close',
-            'uri': 'http://vocab.getty.edu/aat/300003625'
-        }})
+        all = self.provider.find(
+            {'matches': {'type': 'close', 'uri': 'http://vocab.getty.edu/aat/300003625'}}
+        )
         assert len(all) == 1
         assert {
-                   'id': '9',
-                   'uri': 'urn:x-skosprovider:test:9',
-                   'type': 'concept',
-                   'label': 'Churchtowers'
-               } in all
+            'id': '9',
+            'uri': 'urn:x-skosprovider:test:9',
+            'type': 'concept',
+            'label': 'Churchtowers',
+        } in all
 
     def test_expand_concept(self):
         ids = self.provider.expand(1)
@@ -594,17 +576,16 @@ class TestSQLAlchemyProvider(DBTestCase):
 
 
 class TestSQLAlchemyProviderExpandVisit(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
         create_data(self.session)
         create_visitation(self.session)
-        self.visitationprovider=SQLAlchemyProvider(
+        self.visitationprovider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
             self.session,
-            expand_strategy='visit'
+            expand_strategy='visit',
         )
 
     def tearDown(self):
@@ -634,15 +615,14 @@ class TestSQLAlchemyProviderExpandVisit(DBTestCase):
 
 
 class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
-
     def setUp(self):
         Base.metadata.create_all(self.engine)
         self.session = self.session_maker()
         Initialiser(self.session).init_all()
-        self.visitationprovider=SQLAlchemyProvider(
+        self.visitationprovider = SQLAlchemyProvider(
             {'id': 'SOORTEN', 'conceptscheme_id': 1},
             self.session,
-            expand_strategy='visit'
+            expand_strategy='visit',
         )
 
     def tearDown(self):
@@ -665,4 +645,3 @@ class TestSQLAlchemyProviderExpandVisitNoVisitation(DBTestCase):
     def test_expand_unexisting_visit(self):
         ids = self.visitationprovider.expand(404)
         assert not ids
-
