@@ -1,3 +1,8 @@
+2.2.1 (2026-10-29)
+------------------
+
+* Fix contradicting discriminator criteria with SQLAlchemy 2.1 (#129)
+
 2.2.0 (2025-12-12)
 ------------------
 
